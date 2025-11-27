@@ -5,6 +5,11 @@ A Home Assistant Lovelace card that displays a customizable grid of indicator li
 ![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
+<img width="514" height="221" alt="Screenshot 2025-11-26 at 21 49 21" src="https://github.com/user-attachments/assets/2b24bb82-c2b8-4163-ad46-28e2340b2bbf" />
+
+<img width="248" height="66" alt="Screenshot 2025-11-26 at 21 50 17" src="https://github.com/user-attachments/assets/e2283e61-1cf6-4fad-9b31-373cec20bed8" />
+
+
 ## Features
 
 - **Customizable Grid**: Define any number of rows and columns
@@ -267,10 +272,6 @@ entities:
 **Colors not working**: Check that color values are valid CSS colors
 
 **Entities not updating**: Verify entity IDs are correct and entities exist in Home Assistant
-
-## Development
-
-See [CLAUDE.md](CLAUDE.md) for development instructions.
 
 ## Support
 
