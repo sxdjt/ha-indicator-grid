@@ -107,6 +107,7 @@ export class IndicatorGridCard extends LitElement {
           displayText: '',
           backgroundColor: this.config.global_colors?.off || 'gray',
           textColor: this.config.global_colors?.text || 'white',
+          textOpacity: 1,
           clickable: false,
           clickAction: 'none',
         });
@@ -128,6 +129,7 @@ export class IndicatorGridCard extends LitElement {
         displayText: this.config.unavailable_text || 'INOP',
         backgroundColor: this._getColor('unavailable', entityConfig.colors),
         textColor: this._getColor('text', entityConfig.colors),
+        textOpacity: 1,
         state: stateObj?.state,
         clickable: false,
         clickAction: 'none',
@@ -138,6 +140,7 @@ export class IndicatorGridCard extends LitElement {
     const displayText = this._getDisplayText(entityConfig, stateObj);
     const backgroundColor = this._getBackgroundColor(state, entityConfig);
     const textColor = this._getColor('text', entityConfig.colors);
+    const textOpacity = this._getTextOpacity(state, entityConfig);
     const clickAction = entityConfig.click_action || this._getDefaultClickAction(stateObj);
 
     return {
@@ -145,6 +148,7 @@ export class IndicatorGridCard extends LitElement {
       displayText,
       backgroundColor,
       textColor,
+      textOpacity,
       state,
       clickable: clickAction !== 'none',
       clickAction,
@@ -261,6 +265,26 @@ export class IndicatorGridCard extends LitElement {
     return defaults[type];
   }
 
+  private _getTextOpacity(state: string, entityConfig: EntityConfig): number {
+    // Only dim if state is "off"
+    if (state !== 'off') {
+      return 1;
+    }
+
+    // Check for per-entity dim setting first
+    if (entityConfig.dim_off_text !== undefined) {
+      return entityConfig.dim_off_text / 100;
+    }
+
+    // Fall back to global dim setting
+    if (this.config.dim_off_text !== undefined) {
+      return this.config.dim_off_text / 100;
+    }
+
+    // Default: no dimming
+    return 1;
+  }
+
   private _getDefaultClickAction(stateObj: any): 'toggle' | 'more-info' | 'none' {
     const domain = stateObj.entity_id.split('.')[0];
 
@@ -365,6 +389,7 @@ export class IndicatorGridCard extends LitElement {
       'color': cell.textColor,
       'font-size': this.config.font_size || '16px',
       'font-weight': String(this.config.font_weight || 'bold'),
+      'opacity': String(cell.textOpacity),
     };
 
     return html`

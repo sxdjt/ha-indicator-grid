@@ -10,6 +10,7 @@ export interface IndicatorGridCardConfig extends LovelaceCardConfig {
   cell_gap?: string; // Gap between cells, e.g., "5px", "1rem"
   font_size?: string; // e.g., "14px", "1rem"
   font_weight?: string | number; // e.g., "bold", 700
+  dim_off_text?: number; // Opacity percentage (0-100) for text when entity is off, e.g., 50
   entities: EntityConfig[];
   global_colors?: ColorConfig;
   unavailable_text?: string;
@@ -21,6 +22,7 @@ export interface EntityConfig {
   text_template?: string; // Template for dynamic text
   colors?: ColorConfig; // Per-entity color overrides
   click_action?: 'toggle' | 'more-info' | 'none';
+  dim_off_text?: number; // Per-entity override for dim_off_text
 }
 
 export interface ColorConfig {
@@ -43,6 +45,7 @@ export interface IndicatorCell {
   displayText: string;
   backgroundColor: string;
   textColor: string;
+  textOpacity: number;
   state?: string;
   clickable: boolean;
   clickAction: 'toggle' | 'more-info' | 'none';

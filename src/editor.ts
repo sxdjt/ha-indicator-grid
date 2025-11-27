@@ -219,6 +219,16 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
         helper-text="Text to display when entity is unavailable"
       ></ha-textfield>
 
+      <ha-textfield
+        label="Dim Off Text (%)"
+        type="number"
+        min="0"
+        max="100"
+        .value=${this._config.dim_off_text ?? ''}
+        @input=${(ev: Event) => this._configValueChanged('dim_off_text', (ev.target as HTMLInputElement).value ? Number((ev.target as HTMLInputElement).value) : undefined)}
+        helper-text="Opacity percentage for text when entity is off (0-100). Leave blank for no dimming. Example: 50"
+      ></ha-textfield>
+
       <ha-expansion-panel header="Global Colors" .expanded=${false}>
         <ha-textfield
           label="On Color"
@@ -343,6 +353,17 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
                 @input=${(ev: Event) =>
                   this._entityColorChanged(index, 'text', (ev.target as HTMLInputElement).value)}
                 helper-text="Override global text color"
+              ></ha-textfield>
+
+              <ha-textfield
+                label="Dim Off Text (%)"
+                type="number"
+                min="0"
+                max="100"
+                .value=${entity.dim_off_text ?? ''}
+                @input=${(ev: Event) =>
+                  this._entityChanged(index, 'dim_off_text', (ev.target as HTMLInputElement).value ? Number((ev.target as HTMLInputElement).value) : undefined)}
+                helper-text="Override global dim setting (0-100)"
               ></ha-textfield>
             </div>
           </ha-expansion-panel>

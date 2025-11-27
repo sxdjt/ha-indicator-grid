@@ -72,6 +72,7 @@ cell_gap: 8px
 font_size: 18px
 font_weight: bold
 unavailable_text: OFFLINE
+dim_off_text: 50  # Dim "off" entities to 50% opacity
 global_colors:
   on: '#00FF00'
   off: '#404040'
@@ -124,6 +125,7 @@ entities:
 | `font_size` | string | `16px` | Font size for text (CSS units) |
 | `font_weight` | string/number | `bold` | Font weight for text |
 | `unavailable_text` | string | `INOP` | Text to display for unavailable entities |
+| `dim_off_text` | number | none | Opacity percentage (0-100) for text when entity is "off" (e.g., `50` for 50% opacity) |
 | `global_colors` | object | see below | Global color configuration |
 | `entities` | list | **required** | List of entity configurations |
 
@@ -146,6 +148,7 @@ entities:
 | `text` | string | entity name | Custom static text to display |
 | `text_template` | string | - | Template for dynamic text (use `{{ state }}` for state) |
 | `click_action` | string | auto | Action on click: `toggle`, `more-info`, or `none` |
+| `dim_off_text` | number | - | Per-entity override for dim_off_text (0-100) |
 | `colors` | object | - | Per-entity color overrides |
 
 ### Color Configuration
