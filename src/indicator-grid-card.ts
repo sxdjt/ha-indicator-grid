@@ -91,6 +91,31 @@ export class IndicatorGridCard extends LitElement {
       return false;
     }
 
+    // Always update if config changed
+    if (changedProps.has('config')) {
+      return true;
+    }
+
+    // Check if any of our configured entities changed
+    if (changedProps.has('hass')) {
+      const oldHass = changedProps.get('hass') as HomeAssistant | undefined;
+      if (!oldHass) {
+        return true;
+      }
+
+      // Get all entity IDs from config
+      const entityIds = this.config.entities
+        .filter((e): e is EntityConfig => e && !!e.entity)
+        .map(e => e.entity!);
+
+      // Check if any of our entities changed
+      return entityIds.some(entityId => {
+        const oldState = oldHass.states[entityId];
+        const newState = this.hass.states[entityId];
+        return oldState !== newState;
+      });
+    }
+
     return true;
   }
 
