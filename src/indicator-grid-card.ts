@@ -1,9 +1,9 @@
 import { LitElement, html, css, PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { HomeAssistant, LovelaceCardEditor, fireEvent } from 'custom-card-helpers';
-import { IndicatorGridCardConfig, EntityConfig, ColorConfig, IndicatorCell } from './types';
+import { IndicatorGridCardConfig, EntityConfig, ColorConfig, IconConfig, IndicatorCell } from './types';
 
-const CARD_VERSION = '0.1.1';
+const CARD_VERSION = '0.2.0';
 
 console.info(
   `%c  INDICATOR-GRID-CARD  \n%c  Version ${CARD_VERSION}  `,
@@ -37,6 +37,9 @@ export class IndicatorGridCard extends LitElement {
       cell_gap: '5px',
       font_size: '16px',
       font_weight: 'bold',
+      show_icons: false,
+      icon_placement: 'above',
+      icon_size: '24px',
       entities: [],
       unavailable_text: 'INOP',
       global_colors: {
@@ -44,6 +47,7 @@ export class IndicatorGridCard extends LitElement {
         off: 'gray',
         text: 'white',
         unavailable: 'orange',
+        blank: '#333333',
       },
     };
   }
@@ -71,12 +75,16 @@ export class IndicatorGridCard extends LitElement {
       cell_gap: config.cell_gap ?? '5px',
       font_size: config.font_size ?? '16px',
       font_weight: config.font_weight ?? 'bold',
+      show_icons: config.show_icons ?? false,
+      icon_placement: config.icon_placement ?? 'above',
+      icon_size: config.icon_size ?? '24px',
       unavailable_text: config.unavailable_text ?? 'INOP',
       global_colors: {
         on: 'green',
         off: 'gray',
         text: 'white',
         unavailable: 'orange',
+        blank: '#333333',
         ...config.global_colors,
       },
     };
@@ -130,8 +138,8 @@ export class IndicatorGridCard extends LitElement {
         // Empty/blank cell
         cells.push({
           displayText: '',
-          backgroundColor: this.config.global_colors?.off || 'gray',
-          textColor: this.config.global_colors?.text || 'white',
+          backgroundColor: this._getColor('blank', entityConfig?.colors),
+          textColor: this._getColor('text', entityConfig?.colors),
           textOpacity: 1,
           clickable: false,
           clickAction: 'none',
@@ -166,6 +174,7 @@ export class IndicatorGridCard extends LitElement {
     const backgroundColor = this._getBackgroundColor(state, entityConfig);
     const textColor = this._getColor('text', entityConfig.colors);
     const textOpacity = this._getTextOpacity(state, entityConfig);
+    const icon = this._getIcon(state, entityConfig, stateObj);
     const clickAction = entityConfig.click_action || this._getDefaultClickAction(stateObj);
 
     return {
@@ -174,6 +183,7 @@ export class IndicatorGridCard extends LitElement {
       backgroundColor,
       textColor,
       textOpacity,
+      icon,
       state,
       clickable: clickAction !== 'none',
       clickAction,
@@ -268,7 +278,7 @@ export class IndicatorGridCard extends LitElement {
     return null;
   }
 
-  private _getColor(type: 'on' | 'off' | 'unavailable' | 'text', entityColors?: ColorConfig): string {
+  private _getColor(type: 'on' | 'off' | 'unavailable' | 'text' | 'blank', entityColors?: ColorConfig): string {
     // Check entity-specific color first
     if (entityColors && entityColors[type]) {
       return entityColors[type]!;
@@ -285,9 +295,61 @@ export class IndicatorGridCard extends LitElement {
       off: 'gray',
       unavailable: 'orange',
       text: 'white',
+      blank: '#333333',
     };
 
     return defaults[type];
+  }
+
+  private _getIcon(state: string, entityConfig: EntityConfig, stateObj: any): string | undefined {
+    // Check entity-specific override first
+    if (entityConfig && entityConfig.show_icon !== undefined) {
+      // Entity explicitly sets show_icon, respect it
+      if (!entityConfig.show_icon) {
+        return undefined;
+      }
+      // Entity wants icon, continue to get icon
+    } else {
+      // No entity override, check global setting
+      if (!this.config.show_icons) {
+        return undefined;
+      }
+    }
+
+    // Determine which icon to use based on state
+    const iconType = state === 'on' ? 'on' : 'off';
+
+    // Check entity-specific custom icon first
+    if (entityConfig && entityConfig.icon && entityConfig.icon[iconType]) {
+      return entityConfig.icon[iconType];
+    }
+
+    // Fall back to entity's own icon from Home Assistant
+    if (stateObj && stateObj.attributes) {
+      // Try icon attribute first
+      if (stateObj.attributes.icon) {
+        return stateObj.attributes.icon;
+      }
+
+      // Try entity_picture as fallback (some entities use this)
+      // Actually, entity_picture is an image URL, not an icon, so skip this
+
+      // For domains that don't set icon, return a default based on domain
+      const domain = stateObj.entity_id.split('.')[0];
+      const domainIcons: Record<string, string> = {
+        'light': state === 'on' ? 'mdi:lightbulb-on' : 'mdi:lightbulb',
+        'switch': state === 'on' ? 'mdi:toggle-switch' : 'mdi:toggle-switch-off',
+        'binary_sensor': state === 'on' ? 'mdi:checkbox-marked-circle' : 'mdi:checkbox-blank-circle-outline',
+        'sensor': 'mdi:eye',
+      };
+
+      if (domainIcons[domain]) {
+        return domainIcons[domain];
+      }
+    }
+
+    // No icon available
+    return undefined;
   }
 
   private _getTextOpacity(state: string, entityConfig: EntityConfig): number {
@@ -351,6 +413,13 @@ export class IndicatorGridCard extends LitElement {
         display: block;
       }
 
+      ha-card {
+        box-shadow: none;
+        padding: 0;
+        background: transparent;
+        border: none;
+      }
+
       .grid-container {
         display: grid;
         width: 100%;
@@ -365,6 +434,41 @@ export class IndicatorGridCard extends LitElement {
         overflow: hidden;
         padding: 4px;
         box-sizing: border-box;
+      }
+
+      .cell.icon-above {
+        flex-direction: column;
+      }
+
+      .cell.icon-below {
+        flex-direction: column-reverse;
+      }
+
+      .cell.icon-left {
+        flex-direction: row;
+      }
+
+      .cell.icon-right {
+        flex-direction: row-reverse;
+      }
+
+      .cell-icon {
+        flex-shrink: 0;
+      }
+
+      .cell.icon-above .cell-icon,
+      .cell.icon-below .cell-icon {
+        margin: 2px 0;
+      }
+
+      .cell.icon-left .cell-icon,
+      .cell.icon-right .cell-icon {
+        margin: 0 4px;
+      }
+
+      .cell-text {
+        min-width: 0;
+        word-break: break-word;
       }
 
       .cell.clickable {
@@ -408,22 +512,70 @@ export class IndicatorGridCard extends LitElement {
     `;
   }
 
+  private _colorWithOpacity(color: string, opacity: number): string {
+    // If already rgba, extract rgb and apply new opacity
+    const rgbaMatch = color.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)$/);
+    if (rgbaMatch) {
+      return `rgba(${rgbaMatch[1]}, ${rgbaMatch[2]}, ${rgbaMatch[3]}, ${opacity})`;
+    }
+
+    // Try to convert hex to rgba
+    const hexMatch = color.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
+    if (hexMatch) {
+      const r = parseInt(hexMatch[1], 16);
+      const g = parseInt(hexMatch[2], 16);
+      const b = parseInt(hexMatch[3], 16);
+      return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+    }
+
+    // For named colors, we'll need to use a different approach
+    // Create a temporary element to get computed color
+    const temp = document.createElement('div');
+    temp.style.color = color;
+    document.body.appendChild(temp);
+    const computed = getComputedStyle(temp).color;
+    document.body.removeChild(temp);
+
+    // Extract RGB from computed rgb() or rgba()
+    const computedMatch = computed.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+    if (computedMatch) {
+      return `rgba(${computedMatch[1]}, ${computedMatch[2]}, ${computedMatch[3]}, ${opacity})`;
+    }
+
+    // Fallback: just return the color as-is
+    return color;
+  }
+
   private _renderCell(cell: IndicatorCell) {
+    // Convert text color to rgba with opacity if needed
+    const textColor = cell.textOpacity < 1
+      ? this._colorWithOpacity(cell.textColor, cell.textOpacity)
+      : cell.textColor;
+
     const cellStyle = {
       'background-color': cell.backgroundColor,
-      'color': cell.textColor,
+      'color': textColor,
       'font-size': this.config.font_size || '16px',
       'font-weight': String(this.config.font_weight || 'bold'),
-      'opacity': String(cell.textOpacity),
+    };
+
+    // Determine icon placement class
+    const iconPlacementClass = cell.icon
+      ? `icon-${this.config.icon_placement}`
+      : '';
+
+    const iconStyle = {
+      '--mdc-icon-size': this.config.icon_size || '24px',
     };
 
     return html`
       <div
-        class="cell ${cell.clickable ? 'clickable' : ''}"
+        class="cell ${cell.clickable ? 'clickable' : ''} ${iconPlacementClass}"
         style=${this._styleMap(cellStyle)}
         @click=${() => this._handleClick(cell)}
       >
-        ${cell.displayText}
+        ${cell.icon ? html`<ha-icon class="cell-icon" .icon=${cell.icon} style=${this._styleMap(iconStyle)}></ha-icon>` : ''}
+        <span class="cell-text">${cell.displayText}</span>
       </div>
     `;
   }

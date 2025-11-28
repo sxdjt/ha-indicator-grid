@@ -104,6 +104,26 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
     fireEvent(this, 'config-changed', { config: newConfig });
   }
 
+  private _entityIconChanged(index: number, iconType: string, value: string): void {
+    const newConfig = { ...this._config };
+    newConfig.entities = [...newConfig.entities];
+
+    const entity = { ...newConfig.entities[index] };
+
+    if (!entity.icon) {
+      entity.icon = {};
+    }
+
+    entity.icon = {
+      ...entity.icon,
+      [iconType]: value,
+    };
+
+    newConfig.entities[index] = entity;
+
+    fireEvent(this, 'config-changed', { config: newConfig });
+  }
+
   static get styles() {
     return css`
       ha-textfield,
@@ -229,6 +249,38 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
         helper-text="Opacity percentage for text when entity is off (0-100). Leave blank for no dimming. Example: 50"
       ></ha-textfield>
 
+      <ha-selector
+        .hass=${this.hass}
+        .selector=${{ boolean: {} }}
+        .value=${this._config.show_icons ?? false}
+        @value-changed=${(ev: CustomEvent) => this._configValueChanged('show_icons', ev.detail.value)}
+        .label=${'Show Icons'}
+      ></ha-selector>
+
+      <ha-selector
+        .hass=${this.hass}
+        .selector=${{
+          select: {
+            options: [
+              { value: 'above', label: 'Above text' },
+              { value: 'below', label: 'Below text' },
+              { value: 'left', label: 'Left of text' },
+              { value: 'right', label: 'Right of text' },
+            ],
+          },
+        }}
+        .value=${this._config.icon_placement || 'above'}
+        @value-changed=${(ev: CustomEvent) => this._configValueChanged('icon_placement', ev.detail.value)}
+        .label=${'Icon Placement'}
+      ></ha-selector>
+
+      <ha-textfield
+        label="Icon Size"
+        .value=${this._config.icon_size || '24px'}
+        @input=${(ev: Event) => this._configValueChanged('icon_size', (ev.target as HTMLInputElement).value)}
+        helper-text="Examples: 24px, 2rem, 32px"
+      ></ha-textfield>
+
       <ha-expansion-panel header="Global Colors" .expanded=${false}>
         <ha-textfield
           label="On Color"
@@ -256,6 +308,13 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
           .value=${this._config.global_colors?.text || 'white'}
           @input=${(ev: CustomEvent) => this._globalColorChanged(ev, 'text')}
           helper-text="e.g., white, #FFFFFF"
+        ></ha-textfield>
+
+        <ha-textfield
+          label="Blank Cell Color"
+          .value=${this._config.global_colors?.blank || '#333333'}
+          @input=${(ev: CustomEvent) => this._globalColorChanged(ev, 'blank')}
+          helper-text="e.g., #333333, darkgray"
         ></ha-textfield>
       </ha-expansion-panel>
 
@@ -329,6 +388,15 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
             .label=${'Click Action'}
           ></ha-selector>
 
+          <ha-selector
+            .hass=${this.hass}
+            .selector=${{ boolean: {} }}
+            .value=${entity.show_icon ?? false}
+            @value-changed=${(ev: CustomEvent) =>
+              this._entityChanged(index, 'show_icon', ev.detail.value)}
+            .label=${'Show Icon (override global setting)'}
+          ></ha-selector>
+
           <ha-expansion-panel header="Per-Entity Colors (optional)" .expanded=${false}>
             <div class="color-grid">
               <ha-textfield
@@ -356,6 +424,14 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
               ></ha-textfield>
 
               <ha-textfield
+                label="Blank Cell Color"
+                .value=${entity.colors?.blank || ''}
+                @input=${(ev: Event) =>
+                  this._entityColorChanged(index, 'blank', (ev.target as HTMLInputElement).value)}
+                helper-text="Override global blank color (for blank cells only)"
+              ></ha-textfield>
+
+              <ha-textfield
                 label="Dim Off Text (%)"
                 type="number"
                 min="0"
@@ -366,6 +442,26 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
                 helper-text="Override global dim setting (0-100)"
               ></ha-textfield>
             </div>
+          </ha-expansion-panel>
+
+          <ha-expansion-panel header="Custom Icons (optional)" .expanded=${false}>
+            <ha-selector
+              .hass=${this.hass}
+              .selector=${{ icon: {} }}
+              .value=${entity.icon?.on || ''}
+              @value-changed=${(ev: CustomEvent) =>
+                this._entityIconChanged(index, 'on', ev.detail.value)}
+              .label=${'On Icon'}
+            ></ha-selector>
+
+            <ha-selector
+              .hass=${this.hass}
+              .selector=${{ icon: {} }}
+              .value=${entity.icon?.off || ''}
+              @value-changed=${(ev: CustomEvent) =>
+                this._entityIconChanged(index, 'off', ev.detail.value)}
+              .label=${'Off Icon'}
+            ></ha-selector>
           </ha-expansion-panel>
         </div>
       </div>

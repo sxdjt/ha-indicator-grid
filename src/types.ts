@@ -11,6 +11,9 @@ export interface IndicatorGridCardConfig extends LovelaceCardConfig {
   font_size?: string; // e.g., "14px", "1rem"
   font_weight?: string | number; // e.g., "bold", 700
   dim_off_text?: number; // Opacity percentage (0-100) for text when entity is off, e.g., 50
+  show_icons?: boolean; // Enable/disable icons globally (default false)
+  icon_placement?: 'none' | 'above' | 'below' | 'left' | 'right'; // Global icon placement
+  icon_size?: string; // Icon size, e.g., "24px", "2rem" (default "24px")
   entities: EntityConfig[];
   global_colors?: ColorConfig;
   unavailable_text?: string;
@@ -21,6 +24,8 @@ export interface EntityConfig {
   text?: string; // Custom text to display, defaults to entity friendly name
   text_template?: string; // Template for dynamic text
   colors?: ColorConfig; // Per-entity color overrides
+  show_icon?: boolean; // Per-entity override to show/hide icon
+  icon?: IconConfig; // Per-entity custom icon (on/off states)
   click_action?: 'toggle' | 'more-info' | 'none';
   dim_off_text?: number; // Per-entity override for dim_off_text
 }
@@ -30,8 +35,14 @@ export interface ColorConfig {
   off?: string; // Color when entity is "off"
   unavailable?: string; // Color when entity is unavailable/unknown
   text?: string; // Text color
+  blank?: string; // Color for blank cells (no entity assigned)
   states?: Record<string, string>; // Map specific state values to colors
   thresholds?: ThresholdConfig[]; // For numeric values
+}
+
+export interface IconConfig {
+  on?: string; // Icon for "on" state (e.g., "mdi:lightbulb-on")
+  off?: string; // Icon for "off" state (e.g., "mdi:lightbulb-off")
 }
 
 export interface ThresholdConfig {
@@ -46,6 +57,7 @@ export interface IndicatorCell {
   backgroundColor: string;
   textColor: string;
   textOpacity: number;
+  icon?: string; // Icon to display (if any)
   state?: string;
   clickable: boolean;
   clickAction: 'toggle' | 'more-info' | 'none';

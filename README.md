@@ -2,7 +2,7 @@
 
 A Home Assistant Lovelace card that displays a customizable grid of indicator lights, similar to an aircraft cockpit panel. Each indicator shows the state of an entity with configurable colors, text, and behavior.
 
-![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)
+![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 <img width="514" height="221" alt="Screenshot 2025-11-26 at 21 49 21" src="https://github.com/user-attachments/assets/2b24bb82-c2b8-4163-ad46-28e2340b2bbf" />
@@ -17,10 +17,11 @@ A Home Assistant Lovelace card that displays a customizable grid of indicator li
 - **Threshold Support**: Set color thresholds for numeric sensors (e.g., temperature ranges)
 - **Custom State Mapping**: Map specific states to specific colors
 - **Flexible Text Display**: Show entity names, states, or custom text
+- **Icon Support**: Display entity icons with configurable size and placement (above, below, left, right)
 - **Click Actions**: Toggle entities or show more info on click
 - **Global & Per-Entity Settings**: Set defaults globally and override per entity
 - **Visual Editor Support**: Configure everything through the Home Assistant UI
-- **Empty Cells**: Support for blank cells in your grid
+- **Blank Cells**: Support for blank cells with customizable color
 
 ## Installation
 
@@ -78,11 +79,15 @@ font_size: 18px
 font_weight: bold
 unavailable_text: OFFLINE
 dim_off_text: 50  # Dim "off" entities to 50% opacity
+show_icons: true  # Enable icons globally
+icon_placement: above  # Icons above text
+icon_size: 28px  # Larger icons
 global_colors:
   on: '#00FF00'
   off: '#404040'
   unavailable: '#FFA500'
   text: white
+  blank: '#1a1a1a'  # Dark color for blank cells
 entities:
   - entity: light.kitchen
     text: KITCHEN
@@ -113,6 +118,12 @@ entities:
   - entity: switch.pump
     text: PUMP
     click_action: toggle
+    icon:
+      on: mdi:pump
+      off: mdi:pump-off
+  - entity: sensor.humidity
+    text: HUMIDITY
+    show_icon: false  # Override global setting, hide icon for this entity
 ```
 
 ## Configuration Options
@@ -131,6 +142,9 @@ entities:
 | `font_weight` | string/number | `bold` | Font weight for text |
 | `unavailable_text` | string | `INOP` | Text to display for unavailable entities |
 | `dim_off_text` | number | none | Opacity percentage (0-100) for text when entity is "off" (e.g., `50` for 50% opacity) |
+| `show_icons` | boolean | `false` | Enable/disable icons globally |
+| `icon_placement` | string | `above` | Icon placement: `above`, `below`, `left`, or `right` |
+| `icon_size` | string | `24px` | Icon size (CSS units, e.g., `24px`, `2rem`) |
 | `global_colors` | object | see below | Global color configuration |
 | `entities` | list | **required** | List of entity configurations |
 
@@ -142,6 +156,7 @@ entities:
 | `off` | string | `gray` | Color when entity is "off" |
 | `unavailable` | string | `orange` | Color when entity is unavailable |
 | `text` | string | `white` | Text color |
+| `blank` | string | `#333333` | Background color for blank cells |
 | `states` | object | - | Map specific states to colors |
 | `thresholds` | list | - | Threshold configuration for numeric values |
 
@@ -154,6 +169,8 @@ entities:
 | `text_template` | string | - | Template for dynamic text (use `{{ state }}` for state) |
 | `click_action` | string | auto | Action on click: `toggle`, `more-info`, or `none` |
 | `dim_off_text` | number | - | Per-entity override for dim_off_text (0-100) |
+| `show_icon` | boolean | - | Override global `show_icons` setting for this entity |
+| `icon` | object | - | Custom icon configuration (on/off states) |
 | `colors` | object | - | Per-entity color overrides |
 
 ### Color Configuration
@@ -192,13 +209,41 @@ colors:
 
 Operators: `<`, `<=`, `>`, `>=`, `==` (default: `<=`)
 
+#### Icons
+
+Icons are displayed from the entity's default icon or can be customized per state:
+
+```yaml
+# Enable icons globally
+show_icons: true
+icon_placement: above  # above, below, left, or right
+icon_size: 28px
+
+# Per-entity custom icons
+entities:
+  - entity: light.bedroom
+    icon:
+      on: mdi:lightbulb-on
+      off: mdi:lightbulb-off
+  - entity: switch.fan
+    show_icon: false  # Hide icon for this entity only
+```
+
+**Icon hierarchy:**
+1. If `show_icon` is set on entity, use that value
+2. Otherwise, use global `show_icons` setting
+3. If enabled, use entity's custom `icon.on/off` if defined
+4. Otherwise, use entity's default icon from Home Assistant
+5. If no icon available, fall back to domain-based default
+
 ## Usage Tips
 
-1. **Empty Cells**: To create a blank space in your grid, add an empty object `{}` in the entities list
+1. **Blank Cells**: Create blank spaces with `{}`. Customize their color with `global_colors.blank` or per-cell with `colors.blank`
 2. **Cell Order**: Entities fill the grid left-to-right, top-to-bottom in the order listed
 3. **Text Templates**: Use `{{ state }}` for entity state and `{{ name }}` for entity name
-4. **Click Behavior**: By default, lights/switches toggle and sensors show more-info
-5. **Responsive Sizing**: Leave `cell_width` blank or use percentages (e.g., `25%`) for responsive layouts that adapt to screen size. Use fixed pixels (e.g., `100px`) for precise control
+4. **Icons**: Enable globally with `show_icons: true`, then customize placement, size, and per-entity icons
+5. **Click Behavior**: By default, lights/switches toggle and sensors show more-info
+6. **Responsive Sizing**: Leave `cell_width` blank or use percentages (e.g., `25%`) for responsive layouts that adapt to screen size. Use fixed pixels (e.g., `100px`) for precise control
 
 ## Examples
 
