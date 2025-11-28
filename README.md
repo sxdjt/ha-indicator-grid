@@ -31,9 +31,9 @@ A Home Assistant Lovelace card that displays a customizable grid of indicator li
 2. Go to "Frontend"
 3. Click the menu (three dots) in the top right
 4. Select "Custom repositories"
-5. Add this repository URL and select "Lovelace" as the category
+5. Add this repository URL and select "Dashboard" as the category
 6. Click "Install"
-7. Restart Home Assistant
+7. Hard-refresh your browser (or restart Home Assistant if needed)
 
 ### Manual Installation
 
