@@ -3,7 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { HomeAssistant, LovelaceCardEditor, fireEvent } from 'custom-card-helpers';
 import { IndicatorGridCardConfig, EntityConfig, ColorConfig, IconConfig, IndicatorCell } from './types';
 
-const CARD_VERSION = '0.2.0';
+const CARD_VERSION = '0.3.0';
 
 console.info(
   `%c  INDICATOR-GRID-CARD  \n%c  Version ${CARD_VERSION}  `,
@@ -157,9 +157,17 @@ export class IndicatorGridCard extends LitElement {
 
   private _computeCell(entityConfig: EntityConfig, stateObj: any): IndicatorCell {
     if (!stateObj || stateObj.state === 'unavailable' || stateObj.state === 'unknown') {
+      // Get entity name - prefer custom text, then friendly_name, then entity ID
+      const entityName = entityConfig.text ||
+                        stateObj?.attributes?.friendly_name ||
+                        entityConfig.entity ||
+                        'Unknown';
+      const unavailableText = this.config.unavailable_text || 'INOP';
+      const displayText = `${entityName}\n${unavailableText}`;
+
       return {
         entity: entityConfig.entity,
-        displayText: this.config.unavailable_text || 'INOP',
+        displayText,
         backgroundColor: this._getColor('unavailable', entityConfig.colors),
         textColor: this._getColor('text', entityConfig.colors),
         textOpacity: 1,
@@ -469,6 +477,14 @@ export class IndicatorGridCard extends LitElement {
       .cell-text {
         min-width: 0;
         word-break: break-word;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .text-line {
+        line-height: 1.2;
       }
 
       .cell.clickable {
@@ -568,6 +584,9 @@ export class IndicatorGridCard extends LitElement {
       '--mdc-icon-size': this.config.icon_size || '24px',
     };
 
+    // Check if text contains newlines for multi-line display
+    const textLines = cell.displayText.split('\n');
+
     return html`
       <div
         class="cell ${cell.clickable ? 'clickable' : ''} ${iconPlacementClass}"
@@ -575,7 +594,9 @@ export class IndicatorGridCard extends LitElement {
         @click=${() => this._handleClick(cell)}
       >
         ${cell.icon ? html`<ha-icon class="cell-icon" .icon=${cell.icon} style=${this._styleMap(iconStyle)}></ha-icon>` : ''}
-        <span class="cell-text">${cell.displayText}</span>
+        <div class="cell-text">
+          ${textLines.map(line => html`<div class="text-line">${line}</div>`)}
+        </div>
       </div>
     `;
   }
