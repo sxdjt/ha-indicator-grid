@@ -5,10 +5,9 @@ A Home Assistant Lovelace card that displays a customizable grid of indicator li
 ![Version](https://img.shields.io/badge/version-0.4.0-blue.svg)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-<img width="514" height="221" alt="Screenshot 2025-11-26 at 21 49 21" src="https://github.com/user-attachments/assets/2b24bb82-c2b8-4163-ad46-28e2340b2bbf" />
 
-<img width="248" height="66" alt="Screenshot 2025-11-26 at 21 50 17" src="https://github.com/user-attachments/assets/e2283e61-1cf6-4fad-9b31-373cec20bed8" />
-
+<img width="490" height="124" alt="Screenshot 2025-11-28 at 21 33 24" src="https://github.com/user-attachments/assets/f8b85c0f-a3f9-47bb-969e-5c7bbe697486" />
+<img width="517" height="121" alt="Screenshot 2025-11-28 at 21 41 21" src="https://github.com/user-attachments/assets/2277f857-836c-4bf3-873d-f2e397c43e25" />
 
 ## Features
 
