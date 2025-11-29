@@ -17,6 +17,7 @@ export interface IndicatorGridCardConfig extends LovelaceCardConfig {
   entities: EntityConfig[];
   global_colors?: ColorConfig;
   unavailable_text?: string;
+  header_rows?: HeaderRowConfig[]; // Optional header rows
 }
 
 export interface EntityConfig {
@@ -61,4 +62,19 @@ export interface IndicatorCell {
   state?: string;
   clickable: boolean;
   clickAction: 'toggle' | 'more-info' | 'none';
+}
+
+export interface HeaderRowConfig {
+  row_index: number; // Which row this header occupies (0-based)
+  cells: HeaderCellConfig[]; // Header cells in this row
+}
+
+export interface HeaderCellConfig {
+  text: string; // Text to display in header
+  colspan?: number; // Number of columns to span (default: 1)
+  text_align?: 'left' | 'center' | 'right'; // Text alignment (default: center)
+  font_size?: string; // Font size override (default: card font_size)
+  font_weight?: string | number; // Font weight override (default: card font_weight)
+  text_color?: string; // Text color override (default: global_colors.text)
+  background_color?: string; // Background color override (default: global_colors.blank)
 }

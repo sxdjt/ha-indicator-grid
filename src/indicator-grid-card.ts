@@ -1,9 +1,9 @@
 import { LitElement, html, css, PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { HomeAssistant, LovelaceCardEditor, fireEvent } from 'custom-card-helpers';
-import { IndicatorGridCardConfig, EntityConfig, ColorConfig, IconConfig, IndicatorCell } from './types';
+import { IndicatorGridCardConfig, EntityConfig, ColorConfig, IconConfig, IndicatorCell, HeaderRowConfig, HeaderCellConfig } from './types';
 
-const CARD_VERSION = '0.3.0';
+const CARD_VERSION = '0.4.0';
 
 console.info(
   `%c  INDICATOR-GRID-CARD  \n%c  Version ${CARD_VERSION}  `,
@@ -415,6 +415,74 @@ export class IndicatorGridCard extends LitElement {
     fireEvent(this, 'hass-more-info', { entityId });
   }
 
+  private _isHeaderRow(rowIndex: number): boolean {
+    if (!this.config.header_rows) {
+      return false;
+    }
+    return this.config.header_rows.some(hr => hr.row_index === rowIndex);
+  }
+
+  private _getHeaderRow(rowIndex: number): HeaderRowConfig | undefined {
+    if (!this.config.header_rows) {
+      return undefined;
+    }
+    return this.config.header_rows.find(hr => hr.row_index === rowIndex);
+  }
+
+  private _renderHeaderCell(headerCell: HeaderCellConfig) {
+    const colspan = headerCell.colspan || 1;
+    const textAlign = headerCell.text_align || 'center';
+    const fontSize = headerCell.font_size || this.config.font_size || '16px';
+    const fontWeight = headerCell.font_weight || this.config.font_weight || 'bold';
+    const textColor = headerCell.text_color || this._getColor('text', undefined);
+    const backgroundColor = headerCell.background_color || this._getColor('blank', undefined);
+
+    const cellStyle = {
+      'background-color': backgroundColor,
+      'color': textColor,
+      'font-size': fontSize,
+      'font-weight': String(fontWeight),
+      'text-align': textAlign,
+      'grid-column': `span ${colspan}`,
+    };
+
+    return html`
+      <div class="cell header-cell" style=${this._styleMap(cellStyle)}>
+        <div class="cell-text">
+          <div class="text-line">${headerCell.text}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  private _renderAllCells() {
+    const allCells: any[] = [];
+    let entityIndex = 0;
+    const entityCells = this._getCells();
+
+    for (let row = 0; row < this.config.rows; row++) {
+      if (this._isHeaderRow(row)) {
+        // Render header row
+        const headerRow = this._getHeaderRow(row);
+        if (headerRow && headerRow.cells) {
+          headerRow.cells.forEach(headerCell => {
+            allCells.push(this._renderHeaderCell(headerCell));
+          });
+        }
+      } else {
+        // Render entity row
+        for (let col = 0; col < this.config.columns; col++) {
+          if (entityIndex < entityCells.length) {
+            allCells.push(this._renderCell(entityCells[entityIndex]));
+            entityIndex++;
+          }
+        }
+      }
+    }
+
+    return allCells;
+  }
+
   static get styles() {
     return css`
       :host {
@@ -442,6 +510,10 @@ export class IndicatorGridCard extends LitElement {
         overflow: hidden;
         padding: 4px;
         box-sizing: border-box;
+      }
+
+      .header-cell {
+        /* Header cells don't need icon placement classes */
       }
 
       .cell.icon-above {
@@ -506,8 +578,6 @@ export class IndicatorGridCard extends LitElement {
       return html``;
     }
 
-    const cells = this._getCells();
-
     // If cell_width is blank/empty, use 1fr for auto-sizing
     const columnSize = this.config.cell_width && this.config.cell_width.trim() !== ''
       ? this.config.cell_width
@@ -522,7 +592,7 @@ export class IndicatorGridCard extends LitElement {
     return html`
       <ha-card>
         <div class="grid-container" style=${this._styleMap(gridStyle)}>
-          ${cells.map((cell) => this._renderCell(cell))}
+          ${this._renderAllCells()}
         </div>
       </ha-card>
     `;

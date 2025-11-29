@@ -1,7 +1,7 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { HomeAssistant, fireEvent, LovelaceCardEditor } from 'custom-card-helpers';
-import { IndicatorGridCardConfig, EntityConfig } from './types';
+import { IndicatorGridCardConfig, EntityConfig, HeaderRowConfig, HeaderCellConfig } from './types';
 
 @customElement('indicator-grid-card-editor')
 export class IndicatorGridCardEditor extends LitElement implements LovelaceCardEditor {
@@ -120,6 +120,98 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
     };
 
     newConfig.entities[index] = entity;
+
+    fireEvent(this, 'config-changed', { config: newConfig });
+  }
+
+  private _addHeaderRow(): void {
+    const newConfig = { ...this._config };
+
+    if (!newConfig.header_rows) {
+      newConfig.header_rows = [];
+    }
+
+    newConfig.header_rows = [
+      ...newConfig.header_rows,
+      {
+        row_index: 0,
+        cells: [{ text: 'Header', colspan: 1 }],
+      },
+    ];
+
+    fireEvent(this, 'config-changed', { config: newConfig });
+  }
+
+  private _removeHeaderRow(index: number): void {
+    const newConfig = { ...this._config };
+    if (!newConfig.header_rows) {
+      return;
+    }
+
+    newConfig.header_rows = [...newConfig.header_rows];
+    newConfig.header_rows.splice(index, 1);
+
+    fireEvent(this, 'config-changed', { config: newConfig });
+  }
+
+  private _headerRowChanged(index: number, key: keyof HeaderRowConfig, value: any): void {
+    const newConfig = { ...this._config };
+    if (!newConfig.header_rows) {
+      return;
+    }
+
+    newConfig.header_rows = [...newConfig.header_rows];
+    newConfig.header_rows[index] = {
+      ...newConfig.header_rows[index],
+      [key]: value,
+    };
+
+    fireEvent(this, 'config-changed', { config: newConfig });
+  }
+
+  private _addHeaderCell(rowIndex: number): void {
+    const newConfig = { ...this._config };
+    if (!newConfig.header_rows) {
+      return;
+    }
+
+    newConfig.header_rows = [...newConfig.header_rows];
+    const headerRow = { ...newConfig.header_rows[rowIndex] };
+    headerRow.cells = [...headerRow.cells, { text: 'Header', colspan: 1 }];
+    newConfig.header_rows[rowIndex] = headerRow;
+
+    fireEvent(this, 'config-changed', { config: newConfig });
+  }
+
+  private _removeHeaderCell(rowIndex: number, cellIndex: number): void {
+    const newConfig = { ...this._config };
+    if (!newConfig.header_rows) {
+      return;
+    }
+
+    newConfig.header_rows = [...newConfig.header_rows];
+    const headerRow = { ...newConfig.header_rows[rowIndex] };
+    headerRow.cells = [...headerRow.cells];
+    headerRow.cells.splice(cellIndex, 1);
+    newConfig.header_rows[rowIndex] = headerRow;
+
+    fireEvent(this, 'config-changed', { config: newConfig });
+  }
+
+  private _headerCellChanged(rowIndex: number, cellIndex: number, key: keyof HeaderCellConfig, value: any): void {
+    const newConfig = { ...this._config };
+    if (!newConfig.header_rows) {
+      return;
+    }
+
+    newConfig.header_rows = [...newConfig.header_rows];
+    const headerRow = { ...newConfig.header_rows[rowIndex] };
+    headerRow.cells = [...headerRow.cells];
+    headerRow.cells[cellIndex] = {
+      ...headerRow.cells[cellIndex],
+      [key]: value,
+    };
+    newConfig.header_rows[rowIndex] = headerRow;
 
     fireEvent(this, 'config-changed', { config: newConfig });
   }
@@ -319,12 +411,146 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
       </ha-expansion-panel>
 
       <div style="margin-top: 16px;">
+        <h3>Header Rows</h3>
+        ${(this._config.header_rows || []).map((headerRow, index) => this._renderHeaderRowConfig(headerRow, index))}
+
+        <mwc-button @click=${this._addHeaderRow}>
+          Add Header Row
+        </mwc-button>
+      </div>
+
+      <div style="margin-top: 16px;">
         <h3>Entities</h3>
         ${(this._config.entities || []).map((entity, index) => this._renderEntityConfig(entity, index))}
 
         <mwc-button @click=${this._addEntity}>
           Add Entity
         </mwc-button>
+      </div>
+    `;
+  }
+
+  private _renderHeaderRowConfig(headerRow: HeaderRowConfig, rowIndex: number) {
+    return html`
+      <div class="entity-item">
+        <div class="entity-header">
+          <strong>Header Row ${rowIndex + 1}</strong>
+          <mwc-button @click=${() => this._removeHeaderRow(rowIndex)}>Remove</mwc-button>
+        </div>
+
+        <div class="entity-details">
+          <ha-textfield
+            label="Row Index (0-based)"
+            type="number"
+            min="0"
+            .max=${this._config.rows - 1}
+            .value=${headerRow.row_index}
+            @input=${(ev: Event) =>
+              this._headerRowChanged(rowIndex, 'row_index', Number((ev.target as HTMLInputElement).value))}
+            helper-text="Which row this header occupies (0 = first row)"
+          ></ha-textfield>
+
+          <h4>Header Cells</h4>
+          ${headerRow.cells.map((cell, cellIndex) => this._renderHeaderCellConfig(rowIndex, cell, cellIndex))}
+
+          <mwc-button @click=${() => this._addHeaderCell(rowIndex)}>
+            Add Header Cell
+          </mwc-button>
+        </div>
+      </div>
+    `;
+  }
+
+  private _renderHeaderCellConfig(rowIndex: number, cell: HeaderCellConfig, cellIndex: number) {
+    return html`
+      <div style="border: 1px dashed var(--divider-color); padding: 8px; margin: 8px 0; border-radius: 4px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <strong>Cell ${cellIndex + 1}</strong>
+          <mwc-button @click=${() => this._removeHeaderCell(rowIndex, cellIndex)}>Remove</mwc-button>
+        </div>
+
+        <ha-textfield
+          label="Text"
+          .value=${cell.text || ''}
+          @input=${(ev: Event) =>
+            this._headerCellChanged(rowIndex, cellIndex, 'text', (ev.target as HTMLInputElement).value)}
+        ></ha-textfield>
+
+        <ha-textfield
+          label="Column Span"
+          type="number"
+          min="1"
+          .max=${this._config.columns}
+          .value=${cell.colspan || 1}
+          @input=${(ev: Event) =>
+            this._headerCellChanged(rowIndex, cellIndex, 'colspan', Number((ev.target as HTMLInputElement).value))}
+          helper-text="Number of columns this cell spans"
+        ></ha-textfield>
+
+        <ha-selector
+          .hass=${this.hass}
+          .selector=${{
+            select: {
+              options: [
+                { value: 'left', label: 'Left' },
+                { value: 'center', label: 'Center' },
+                { value: 'right', label: 'Right' },
+              ],
+            },
+          }}
+          .value=${cell.text_align || 'center'}
+          @value-changed=${(ev: CustomEvent) =>
+            this._headerCellChanged(rowIndex, cellIndex, 'text_align', ev.detail.value)}
+          .label=${'Text Alignment'}
+        ></ha-selector>
+
+        <ha-expansion-panel header="Advanced Styling (optional)" .expanded=${false}>
+          <ha-textfield
+            label="Font Size"
+            .value=${cell.font_size || ''}
+            @input=${(ev: Event) =>
+              this._headerCellChanged(rowIndex, cellIndex, 'font_size', (ev.target as HTMLInputElement).value)}
+            helper-text="Leave blank to use card font size"
+          ></ha-textfield>
+
+          <ha-selector
+            .hass=${this.hass}
+            .selector=${{
+              select: {
+                options: [
+                  { value: '', label: 'Default (from card)' },
+                  { value: '300', label: 'Light (300)' },
+                  { value: 'normal', label: 'Normal (400)' },
+                  { value: '500', label: 'Medium (500)' },
+                  { value: '600', label: 'Semi-Bold (600)' },
+                  { value: 'bold', label: 'Bold (700)' },
+                  { value: '800', label: 'Extra Bold (800)' },
+                  { value: '900', label: 'Black (900)' },
+                ],
+              },
+            }}
+            .value=${cell.font_weight || ''}
+            @value-changed=${(ev: CustomEvent) =>
+              this._headerCellChanged(rowIndex, cellIndex, 'font_weight', ev.detail.value)}
+            .label=${'Font Weight'}
+          ></ha-selector>
+
+          <ha-textfield
+            label="Text Color"
+            .value=${cell.text_color || ''}
+            @input=${(ev: Event) =>
+              this._headerCellChanged(rowIndex, cellIndex, 'text_color', (ev.target as HTMLInputElement).value)}
+            helper-text="Leave blank to use global text color"
+          ></ha-textfield>
+
+          <ha-textfield
+            label="Background Color"
+            .value=${cell.background_color || ''}
+            @input=${(ev: Event) =>
+              this._headerCellChanged(rowIndex, cellIndex, 'background_color', (ev.target as HTMLInputElement).value)}
+            helper-text="Leave blank to use global blank color"
+          ></ha-textfield>
+        </ha-expansion-panel>
       </div>
     `;
   }
