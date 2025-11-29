@@ -2,7 +2,7 @@
 
 A Home Assistant Lovelace card that displays a customizable grid of indicator lights, similar to an aircraft cockpit panel. Each indicator shows the state of an entity with configurable colors, text, and behavior.
 
-![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)
+![Version](https://img.shields.io/badge/version-0.4.0-blue.svg)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 <img width="514" height="221" alt="Screenshot 2025-11-26 at 21 49 21" src="https://github.com/user-attachments/assets/2b24bb82-c2b8-4163-ad46-28e2340b2bbf" />
@@ -13,6 +13,7 @@ A Home Assistant Lovelace card that displays a customizable grid of indicator li
 ## Features
 
 - **Customizable Grid**: Define any number of rows and columns
+- **Header Rows**: Add header rows at any position with configurable colspan and styling
 - **Entity State Colors**: Automatically color indicators based on entity state
 - **Threshold Support**: Set color thresholds for numeric sensors (e.g., temperature ranges)
 - **Custom State Mapping**: Map specific states to specific colors
@@ -126,6 +127,34 @@ entities:
     show_icon: false  # Override global setting, hide icon for this entity
 ```
 
+### Header Rows Example
+
+```yaml
+type: custom:indicator-grid-card
+columns: 5
+rows: 6
+cell_height: 100px
+header_rows:
+  - row_index: 0  # First row is a header
+    cells:
+      - text: Living Room
+        colspan: 3
+        text_align: center
+      - text: Bedroom
+        colspan: 2
+  - row_index: 3  # Fourth row is a header
+    cells:
+      - text: Basement
+        colspan: 5
+        font_size: 20px
+        background_color: '#1a1a1a'
+entities:
+  # Only need entities for non-header rows (4 rows x 5 columns = 20 entities)
+  - entity: light.living_room_1
+  - entity: light.living_room_2
+  # ... etc
+```
+
 ## Configuration Options
 
 ### Card Options
@@ -146,6 +175,7 @@ entities:
 | `icon_placement` | string | `above` | Icon placement: `above`, `below`, `left`, or `right` |
 | `icon_size` | string | `24px` | Icon size (CSS units, e.g., `24px`, `2rem`) |
 | `global_colors` | object | see below | Global color configuration |
+| `header_rows` | list | - | List of header row configurations |
 | `entities` | list | **required** | List of entity configurations |
 
 ### Global Colors
@@ -172,6 +202,25 @@ entities:
 | `show_icon` | boolean | - | Override global `show_icons` setting for this entity |
 | `icon` | object | - | Custom icon configuration (on/off states) |
 | `colors` | object | - | Per-entity color overrides |
+
+### Header Row Configuration
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `row_index` | number | **required** | Which row this header occupies (0-based, 0 = first row) |
+| `cells` | list | **required** | List of header cell configurations |
+
+### Header Cell Configuration
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `text` | string | **required** | Text to display in header |
+| `colspan` | number | `1` | Number of columns this cell spans |
+| `text_align` | string | `center` | Text alignment: `left`, `center`, or `right` |
+| `font_size` | string | card default | Font size override (e.g., `20px`) |
+| `font_weight` | string/number | card default | Font weight override (e.g., `bold`, `600`) |
+| `text_color` | string | global text | Text color override |
+| `background_color` | string | global blank | Background color override |
 
 ### Color Configuration
 
