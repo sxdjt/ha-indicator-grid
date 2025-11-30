@@ -2,7 +2,7 @@
 
 A Home Assistant Lovelace card that displays a customizable grid of indicator lights, similar to an aircraft cockpit panel. Each indicator shows the state of an entity with configurable colors, text, and behavior.
 
-![Version](https://img.shields.io/badge/version-0.4.0-blue.svg)
+![Version](https://img.shields.io/badge/version-0.5.0-blue.svg)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 
@@ -72,16 +72,16 @@ entities:
 type: custom:indicator-grid-card
 columns: 4
 rows: 3
-cell_width: 25%  # Auto-sizes to fill width
-cell_height: 120px
-cell_gap: 8px
-font_size: 18px
+cell_width: 25%  # Auto-sizes to fill width (percentages supported)
+cell_height: 120  # Numbers auto-convert to px ("120px")
+cell_gap: 8       # Numbers auto-convert to px ("8px")
+font_size: 18     # Numbers auto-convert to px ("18px")
 font_weight: bold
 unavailable_text: OFFLINE
 dim_off_text: 50  # Dim "off" entities to 50% opacity
 show_icons: true  # Enable icons globally
 icon_placement: above  # Icons above text
-icon_size: 28px  # Larger icons
+icon_size: 28     # Numbers auto-convert to px ("28px")
 global_colors:
   on: '#00FF00'
   off: '#404040'
@@ -132,7 +132,7 @@ entities:
 type: custom:indicator-grid-card
 columns: 5
 rows: 6
-cell_height: 100px
+cell_height: 100
 header_rows:
   - row_index: 0  # First row is a header
     cells:
@@ -145,7 +145,7 @@ header_rows:
     cells:
       - text: Basement
         colspan: 5
-        font_size: 20px
+        font_size: 20
         background_color: '#1a1a1a'
 entities:
   # Only need entities for non-header rows (4 rows x 5 columns = 20 entities)
@@ -163,16 +163,16 @@ entities:
 | `type` | string | **required** | Must be `custom:indicator-grid-card` |
 | `columns` | number | `3` | Number of columns in the grid |
 | `rows` | number | `2` | Number of rows in the grid |
-| `cell_width` | string | auto (100%) | Width of each cell (e.g., `100px`, `25%`, blank for auto) |
-| `cell_height` | string | `100px` | Height of each cell (e.g., `100px`, `10vh`) |
-| `cell_gap` | string | `5px` | Gap between cells (e.g., `5px`, `0.5rem`) |
-| `font_size` | string | `16px` | Font size for text (CSS units) |
+| `cell_width` | string/number | auto (100%) | Width of each cell (e.g., `100`, `"100px"`, `"25%"`, blank for auto) |
+| `cell_height` | string/number | `100` | Height of each cell (e.g., `100` or `"100px"`) - numbers auto-convert to px |
+| `cell_gap` | string/number | `5` | Gap between cells (e.g., `5` or `"5px"`) - numbers auto-convert to px |
+| `font_size` | string/number | `16` | Font size for text (e.g., `16` or `"16px"`) - numbers auto-convert to px |
 | `font_weight` | string/number | `bold` | Font weight for text |
 | `unavailable_text` | string | `INOP` | Text to display for unavailable entities |
 | `dim_off_text` | number | none | Opacity percentage (0-100) for text when entity is "off" (e.g., `50` for 50% opacity) |
 | `show_icons` | boolean | `false` | Enable/disable icons globally |
 | `icon_placement` | string | `above` | Icon placement: `above`, `below`, `left`, or `right` |
-| `icon_size` | string | `24px` | Icon size (CSS units, e.g., `24px`, `2rem`) |
+| `icon_size` | string/number | `24` | Icon size (e.g., `24` or `"24px"`) - numbers auto-convert to px |
 | `global_colors` | object | see below | Global color configuration |
 | `header_rows` | list | - | List of header row configurations |
 | `entities` | list | **required** | List of entity configurations |
@@ -216,7 +216,7 @@ entities:
 | `text` | string | **required** | Text to display in header |
 | `colspan` | number | `1` | Number of columns this cell spans |
 | `text_align` | string | `center` | Text alignment: `left`, `center`, or `right` |
-| `font_size` | string | card default | Font size override (e.g., `20px`) |
+| `font_size` | string/number | card default | Font size override (e.g., `20` or `"20px"`) - numbers auto-convert to px |
 | `font_weight` | string/number | card default | Font weight override (e.g., `bold`, `600`) |
 | `text_color` | string | global text | Text color override |
 | `background_color` | string | global blank | Background color override |
@@ -265,7 +265,7 @@ Icons are displayed from the entity's default icon or can be customized per stat
 # Enable icons globally
 show_icons: true
 icon_placement: above  # above, below, left, or right
-icon_size: 28px
+icon_size: 28
 
 # Per-entity custom icons
 entities:
@@ -286,12 +286,14 @@ entities:
 
 ## Usage Tips
 
-1. **Blank Cells**: Create blank spaces with `{}`. Customize their color with `global_colors.blank` or per-cell with `colors.blank`
-2. **Cell Order**: Entities fill the grid left-to-right, top-to-bottom in the order listed
-3. **Text Templates**: Use `{{ state }}` for entity state and `{{ name }}` for entity name
-4. **Icons**: Enable globally with `show_icons: true`, then customize placement, size, and per-entity icons
-5. **Click Behavior**: By default, lights/switches toggle and sensors show more-info
-6. **Responsive Sizing**: Leave `cell_width` blank or use percentages (e.g., `25%`) for responsive layouts that adapt to screen size. Use fixed pixels (e.g., `100px`) for precise control
+1. **Simplified Configuration**: Size values can be specified as numbers (auto-convert to `px`) or strings. For example, `cell_height: 100` is equivalent to `cell_height: "100px"`
+2. **Blank Cells**: Create blank spaces with `{}`. Customize their color with `global_colors.blank` or per-cell with `colors.blank`
+3. **Cell Order**: Entities fill the grid left-to-right, top-to-bottom in the order listed
+4. **Text Templates**: Use `{{ state }}` for entity state and `{{ name }}` for entity name
+5. **Icons**: Enable globally with `show_icons: true`, then customize placement, size, and per-entity icons
+6. **Click Behavior**: By default, lights/switches toggle and sensors show more-info
+7. **Responsive Width**: Leave `cell_width` blank or use percentages (e.g., `25%`) for responsive layouts. Use pixels (e.g., `100` or `"100px"`) for fixed widths
+8. **Cell Height**: Use pixel values for `cell_height` (e.g., `100` or `"100px"`). The card automatically calculates its total height to prevent overlapping with cards below
 
 ## Examples
 
@@ -301,7 +303,7 @@ entities:
 type: custom:indicator-grid-card
 columns: 4
 rows: 2
-cell_height: 100px
+cell_height: 100
 entities:
   - entity: binary_sensor.internet
     text: INTERNET
@@ -339,7 +341,7 @@ entities:
 type: custom:indicator-grid-card
 columns: 3
 rows: 3
-cell_height: 80px
+cell_height: 80
 global_colors:
   on: '#FFD700'
   off: '#2C2C2C'

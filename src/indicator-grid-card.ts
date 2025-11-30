@@ -3,7 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { HomeAssistant, LovelaceCardEditor, fireEvent } from 'custom-card-helpers';
 import { IndicatorGridCardConfig, EntityConfig, ColorConfig, IconConfig, IndicatorCell, HeaderRowConfig, HeaderCellConfig } from './types';
 
-const CARD_VERSION = '0.4.0';
+const CARD_VERSION = '0.5.0';
 
 console.info(
   `%c  INDICATOR-GRID-CARD  \n%c  Version ${CARD_VERSION}  `,
@@ -23,6 +23,14 @@ export class IndicatorGridCard extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
   @state() private config!: IndicatorGridCardConfig;
 
+  // Helper to normalize size values - add "px" if just a number
+  private _normalizeSize(value: string | number | undefined, defaultValue: string): string {
+    if (value === undefined) return defaultValue;
+    const str = String(value);
+    // If it's just digits (with optional decimal), append "px"
+    return /^\d+(\.\d+)?$/.test(str) ? `${str}px` : str;
+  }
+
   public static async getConfigElement(): Promise<LovelaceCardEditor> {
     await import('./editor');
     return document.createElement('indicator-grid-card-editor') as LovelaceCardEditor;
@@ -33,13 +41,13 @@ export class IndicatorGridCard extends LitElement {
       columns: 3,
       rows: 2,
       cell_width: '',
-      cell_height: '100px',
-      cell_gap: '5px',
-      font_size: '16px',
+      cell_height: 100,
+      cell_gap: 5,
+      font_size: 16,
       font_weight: 'bold',
       show_icons: false,
       icon_placement: 'above',
-      icon_size: '24px',
+      icon_size: 24,
       entities: [],
       unavailable_text: 'INOP',
       global_colors: {
@@ -57,6 +65,14 @@ export class IndicatorGridCard extends LitElement {
       throw new Error('Invalid configuration');
     }
 
+    // Helper to normalize size values - add "px" if just a number
+    const normalizeSize = (value: string | number | undefined, defaultValue: string): string => {
+      if (value === undefined) return defaultValue;
+      const str = String(value);
+      // If it's just digits (with optional decimal), append "px"
+      return /^\d+(\.\d+)?$/.test(str) ? `${str}px` : str;
+    };
+
     // Backward compatibility: if cell_size is set, use it for width and height
     let cellWidth = config.cell_width;
     let cellHeight = config.cell_height;
@@ -70,14 +86,14 @@ export class IndicatorGridCard extends LitElement {
       ...config,
       columns: config.columns ?? 3,
       rows: config.rows ?? 2,
-      cell_width: cellWidth ?? '',
-      cell_height: cellHeight ?? '100px',
-      cell_gap: config.cell_gap ?? '5px',
-      font_size: config.font_size ?? '16px',
+      cell_width: normalizeSize(cellWidth, ''),
+      cell_height: normalizeSize(cellHeight, '100px'),
+      cell_gap: normalizeSize(config.cell_gap, '5px'),
+      font_size: normalizeSize(config.font_size, '16px'),
       font_weight: config.font_weight ?? 'bold',
       show_icons: config.show_icons ?? false,
       icon_placement: config.icon_placement ?? 'above',
-      icon_size: config.icon_size ?? '24px',
+      icon_size: normalizeSize(config.icon_size, '24px'),
       unavailable_text: config.unavailable_text ?? 'INOP',
       global_colors: {
         on: 'green',
@@ -91,7 +107,25 @@ export class IndicatorGridCard extends LitElement {
   }
 
   public getCardSize(): number {
-    return this.config?.rows || 2;
+    if (!this.config) {
+      return 2;
+    }
+
+    // Parse cell_height - expects pixel values (e.g., "100px", 100)
+    const cellHeightStr = this._normalizeSize(this.config.cell_height, '100px');
+    const cellHeight = parseFloat(cellHeightStr);
+
+    // Parse cell_gap - expects pixel values (e.g., "5px", 5)
+    const cellGapStr = this._normalizeSize(this.config.cell_gap, '5px');
+    const cellGap = parseFloat(cellGapStr);
+
+    // Calculate total height in pixels
+    const rows = this.config.rows || 2;
+    const totalHeight = (rows * cellHeight) + ((rows - 1) * cellGap);
+
+    // Convert to Home Assistant card units (1 unit = 50px)
+    // Round up to ensure we allocate enough space
+    return Math.ceil(totalHeight / 50);
   }
 
   protected shouldUpdate(changedProps: PropertyValues): boolean {
@@ -432,7 +466,8 @@ export class IndicatorGridCard extends LitElement {
   private _renderHeaderCell(headerCell: HeaderCellConfig) {
     const colspan = headerCell.colspan || 1;
     const textAlign = headerCell.text_align || 'center';
-    const fontSize = headerCell.font_size || this.config.font_size || '16px';
+    const defaultFontSize = this._normalizeSize(this.config.font_size, '16px');
+    const fontSize = this._normalizeSize(headerCell.font_size, defaultFontSize);
     const fontWeight = headerCell.font_weight || this.config.font_weight || 'bold';
     const textColor = headerCell.text_color || this._getColor('text', undefined);
     const backgroundColor = headerCell.background_color || this._getColor('blank', undefined);
@@ -487,6 +522,8 @@ export class IndicatorGridCard extends LitElement {
     return css`
       :host {
         display: block;
+        position: relative;
+        contain: layout;
       }
 
       ha-card {
@@ -494,11 +531,16 @@ export class IndicatorGridCard extends LitElement {
         padding: 0;
         background: transparent;
         border: none;
+        position: relative;
+        overflow: visible;
+        height: 100%;
       }
 
       .grid-container {
         display: grid;
         width: 100%;
+        position: relative;
+        min-height: 100%;
       }
 
       .cell {
@@ -579,14 +621,18 @@ export class IndicatorGridCard extends LitElement {
     }
 
     // If cell_width is blank/empty, use 1fr for auto-sizing
-    const columnSize = this.config.cell_width && this.config.cell_width.trim() !== ''
-      ? this.config.cell_width
+    const cellWidthNormalized = this._normalizeSize(this.config.cell_width, '');
+    const columnSize = cellWidthNormalized && cellWidthNormalized.trim() !== ''
+      ? cellWidthNormalized
       : '1fr';
+
+    const cellHeightNormalized = this._normalizeSize(this.config.cell_height, '100px');
+    const cellGapNormalized = this._normalizeSize(this.config.cell_gap, '5px');
 
     const gridStyle = {
       'grid-template-columns': `repeat(${this.config.columns}, ${columnSize})`,
-      'grid-template-rows': `repeat(${this.config.rows}, ${this.config.cell_height})`,
-      'gap': this.config.cell_gap || '5px',
+      'grid-template-rows': `repeat(${this.config.rows}, ${cellHeightNormalized})`,
+      'gap': cellGapNormalized,
     };
 
     return html`
@@ -641,7 +687,7 @@ export class IndicatorGridCard extends LitElement {
     const cellStyle = {
       'background-color': cell.backgroundColor,
       'color': textColor,
-      'font-size': this.config.font_size || '16px',
+      'font-size': this._normalizeSize(this.config.font_size, '16px'),
       'font-weight': String(this.config.font_weight || 'bold'),
     };
 
@@ -651,7 +697,7 @@ export class IndicatorGridCard extends LitElement {
       : '';
 
     const iconStyle = {
-      '--mdc-icon-size': this.config.icon_size || '24px',
+      '--mdc-icon-size': this._normalizeSize(this.config.icon_size, '24px'),
     };
 
     // Check if text contains newlines for multi-line display

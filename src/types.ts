@@ -5,15 +5,15 @@ export interface IndicatorGridCardConfig extends LovelaceCardConfig {
   columns: number;
   rows: number;
   cell_size?: number; // Deprecated: Use cell_width and cell_height instead
-  cell_width?: string; // e.g., "100px", "25%", blank defaults to auto (100% / columns)
-  cell_height?: string; // e.g., "100px", "10vh"
-  cell_gap?: string; // Gap between cells, e.g., "5px", "1rem"
-  font_size?: string; // e.g., "14px", "1rem"
+  cell_width?: string | number; // e.g., "100px", 100 (auto-converts to px)
+  cell_height?: string | number; // e.g., "100px", 100 (auto-converts to px)
+  cell_gap?: string | number; // Gap between cells, e.g., "5px", 5 (auto-converts to px)
+  font_size?: string | number; // e.g., "14px", 14 (auto-converts to px)
   font_weight?: string | number; // e.g., "bold", 700
   dim_off_text?: number; // Opacity percentage (0-100) for text when entity is off, e.g., 50
   show_icons?: boolean; // Enable/disable icons globally (default false)
   icon_placement?: 'none' | 'above' | 'below' | 'left' | 'right'; // Global icon placement
-  icon_size?: string; // Icon size, e.g., "24px", "2rem" (default "24px")
+  icon_size?: string | number; // Icon size, e.g., "24px", 24 (auto-converts to px)
   entities: EntityConfig[];
   global_colors?: ColorConfig;
   unavailable_text?: string;
@@ -73,7 +73,7 @@ export interface HeaderCellConfig {
   text: string; // Text to display in header
   colspan?: number; // Number of columns to span (default: 1)
   text_align?: 'left' | 'center' | 'right'; // Text alignment (default: center)
-  font_size?: string; // Font size override (default: card font_size)
+  font_size?: string | number; // Font size override, e.g., "14px", 14 (auto-converts to px)
   font_weight?: string | number; // Font weight override (default: card font_weight)
   text_color?: string; // Text color override (default: global_colors.text)
   background_color?: string; // Background color override (default: global_colors.blank)
