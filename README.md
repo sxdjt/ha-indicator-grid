@@ -33,13 +33,7 @@ A Home Assistant Lovelace card that displays a customizable grid of indicator li
 
 ### HACS (Recommended)
 
-1. Open HACS in your Home Assistant instance
-2. Go to "Frontend"
-3. Click the menu (three dots) in the top right
-4. Select "Custom repositories"
-5. Add this repository URL and select "Dashboard" as the category
-6. Click "Install"
-7. Hard-refresh your browser (or restart Home Assistant if needed)
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=sxdjt&repository=ha-indicator-grid)
 
 ### Manual Installation
 
