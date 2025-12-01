@@ -17,7 +17,7 @@ A Home Assistant Lovelace card that displays a customizable grid of indicator li
 
 ## Features
 
-- **NEW: Entity Column Spanning** Both entity and header cells can span multiple columns for flexible layouts
+- **NEW: Entity Column Spanning**: Both entity and header cells can span multiple columns for flexible layouts
 - **Customizable Grid**: Define any number of rows and columns
 - **Header Rows**: Add header rows at any position with configurable colspan and styling
 - **Entity State Colors**: Automatically color indicators based on entity state
