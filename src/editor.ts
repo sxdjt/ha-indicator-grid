@@ -596,6 +596,17 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
             helper-text="e.g., {{ state }}"
           ></ha-textfield>
 
+          <ha-textfield
+            label="Column Span"
+            type="number"
+            min="1"
+            .max=${this._config.columns}
+            .value=${entity.colspan || 1}
+            @input=${(ev: Event) =>
+              this._entityChanged(index, 'colspan', Number((ev.target as HTMLInputElement).value))}
+            helper-text="Number of columns this cell spans (default: 1)"
+          ></ha-textfield>
+
           <ha-selector
             .hass=${this.hass}
             .selector=${{

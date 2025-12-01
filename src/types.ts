@@ -29,6 +29,7 @@ export interface EntityConfig {
   icon?: IconConfig; // Per-entity custom icon (on/off states)
   click_action?: 'toggle' | 'more-info' | 'none';
   dim_off_text?: number; // Per-entity override for dim_off_text
+  colspan?: number; // Number of columns to span (default: 1) - BETA feature
 }
 
 export interface ColorConfig {
@@ -62,6 +63,7 @@ export interface IndicatorCell {
   state?: string;
   clickable: boolean;
   clickAction: 'toggle' | 'more-info' | 'none';
+  colspan?: number; // Number of columns to span (default: 1) - BETA feature
 }
 
 export interface HeaderRowConfig {

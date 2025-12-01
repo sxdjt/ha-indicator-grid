@@ -14,10 +14,10 @@ const timestamp = new Date().toLocaleString('en-US', {
   hour12: false
 });
 
-export default {
-  input: 'src/indicator-grid-card.ts',
+const createConfig = (input, output) => ({
+  input,
   output: {
-    file: 'dist/indicator-grid-card.js',
+    file: output,
     format: 'es',
     sourcemap: true,
     inlineDynamicImports: true,
@@ -37,4 +37,8 @@ export default {
       },
     }),
   ],
-};
+});
+
+export default [
+  createConfig('src/indicator-grid-card.ts', 'dist/indicator-grid-card.js'),
+];

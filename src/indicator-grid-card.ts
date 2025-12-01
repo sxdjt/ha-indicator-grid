@@ -3,7 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { HomeAssistant, LovelaceCardEditor, fireEvent } from 'custom-card-helpers';
 import { IndicatorGridCardConfig, EntityConfig, ColorConfig, IconConfig, IndicatorCell, HeaderRowConfig, HeaderCellConfig } from './types';
 
-const CARD_VERSION = '0.5.0';
+const CARD_VERSION = '1.1.0';
 
 console.info(
   `%c  INDICATOR-GRID-CARD  \n%c  Version ${CARD_VERSION}  `,
@@ -177,6 +177,7 @@ export class IndicatorGridCard extends LitElement {
           textOpacity: 1,
           clickable: false,
           clickAction: 'none',
+          colspan: entityConfig?.colspan || 1,
         });
         continue;
       }
@@ -208,6 +209,7 @@ export class IndicatorGridCard extends LitElement {
         state: stateObj?.state,
         clickable: false,
         clickAction: 'none',
+        colspan: entityConfig.colspan || 1,
       };
     }
 
@@ -229,6 +231,7 @@ export class IndicatorGridCard extends LitElement {
       state,
       clickable: clickAction !== 'none',
       clickAction,
+      colspan: entityConfig.colspan || 1,
     };
   }
 
@@ -493,7 +496,6 @@ export class IndicatorGridCard extends LitElement {
   private _renderAllCells() {
     const allCells: any[] = [];
     let entityIndex = 0;
-    const entityCells = this._getCells();
 
     for (let row = 0; row < this.config.rows; row++) {
       if (this._isHeaderRow(row)) {
@@ -505,12 +507,33 @@ export class IndicatorGridCard extends LitElement {
           });
         }
       } else {
-        // Render entity row
-        for (let col = 0; col < this.config.columns; col++) {
-          if (entityIndex < entityCells.length) {
-            allCells.push(this._renderCell(entityCells[entityIndex]));
-            entityIndex++;
+        // Render entity row - track columns filled by colspan
+        let colsFilled = 0;
+        while (colsFilled < this.config.columns && entityIndex < this.config.entities.length) {
+          const entityConfig = this.config.entities[entityIndex];
+          const colspan = entityConfig?.colspan || 1;
+
+          // Create and render the cell
+          let cell: IndicatorCell;
+          if (!entityConfig || !entityConfig.entity) {
+            // Empty/blank cell
+            cell = {
+              displayText: '',
+              backgroundColor: this._getColor('blank', entityConfig?.colors),
+              textColor: this._getColor('text', entityConfig?.colors),
+              textOpacity: 1,
+              clickable: false,
+              clickAction: 'none',
+              colspan: colspan,
+            };
+          } else {
+            const stateObj = this.hass.states[entityConfig.entity];
+            cell = this._computeCell(entityConfig, stateObj);
           }
+
+          allCells.push(this._renderCell(cell));
+          colsFilled += colspan;
+          entityIndex++;
         }
       }
     }
@@ -684,12 +707,17 @@ export class IndicatorGridCard extends LitElement {
       ? this._colorWithOpacity(cell.textColor, cell.textOpacity)
       : cell.textColor;
 
-    const cellStyle = {
+    const cellStyle: Record<string, string> = {
       'background-color': cell.backgroundColor,
       'color': textColor,
       'font-size': this._normalizeSize(this.config.font_size, '16px'),
       'font-weight': String(this.config.font_weight || 'bold'),
     };
+
+    // Add grid-column span if colspan is set
+    if (cell.colspan && cell.colspan > 1) {
+      cellStyle['grid-column'] = `span ${cell.colspan}`;
+    }
 
     // Determine icon placement class
     const iconPlacementClass = cell.icon

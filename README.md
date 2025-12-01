@@ -2,7 +2,7 @@
 
 A Home Assistant Lovelace card that displays a customizable grid of indicator lights, similar to an aircraft cockpit panel. Each indicator shows the state of an entity with configurable colors, text, and behavior.
 
-![Version](https://img.shields.io/badge/version-0.5.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 **Default:**
@@ -17,6 +17,7 @@ A Home Assistant Lovelace card that displays a customizable grid of indicator li
 
 ## Features
 
+- **NEW: Entity Column Spanning** Both entity and header cells can span multiple columns for flexible layouts
 - **Customizable Grid**: Define any number of rows and columns
 - **Header Rows**: Add header rows at any position with configurable colspan and styling
 - **Entity State Colors**: Automatically color indicators based on entity state
@@ -154,6 +155,45 @@ entities:
   # ... etc
 ```
 
+### Entity Column Spanning Example (**NEW in v1.1.0**)
+
+```yaml
+type: custom:indicator-grid-card
+columns: 4
+rows: 3
+cell_height: 100
+entities:
+  # First row - wide status display
+  - entity: sensor.system_status
+    text: SYSTEM STATUS
+    colspan: 4  # Spans all 4 columns
+    colors:
+      states:
+        'online': green
+        'offline': red
+  # Second row - normal cells
+  - entity: light.kitchen
+    text: KITCHEN
+  - entity: light.living_room
+    text: LIVING RM
+  - entity: light.bedroom
+    text: BEDROOM
+  - entity: light.bathroom
+    text: BATHROOM
+  # Third row - mixed spanning
+  - entity: sensor.temperature
+    text_template: 'TEMP {{ state }}°C'
+    colspan: 2  # Spans 2 columns
+  - entity: sensor.humidity
+    text_template: 'HUMIDITY {{ state }}%'
+    colspan: 2  # Spans 2 columns
+```
+
+**Note**: When using `colspan`, make sure the total column count per row adds up correctly. For example, with 4 columns:
+- One cell with `colspan: 4` = 4 columns (full width)
+- Two cells with `colspan: 2` each = 4 columns
+- Four cells with `colspan: 1` each (or omitted) = 4 columns
+
 ## Configuration Options
 
 ### Card Options
@@ -196,6 +236,7 @@ entities:
 | `entity` | string | - | Entity ID (omit for blank cell) |
 | `text` | string | entity name | Custom static text to display |
 | `text_template` | string | - | Template for dynamic text (use `{{ state }}` for state) |
+| `colspan` | number | `1` | **NEW in v1.1.0:** Number of columns this cell spans |
 | `click_action` | string | auto | Action on click: `toggle`, `more-info`, or `none` |
 | `dim_off_text` | number | - | Per-entity override for dim_off_text (0-100) |
 | `show_icon` | boolean | - | Override global `show_icons` setting for this entity |
