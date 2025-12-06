@@ -2,7 +2,7 @@
 
 A Home Assistant Lovelace card that displays a customizable grid of indicator lights, similar to an aircraft cockpit panel. Each indicator shows the state of an entity with configurable colors, text, and behavior.
 
-![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 **Default:**
@@ -22,6 +22,7 @@ A Home Assistant Lovelace card that displays a customizable grid of indicator li
 - **Header Rows**: Add header rows at any position with configurable colspan and styling
 - **Entity State Colors**: Automatically color indicators based on entity state
 - **Threshold Support**: Set color thresholds for numeric sensors (e.g., temperature ranges)
+- **Numeric Rounding**: Control decimal places for numeric sensor values (e.g., show "72.5" instead of "72.456789")
 - **Custom State Mapping**: Map specific states to specific colors
 - **Flexible Text Display**: Show entity names, states, or custom text
 - **Icon Support**: Display entity icons with configurable size and placement (above, below, left, right)
@@ -80,6 +81,7 @@ font_size: 18     # Numbers auto-convert to px ("18px")
 font_weight: bold
 unavailable_text: OFFLINE
 dim_off_text: 50  # Dim "off" entities to 50% opacity
+decimals: 1  # Show 1 decimal place for numeric sensors
 show_icons: true  # Enable icons globally
 icon_placement: above  # Icons above text
 icon_size: 28     # Numbers auto-convert to px ("28px")
@@ -123,7 +125,8 @@ entities:
       on: mdi:pump
       off: mdi:pump-off
   - entity: sensor.humidity
-    text: HUMIDITY
+    text_template: '{{ state }}%'
+    decimals: 0  # Override global, no decimals for humidity
     show_icon: false  # Override global setting, hide icon for this entity
 ```
 
@@ -210,6 +213,7 @@ entities:
 | `font_weight` | string/number | `bold` | Font weight for text |
 | `unavailable_text` | string | `INOP` | Text to display for unavailable entities |
 | `dim_off_text` | number | none | Opacity percentage (0-100) for text when entity is "off" (e.g., `50` for 50% opacity) |
+| `decimals` | number | none | Number of decimal places for numeric sensors (0-10, e.g., `2` shows "72.50") |
 | `show_icons` | boolean | `false` | Enable/disable icons globally |
 | `icon_placement` | string | `above` | Icon placement: `above`, `below`, `left`, or `right` |
 | `icon_size` | string/number | `24` | Icon size (e.g., `24` or `"24px"`) - numbers auto-convert to px |
@@ -239,6 +243,7 @@ entities:
 | `colspan` | number | `1` | **NEW in v1.1.0:** Number of columns this cell spans |
 | `click_action` | string | auto | Action on click: `toggle`, `more-info`, or `none` |
 | `dim_off_text` | number | - | Per-entity override for dim_off_text (0-100) |
+| `decimals` | number | - | Per-entity override for decimals (0-10) |
 | `show_icon` | boolean | - | Override global `show_icons` setting for this entity |
 | `icon` | object | - | Custom icon configuration (on/off states) |
 | `colors` | object | - | Per-entity color overrides |
@@ -345,6 +350,7 @@ type: custom:indicator-grid-card
 columns: 4
 rows: 2
 cell_height: 100
+decimals: 1  # Show 1 decimal place for numeric sensors
 entities:
   - entity: binary_sensor.internet
     text: INTERNET
