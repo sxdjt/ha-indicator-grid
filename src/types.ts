@@ -11,6 +11,7 @@ export interface IndicatorGridCardConfig extends LovelaceCardConfig {
   font_size?: string | number; // e.g., "14px", 14 (auto-converts to px)
   font_weight?: string | number; // e.g., "bold", 700
   dim_off_text?: number; // Opacity percentage (0-100) for text when entity is off, e.g., 50
+  decimals?: number; // Number of decimal places for numeric states (0-10), e.g., 2
   show_icons?: boolean; // Enable/disable icons globally (default false)
   icon_placement?: 'none' | 'above' | 'below' | 'left' | 'right'; // Global icon placement
   icon_size?: string | number; // Icon size, e.g., "24px", 24 (auto-converts to px)
@@ -29,6 +30,7 @@ export interface EntityConfig {
   icon?: IconConfig; // Per-entity custom icon (on/off states)
   click_action?: 'toggle' | 'more-info' | 'none';
   dim_off_text?: number; // Per-entity override for dim_off_text
+  decimals?: number; // Per-entity override for decimals (0-10)
   colspan?: number; // Number of columns to span (default: 1) - BETA feature
 }
 
