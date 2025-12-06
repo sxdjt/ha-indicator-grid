@@ -3,7 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { HomeAssistant, LovelaceCardEditor, fireEvent } from 'custom-card-helpers';
 import { IndicatorGridCardConfig, EntityConfig, ColorConfig, IconConfig, IndicatorCell, HeaderRowConfig, HeaderCellConfig } from './types';
 
-const CARD_VERSION = '1.1.0';
+const CARD_VERSION = '1.2.0';
 
 console.info(
   `%c  INDICATOR-GRID-CARD  \n%c  Version ${CARD_VERSION}  `,
@@ -236,15 +236,28 @@ export class IndicatorGridCard extends LitElement {
   }
 
   private _getDisplayText(entityConfig: EntityConfig, stateObj: any): string {
+    // Static custom text - return as-is without formatting
     if (entityConfig.text) {
       return entityConfig.text;
     }
 
+    // Format state value for numeric sensors
+    const formattedState = this._formatNumericState(stateObj.state, entityConfig);
+
+    // Template with formatted state
     if (entityConfig.text_template) {
-      // Simple template replacement - could be enhanced with more sophisticated templating
       return entityConfig.text_template
-        .replace(/\{\{\s*state\s*\}\}/g, stateObj.state)
+        .replace(/\{\{\s*state\s*\}\}/g, formattedState)
         .replace(/\{\{\s*name\s*\}\}/g, stateObj.attributes.friendly_name || entityConfig.entity);
+    }
+
+    // Default display: if decimals configured and state is numeric, show formatted number
+    // Otherwise show friendly name (existing behavior)
+    const parsedState = parseFloat(stateObj.state);
+    const hasDecimalsConfig = entityConfig.decimals !== undefined || this.config.decimals !== undefined;
+
+    if (!isNaN(parsedState) && hasDecimalsConfig) {
+      return formattedState;
     }
 
     return stateObj.attributes.friendly_name || entityConfig.entity || '';
@@ -415,6 +428,40 @@ export class IndicatorGridCard extends LitElement {
 
     // Default: no dimming
     return 1;
+  }
+
+  private _formatNumericState(state: string, entityConfig: EntityConfig): string {
+    // Try to parse the state as a number
+    const numericState = parseFloat(state);
+
+    // If not numeric, return original state as-is
+    if (isNaN(numericState)) {
+      return state;
+    }
+
+    // Check for decimals setting - per-entity first, then global
+    let decimals: number | undefined;
+    if (entityConfig.decimals !== undefined) {
+      decimals = entityConfig.decimals;
+    } else if (this.config.decimals !== undefined) {
+      decimals = this.config.decimals;
+    }
+
+    // If no decimals setting configured, return original state
+    if (decimals === undefined) {
+      return state;
+    }
+
+    // Validate decimals range (0-10)
+    const validDecimals = Math.max(0, Math.min(10, Math.floor(decimals)));
+
+    // Handle special numeric values (Infinity, -Infinity)
+    if (!isFinite(numericState)) {
+      return state;
+    }
+
+    // Format the number with specified decimal places
+    return numericState.toFixed(validDecimals);
   }
 
   private _getDefaultClickAction(stateObj: any): 'toggle' | 'more-info' | 'none' {

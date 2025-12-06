@@ -341,6 +341,16 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
         helper-text="Opacity percentage for text when entity is off (0-100). Leave blank for no dimming. Example: 50"
       ></ha-textfield>
 
+      <ha-textfield
+        label="Decimals"
+        type="number"
+        min="0"
+        max="10"
+        .value=${this._config.decimals ?? ''}
+        @input=${(ev: Event) => this._configValueChanged('decimals', (ev.target as HTMLInputElement).value ? Number((ev.target as HTMLInputElement).value) : undefined)}
+        helper-text="Number of decimal places for numeric sensors (0-10). Leave blank for no rounding."
+      ></ha-textfield>
+
       <ha-selector
         .hass=${this.hass}
         .selector=${{ boolean: {} }}
@@ -677,6 +687,17 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
                 @input=${(ev: Event) =>
                   this._entityChanged(index, 'dim_off_text', (ev.target as HTMLInputElement).value ? Number((ev.target as HTMLInputElement).value) : undefined)}
                 helper-text="Override global dim setting (0-100)"
+              ></ha-textfield>
+
+              <ha-textfield
+                label="Decimals"
+                type="number"
+                min="0"
+                max="10"
+                .value=${entity.decimals ?? ''}
+                @input=${(ev: Event) =>
+                  this._entityChanged(index, 'decimals', (ev.target as HTMLInputElement).value ? Number((ev.target as HTMLInputElement).value) : undefined)}
+                helper-text="Override global decimals setting (0-10)"
               ></ha-textfield>
             </div>
           </ha-expansion-panel>
