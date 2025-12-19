@@ -53,6 +53,8 @@ export interface ThresholdConfig {
   value: number; // Threshold value
   color: string; // Color to use when below this threshold
   operator?: '<' | '<=' | '>' | '>=' | '=='; // Comparison operator, defaults to '<='
+  text_color?: string; // Text color override for this threshold
+  font_weight?: string | number; // Font weight override for this threshold
 }
 
 export interface IndicatorCell {
@@ -61,6 +63,7 @@ export interface IndicatorCell {
   backgroundColor: string;
   textColor: string;
   textOpacity: number;
+  fontWeight?: string | number; // Font weight override from threshold
   icon?: string; // Icon to display (if any)
   state?: string;
   clickable: boolean;

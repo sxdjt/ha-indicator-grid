@@ -3,7 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { HomeAssistant, LovelaceCardEditor, fireEvent } from 'custom-card-helpers';
 import { IndicatorGridCardConfig, EntityConfig, ColorConfig, IconConfig, IndicatorCell, HeaderRowConfig, HeaderCellConfig } from './types';
 
-const CARD_VERSION = '1.2.0';
+const CARD_VERSION = '1.3.0';
 
 console.info(
   `%c  INDICATOR-GRID-CARD  \n%c  Version ${CARD_VERSION}  `,
@@ -216,7 +216,25 @@ export class IndicatorGridCard extends LitElement {
     const state = stateObj.state;
     const displayText = this._getDisplayText(entityConfig, stateObj);
     const backgroundColor = this._getBackgroundColor(state, entityConfig);
-    const textColor = this._getColor('text', entityConfig.colors);
+
+    // Check for threshold styles (text_color and font_weight)
+    let textColor = this._getColor('text', entityConfig.colors);
+    let fontWeight: string | number | undefined = undefined;
+
+    const numericState = parseFloat(state);
+    if (!isNaN(numericState)) {
+      const thresholdStyles = this._getThresholdStyles(numericState, entityConfig.colors) ||
+                              this._getThresholdStyles(numericState, this.config.global_colors);
+      if (thresholdStyles) {
+        if (thresholdStyles.textColor) {
+          textColor = thresholdStyles.textColor;
+        }
+        if (thresholdStyles.fontWeight) {
+          fontWeight = thresholdStyles.fontWeight;
+        }
+      }
+    }
+
     const textOpacity = this._getTextOpacity(state, entityConfig);
     const icon = this._getIcon(state, entityConfig, stateObj);
     const clickAction = entityConfig.click_action || this._getDefaultClickAction(stateObj);
@@ -227,6 +245,7 @@ export class IndicatorGridCard extends LitElement {
       backgroundColor,
       textColor,
       textOpacity,
+      fontWeight,
       icon,
       state,
       clickable: clickAction !== 'none',
@@ -279,10 +298,10 @@ export class IndicatorGridCard extends LitElement {
     // Check for numeric thresholds
     const numericState = parseFloat(state);
     if (!isNaN(numericState)) {
-      const thresholdColor = this._getThresholdColor(numericState, colors) ||
-                             this._getThresholdColor(numericState, this.config.global_colors);
-      if (thresholdColor) {
-        return thresholdColor;
+      const thresholdStyles = this._getThresholdStyles(numericState, colors) ||
+                              this._getThresholdStyles(numericState, this.config.global_colors);
+      if (thresholdStyles?.backgroundColor) {
+        return thresholdStyles.backgroundColor;
       }
     }
 
@@ -298,7 +317,7 @@ export class IndicatorGridCard extends LitElement {
     return this._getColor('off', colors);
   }
 
-  private _getThresholdColor(value: number, colors?: ColorConfig): string | null {
+  private _getThresholdStyles(value: number, colors?: ColorConfig): { backgroundColor?: string; textColor?: string; fontWeight?: string | number } | null {
     if (!colors?.thresholds || colors.thresholds.length === 0) {
       return null;
     }
@@ -329,7 +348,11 @@ export class IndicatorGridCard extends LitElement {
       }
 
       if (matches) {
-        return threshold.color;
+        return {
+          backgroundColor: threshold.color,
+          textColor: threshold.text_color,
+          fontWeight: threshold.font_weight,
+        };
       }
     }
 
@@ -758,7 +781,7 @@ export class IndicatorGridCard extends LitElement {
       'background-color': cell.backgroundColor,
       'color': textColor,
       'font-size': this._normalizeSize(this.config.font_size, '16px'),
-      'font-weight': String(this.config.font_weight || 'bold'),
+      'font-weight': String(cell.fontWeight ?? this.config.font_weight ?? 'bold'),
     };
 
     // Add grid-column span if colspan is set

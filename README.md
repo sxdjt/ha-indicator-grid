@@ -2,7 +2,7 @@
 
 A Home Assistant Lovelace card that displays a customizable grid of indicator lights, similar to an aircraft cockpit panel. Each indicator shows the state of an entity with configurable colors, text, and behavior.
 
-![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 **Default:**
@@ -17,39 +17,18 @@ A Home Assistant Lovelace card that displays a customizable grid of indicator li
 
 ## Features
 
-- **NEW: Entity Column Spanning**: Both entity and header cells can span multiple columns for flexible layouts
 - **Customizable Grid**: Define any number of rows and columns
 - **Header Rows**: Add header rows at any position with configurable colspan and styling
 - **Entity State Colors**: Automatically color indicators based on entity state
-- **Threshold Support**: Set color thresholds for numeric sensors (e.g., temperature ranges)
-- **Numeric Rounding**: Control decimal places for numeric sensor values (e.g., show "72.5" instead of "72.456789")
+- **Threshold Support**: Set color, text color, and font weight thresholds for numeric sensors (e.g., temperature ranges with custom styling)
 - **Custom State Mapping**: Map specific states to specific colors
-- **Flexible Text Display**: Show entity names, states, or custom text
 - **Icon Support**: Display entity icons with configurable size and placement (above, below, left, right)
-- **Click Actions**: Toggle entities or show more info on click
 - **Global & Per-Entity Settings**: Set defaults globally and override per entity
-- **Visual Editor Support**: Configure everything through the Home Assistant UI
-- **Blank Cells**: Support for blank cells with customizable color
 
 ## Installation
 
-### HACS (Recommended)
-
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=sxdjt&repository=ha-indicator-grid)
 
-### Manual Installation
-
-1. Download `indicator-grid-card.js` from the [latest release](https://github.com/sxdjt/ha-indicator-grid/releases)
-2. Copy it to `config/www/indicator-grid-card.js`
-3. Add the resource to your Lovelace configuration:
-
-```yaml
-resources:
-  - url: /local/indicator-grid-card.js
-    type: module
-```
-
-4. Restart Home Assistant
 
 ## Configuration
 
@@ -158,45 +137,6 @@ entities:
   # ... etc
 ```
 
-### Entity Column Spanning Example (**NEW in v1.1.0**)
-
-```yaml
-type: custom:indicator-grid-card
-columns: 4
-rows: 3
-cell_height: 100
-entities:
-  # First row - wide status display
-  - entity: sensor.system_status
-    text: SYSTEM STATUS
-    colspan: 4  # Spans all 4 columns
-    colors:
-      states:
-        'online': green
-        'offline': red
-  # Second row - normal cells
-  - entity: light.kitchen
-    text: KITCHEN
-  - entity: light.living_room
-    text: LIVING RM
-  - entity: light.bedroom
-    text: BEDROOM
-  - entity: light.bathroom
-    text: BATHROOM
-  # Third row - mixed spanning
-  - entity: sensor.temperature
-    text_template: 'TEMP {{ state }}°C'
-    colspan: 2  # Spans 2 columns
-  - entity: sensor.humidity
-    text_template: 'HUMIDITY {{ state }}%'
-    colspan: 2  # Spans 2 columns
-```
-
-**Note**: When using `colspan`, make sure the total column count per row adds up correctly. For example, with 4 columns:
-- One cell with `colspan: 4` = 4 columns (full width)
-- Two cells with `colspan: 2` each = 4 columns
-- Four cells with `colspan: 1` each (or omitted) = 4 columns
-
 ## Configuration Options
 
 ### Card Options
@@ -293,15 +233,23 @@ colors:
     - value: 50
       color: blue
       operator: '<'
+      text_color: white       # Optional: override text color for this threshold
+      font_weight: normal     # Optional: override font weight for this threshold
     - value: 80
       color: green
       operator: '<='
+      text_color: black
+      font_weight: bold
     - value: 100
       color: red
       operator: '>'
+      text_color: yellow
+      font_weight: bold
 ```
 
 Operators: `<`, `<=`, `>`, `>=`, `==` (default: `<=`)
+
+**NEW in v1.3.0**: Thresholds can now customize text appearance with `text_color` and `font_weight` in addition to background `color`. This allows for better visual hierarchy and readability when values cross important thresholds.
 
 #### Icons
 
@@ -340,80 +288,6 @@ entities:
 6. **Click Behavior**: By default, lights/switches toggle and sensors show more-info
 7. **Responsive Width**: Leave `cell_width` blank or use percentages (e.g., `25%`) for responsive layouts. Use pixels (e.g., `100` or `"100px"`) for fixed widths
 8. **Cell Height**: Use pixel values for `cell_height` (e.g., `100` or `"100px"`). The card automatically calculates its total height to prevent overlapping with cards below
-
-## Examples
-
-### System Status Panel
-
-```yaml
-type: custom:indicator-grid-card
-columns: 4
-rows: 2
-cell_height: 100
-decimals: 1  # Show 1 decimal place for numeric sensors
-entities:
-  - entity: binary_sensor.internet
-    text: INTERNET
-  - entity: binary_sensor.nas
-    text: NAS
-  - entity: binary_sensor.camera_1
-    text: CAM 1
-  - entity: binary_sensor.camera_2
-    text: CAM 2
-  - entity: sensor.cpu_usage
-    text_template: 'CPU {{ state }}%'
-    colors:
-      thresholds:
-        - value: 50
-          color: green
-        - value: 80
-          color: orange
-        - value: 100
-          color: red
-  - entity: sensor.memory_usage
-    text_template: 'MEM {{ state }}%'
-    colors:
-      thresholds:
-        - value: 50
-          color: green
-        - value: 80
-          color: orange
-        - value: 100
-          color: red
-```
-
-### Room Lighting Control
-
-```yaml
-type: custom:indicator-grid-card
-columns: 3
-rows: 3
-cell_height: 80
-global_colors:
-  on: '#FFD700'
-  off: '#2C2C2C'
-entities:
-  - entity: light.kitchen
-    text: KITCHEN
-  - entity: light.living_room
-    text: LIVING
-  - entity: light.bedroom
-    text: BEDROOM
-  - entity: light.bathroom
-    text: BATH
-  - entity: light.hallway
-    text: HALL
-  - entity: light.outside
-    text: OUTSIDE
-```
-
-## Troubleshooting
-
-**Card not showing**: Make sure you've added the resource and restarted Home Assistant
-
-**Colors not working**: Check that color values are valid CSS colors
-
-**Entities not updating**: Verify entity IDs are correct and entities exist in Home Assistant
 
 ## Support
 
