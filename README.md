@@ -4,6 +4,7 @@ A Home Assistant Lovelace card that displays a customizable grid of indicator li
 
 ![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![AI Assisted](https://img.shields.io/badge/AI-Claude%20Code-AAAAAA.svg)](https://claude.ai/code)
 
 **Default:**
 
