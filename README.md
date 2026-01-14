@@ -2,9 +2,8 @@
 
 A Home Assistant Lovelace card that displays a customizable grid of indicator lights, similar to an aircraft cockpit panel. Each indicator shows the state of an entity with configurable colors, text, and behavior.
 
-![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![AI Assisted](https://img.shields.io/badge/AI-Claude%20Code-AAAAAA.svg)](https://claude.ai/code)
+![GitHub Release](https://img.shields.io/github/v/release/sxdjt/ha-indicator-grid?style=for-the-badge)
+[![AI Assisted](https://img.shields.io/badge/AI-Claude%20Code-AAAAAA.svg?style=for-the-badge)](https://claude.ai/code)
 
 **Default:**
 
