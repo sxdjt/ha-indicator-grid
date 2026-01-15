@@ -55,23 +55,23 @@ entities:
 
 | Name | Type | Default | Description |
 |------|------|---------|-------------|
-| `type` | string | **required** | Must be `custom:indicator-grid-card` |
-| `columns` | number | `3` | Number of columns in the grid |
-| `rows` | number | `2` | Number of rows in the grid |
-| `cell_width` | string/number | auto (100%) | Width of each cell (e.g., `100`, `"100px"`, `"25%"`, blank for auto) |
-| `cell_height` | string/number | `100` | Height of each cell (e.g., `100` or `"100px"`) - numbers auto-convert to px |
+| `entities` | list | **required** | List of entity configurations |
 | `cell_gap` | string/number | `5` | Gap between cells (e.g., `5` or `"5px"`) - numbers auto-convert to px |
+| `cell_height` | string/number | `100` | Height of each cell (e.g., `100` or `"100px"`) - numbers auto-convert to px |
+| `cell_width` | string/number | auto (100%) | Width of each cell (e.g., `100`, `"100px"`, `"25%"`, blank for auto) |
+| `columns` | number | `3` | Number of columns in the grid |
+| `decimals` | number | none | Number of decimal places for numeric sensors (0-10, e.g., `2` shows "72.50") |
+| `dim_off_text` | number | none | Opacity percentage (0-100) for text when entity is "off" (e.g., `50` for 50% opacity) |
 | `font_size` | string/number | `16` | Font size for text (e.g., `16` or `"16px"`) - numbers auto-convert to px |
 | `font_weight` | string/number | `bold` | Font weight for text |
-| `unavailable_text` | string | `INOP` | Text to display for unavailable entities |
-| `dim_off_text` | number | none | Opacity percentage (0-100) for text when entity is "off" (e.g., `50` for 50% opacity) |
-| `decimals` | number | none | Number of decimal places for numeric sensors (0-10, e.g., `2` shows "72.50") |
-| `show_icons` | boolean | `false` | Enable/disable icons globally |
-| `icon_placement` | string | `above` | Icon placement: `above`, `below`, `left`, or `right` |
-| `icon_size` | string/number | `24` | Icon size (e.g., `24` or `"24px"`) - numbers auto-convert to px |
 | `global_colors` | object | see below | Global color configuration |
 | `header_rows` | list | - | List of header row configurations |
-| `entities` | list | **required** | List of entity configurations |
+| `icon_placement` | string | `above` | Icon placement: `above`, `below`, `left`, or `right` |
+| `icon_size` | string/number | `24` | Icon size (e.g., `24` or `"24px"`) - numbers auto-convert to px |
+| `rows` | number | `2` | Number of rows in the grid |
+| `show_icons` | boolean | `false` | Enable/disable icons globally |
+| `unavailable_text` | string | `INOP` | Text to display for unavailable entities |
+
 
 ### Global Colors
 
@@ -79,27 +79,27 @@ entities:
 |------|------|---------|-------------|
 | `on` | string | `green` | Color when entity is "on" |
 | `off` | string | `gray` | Color when entity is "off" |
-| `unavailable` | string | `orange` | Color when entity is unavailable |
-| `text` | string | `white` | Text color |
 | `blank` | string | `#333333` | Background color for blank cells |
 | `states` | object | - | Map specific states to colors |
+| `text` | string | `white` | Text color |
 | `thresholds` | list | - | Threshold configuration for numeric values |
+| `unavailable` | string | `orange` | Color when entity is unavailable |
 
 ### Entity Configuration
 
 | Name | Type | Default | Description |
 |------|------|---------|-------------|
 | `entity` | string | - | Entity ID (omit for blank cell or text-only cell) |
-| `text` | string | entity name | Custom static text to display (works without entity for text-only cells) |
-| `text_template` | string | - | Template for dynamic text (use `{{ state }}` for state) |
-| `text_align` | string | `center` | Text alignment: `left`, `center`, or `right` |
-| `colspan` | number | `1` | Number of columns this cell spans |
 | `click_action` | string | auto | Action on click: `toggle`, `more-info`, or `none` |
-| `dim_off_text` | number | - | Per-entity override for dim_off_text (0-100) |
-| `decimals` | number | - | Per-entity override for decimals (0-10) |
-| `show_icon` | boolean | - | Override global `show_icons` setting for this entity |
-| `icon` | object | - | Custom icon configuration (on/off states) |
 | `colors` | object | - | Per-entity color overrides |
+| `colspan` | number | `1` | Number of columns this cell spans |
+| `decimals` | number | - | Per-entity override for decimals (0-10) |
+| `dim_off_text` | number | - | Per-entity override for dim_off_text (0-100) |
+| `icon` | object | - | Custom icon configuration (on/off states) |
+| `show_icon` | boolean | - | Override global `show_icons` setting for this entity |
+| `text_align` | string | `center` | Text alignment: `left`, `center`, or `right` |
+| `text_template` | string | - | Template for dynamic text (use `{{ state }}` for state) |
+| `text` | string | entity name | Custom static text to display (works without entity for text-only cells) |
 
 ### Header Row Configuration
 
@@ -113,12 +113,12 @@ entities:
 | Name | Type | Default | Description |
 |------|------|---------|-------------|
 | `text` | string | **required** | Text to display in header |
+| `background_color` | string | global blank | Background color override |
 | `colspan` | number | `1` | Number of columns this cell spans |
-| `text_align` | string | `center` | Text alignment: `left`, `center`, or `right` |
 | `font_size` | string/number | card default | Font size override (e.g., `20` or `"20px"`) - numbers auto-convert to px |
 | `font_weight` | string/number | card default | Font weight override (e.g., `bold`, `600`) |
+| `text_align` | string | `center` | Text alignment: `left`, `center`, or `right` |
 | `text_color` | string | global text | Text color override |
-| `background_color` | string | global blank | Background color override |
 
 ### Color Configuration
 
