@@ -48,6 +48,158 @@ entities:
   - entity: sensor.temperature
 ```
 
+
+## Configuration Options
+
+### Card Options
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `type` | string | **required** | Must be `custom:indicator-grid-card` |
+| `columns` | number | `3` | Number of columns in the grid |
+| `rows` | number | `2` | Number of rows in the grid |
+| `cell_width` | string/number | auto (100%) | Width of each cell (e.g., `100`, `"100px"`, `"25%"`, blank for auto) |
+| `cell_height` | string/number | `100` | Height of each cell (e.g., `100` or `"100px"`) - numbers auto-convert to px |
+| `cell_gap` | string/number | `5` | Gap between cells (e.g., `5` or `"5px"`) - numbers auto-convert to px |
+| `font_size` | string/number | `16` | Font size for text (e.g., `16` or `"16px"`) - numbers auto-convert to px |
+| `font_weight` | string/number | `bold` | Font weight for text |
+| `unavailable_text` | string | `INOP` | Text to display for unavailable entities |
+| `dim_off_text` | number | none | Opacity percentage (0-100) for text when entity is "off" (e.g., `50` for 50% opacity) |
+| `decimals` | number | none | Number of decimal places for numeric sensors (0-10, e.g., `2` shows "72.50") |
+| `show_icons` | boolean | `false` | Enable/disable icons globally |
+| `icon_placement` | string | `above` | Icon placement: `above`, `below`, `left`, or `right` |
+| `icon_size` | string/number | `24` | Icon size (e.g., `24` or `"24px"`) - numbers auto-convert to px |
+| `global_colors` | object | see below | Global color configuration |
+| `header_rows` | list | - | List of header row configurations |
+| `entities` | list | **required** | List of entity configurations |
+
+### Global Colors
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `on` | string | `green` | Color when entity is "on" |
+| `off` | string | `gray` | Color when entity is "off" |
+| `unavailable` | string | `orange` | Color when entity is unavailable |
+| `text` | string | `white` | Text color |
+| `blank` | string | `#333333` | Background color for blank cells |
+| `states` | object | - | Map specific states to colors |
+| `thresholds` | list | - | Threshold configuration for numeric values |
+
+### Entity Configuration
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `entity` | string | - | Entity ID (omit for blank cell or text-only cell) |
+| `text` | string | entity name | Custom static text to display (works without entity for text-only cells) |
+| `text_template` | string | - | Template for dynamic text (use `{{ state }}` for state) |
+| `text_align` | string | `center` | Text alignment: `left`, `center`, or `right` |
+| `colspan` | number | `1` | Number of columns this cell spans |
+| `click_action` | string | auto | Action on click: `toggle`, `more-info`, or `none` |
+| `dim_off_text` | number | - | Per-entity override for dim_off_text (0-100) |
+| `decimals` | number | - | Per-entity override for decimals (0-10) |
+| `show_icon` | boolean | - | Override global `show_icons` setting for this entity |
+| `icon` | object | - | Custom icon configuration (on/off states) |
+| `colors` | object | - | Per-entity color overrides |
+
+### Header Row Configuration
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `row_index` | number | **required** | Which row this header occupies (0-based, 0 = first row) |
+| `cells` | list | **required** | List of header cell configurations |
+
+### Header Cell Configuration
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `text` | string | **required** | Text to display in header |
+| `colspan` | number | `1` | Number of columns this cell spans |
+| `text_align` | string | `center` | Text alignment: `left`, `center`, or `right` |
+| `font_size` | string/number | card default | Font size override (e.g., `20` or `"20px"`) - numbers auto-convert to px |
+| `font_weight` | string/number | card default | Font weight override (e.g., `bold`, `600`) |
+| `text_color` | string | global text | Text color override |
+| `background_color` | string | global blank | Background color override |
+
+### Color Configuration
+
+Colors can be specified as:
+- CSS color names: `red`, `green`, `blue`
+- Hex codes: `#FF0000`, `#00FF00`
+- RGB: `rgb(255, 0, 0)`
+- RGBA: `rgba(255, 0, 0, 0.5)`
+
+#### State Mapping
+
+```yaml
+colors:
+  states:
+    'home': green
+    'away': red
+    'not_home': orange
+```
+
+#### Thresholds (for numeric sensors)
+
+```yaml
+colors:
+  thresholds:
+    - value: 50
+      color: blue
+      operator: '<'
+      text_color: white       # Optional: override text color for this threshold
+      font_weight: normal     # Optional: override font weight for this threshold
+    - value: 80
+      color: green
+      operator: '<='
+      text_color: black
+      font_weight: bold
+    - value: 100
+      color: red
+      operator: '>'
+      text_color: yellow
+      font_weight: bold
+```
+
+Operators: `<`, `<=`, `>`, `>=`, `==` (default: `<=`)
+
+#### Icons
+
+Icons are displayed from the entity's default icon or can be customized per state:
+
+```yaml
+# Enable icons globally
+show_icons: true
+icon_placement: above  # above, below, left, or right
+icon_size: 28
+
+# Per-entity custom icons
+entities:
+  - entity: light.bedroom
+    icon:
+      on: mdi:lightbulb-on
+      off: mdi:lightbulb-off
+  - entity: switch.fan
+    show_icon: false  # Hide icon for this entity only
+```
+
+**Icon hierarchy:**
+1. If `show_icon` is set on entity, use that value
+2. Otherwise, use global `show_icons` setting
+3. If enabled, use entity's custom `icon.on/off` if defined
+4. Otherwise, use entity's default icon from Home Assistant
+5. If no icon available, fall back to domain-based default
+
+## Usage Tips
+
+1. **Simplified Configuration**: Size values can be specified as numbers (auto-convert to `px`) or strings. For example, `cell_height: 100` is equivalent to `cell_height: "100px"`
+2. **Blank Cells**: Create blank spaces with `{}`. Customize their color with `global_colors.blank` or per-cell with `colors.blank`
+3. **Cell Order**: Entities fill the grid left-to-right, top-to-bottom in the order listed
+4. **Text Templates**: Use `{{ state }}` for entity state and `{{ name }}` for entity name
+5. **Icons**: Enable globally with `show_icons: true`, then customize placement, size, and per-entity icons
+6. **Click Behavior**: By default, lights/switches toggle and sensors show more-info
+7. **Responsive Width**: Leave `cell_width` blank or use percentages (e.g., `25%`) for responsive layouts. Use pixels (e.g., `100` or `"100px"`) for fixed widths
+8. **Cell Height**: Use pixel values for `cell_height` (e.g., `100` or `"100px"`). The card automatically calculates its total height to prevent overlapping with cards below
+
 ### Full Example
 
 ```yaml
@@ -180,159 +332,6 @@ entities:
   - entity: sensor.garage_humidity
     text_template: "{{ state }}%"
 ```
-
-## Configuration Options
-
-### Card Options
-
-| Name | Type | Default | Description |
-|------|------|---------|-------------|
-| `type` | string | **required** | Must be `custom:indicator-grid-card` |
-| `columns` | number | `3` | Number of columns in the grid |
-| `rows` | number | `2` | Number of rows in the grid |
-| `cell_width` | string/number | auto (100%) | Width of each cell (e.g., `100`, `"100px"`, `"25%"`, blank for auto) |
-| `cell_height` | string/number | `100` | Height of each cell (e.g., `100` or `"100px"`) - numbers auto-convert to px |
-| `cell_gap` | string/number | `5` | Gap between cells (e.g., `5` or `"5px"`) - numbers auto-convert to px |
-| `font_size` | string/number | `16` | Font size for text (e.g., `16` or `"16px"`) - numbers auto-convert to px |
-| `font_weight` | string/number | `bold` | Font weight for text |
-| `unavailable_text` | string | `INOP` | Text to display for unavailable entities |
-| `dim_off_text` | number | none | Opacity percentage (0-100) for text when entity is "off" (e.g., `50` for 50% opacity) |
-| `decimals` | number | none | Number of decimal places for numeric sensors (0-10, e.g., `2` shows "72.50") |
-| `show_icons` | boolean | `false` | Enable/disable icons globally |
-| `icon_placement` | string | `above` | Icon placement: `above`, `below`, `left`, or `right` |
-| `icon_size` | string/number | `24` | Icon size (e.g., `24` or `"24px"`) - numbers auto-convert to px |
-| `global_colors` | object | see below | Global color configuration |
-| `header_rows` | list | - | List of header row configurations |
-| `entities` | list | **required** | List of entity configurations |
-
-### Global Colors
-
-| Name | Type | Default | Description |
-|------|------|---------|-------------|
-| `on` | string | `green` | Color when entity is "on" |
-| `off` | string | `gray` | Color when entity is "off" |
-| `unavailable` | string | `orange` | Color when entity is unavailable |
-| `text` | string | `white` | Text color |
-| `blank` | string | `#333333` | Background color for blank cells |
-| `states` | object | - | Map specific states to colors |
-| `thresholds` | list | - | Threshold configuration for numeric values |
-
-### Entity Configuration
-
-| Name | Type | Default | Description |
-|------|------|---------|-------------|
-| `entity` | string | - | Entity ID (omit for blank cell or text-only cell) |
-| `text` | string | entity name | Custom static text to display (works without entity for text-only cells) |
-| `text_template` | string | - | Template for dynamic text (use `{{ state }}` for state) |
-| `text_align` | string | `center` | Text alignment: `left`, `center`, or `right` |
-| `colspan` | number | `1` | Number of columns this cell spans |
-| `click_action` | string | auto | Action on click: `toggle`, `more-info`, or `none` |
-| `dim_off_text` | number | - | Per-entity override for dim_off_text (0-100) |
-| `decimals` | number | - | Per-entity override for decimals (0-10) |
-| `show_icon` | boolean | - | Override global `show_icons` setting for this entity |
-| `icon` | object | - | Custom icon configuration (on/off states) |
-| `colors` | object | - | Per-entity color overrides |
-
-### Header Row Configuration
-
-| Name | Type | Default | Description |
-|------|------|---------|-------------|
-| `row_index` | number | **required** | Which row this header occupies (0-based, 0 = first row) |
-| `cells` | list | **required** | List of header cell configurations |
-
-### Header Cell Configuration
-
-| Name | Type | Default | Description |
-|------|------|---------|-------------|
-| `text` | string | **required** | Text to display in header |
-| `colspan` | number | `1` | Number of columns this cell spans |
-| `text_align` | string | `center` | Text alignment: `left`, `center`, or `right` |
-| `font_size` | string/number | card default | Font size override (e.g., `20` or `"20px"`) - numbers auto-convert to px |
-| `font_weight` | string/number | card default | Font weight override (e.g., `bold`, `600`) |
-| `text_color` | string | global text | Text color override |
-| `background_color` | string | global blank | Background color override |
-
-### Color Configuration
-
-Colors can be specified as:
-- CSS color names: `red`, `green`, `blue`
-- Hex codes: `#FF0000`, `#00FF00`
-- RGB: `rgb(255, 0, 0)`
-- RGBA: `rgba(255, 0, 0, 0.5)`
-
-#### State Mapping
-
-```yaml
-colors:
-  states:
-    'home': green
-    'away': red
-    'not_home': orange
-```
-
-#### Thresholds (for numeric sensors)
-
-```yaml
-colors:
-  thresholds:
-    - value: 50
-      color: blue
-      operator: '<'
-      text_color: white       # Optional: override text color for this threshold
-      font_weight: normal     # Optional: override font weight for this threshold
-    - value: 80
-      color: green
-      operator: '<='
-      text_color: black
-      font_weight: bold
-    - value: 100
-      color: red
-      operator: '>'
-      text_color: yellow
-      font_weight: bold
-```
-
-Operators: `<`, `<=`, `>`, `>=`, `==` (default: `<=`)
-
-**NEW in v1.3.0**: Thresholds can now customize text appearance with `text_color` and `font_weight` in addition to background `color`. This allows for better visual hierarchy and readability when values cross important thresholds.
-
-#### Icons
-
-Icons are displayed from the entity's default icon or can be customized per state:
-
-```yaml
-# Enable icons globally
-show_icons: true
-icon_placement: above  # above, below, left, or right
-icon_size: 28
-
-# Per-entity custom icons
-entities:
-  - entity: light.bedroom
-    icon:
-      on: mdi:lightbulb-on
-      off: mdi:lightbulb-off
-  - entity: switch.fan
-    show_icon: false  # Hide icon for this entity only
-```
-
-**Icon hierarchy:**
-1. If `show_icon` is set on entity, use that value
-2. Otherwise, use global `show_icons` setting
-3. If enabled, use entity's custom `icon.on/off` if defined
-4. Otherwise, use entity's default icon from Home Assistant
-5. If no icon available, fall back to domain-based default
-
-## Usage Tips
-
-1. **Simplified Configuration**: Size values can be specified as numbers (auto-convert to `px`) or strings. For example, `cell_height: 100` is equivalent to `cell_height: "100px"`
-2. **Blank Cells**: Create blank spaces with `{}`. Customize their color with `global_colors.blank` or per-cell with `colors.blank`
-3. **Cell Order**: Entities fill the grid left-to-right, top-to-bottom in the order listed
-4. **Text Templates**: Use `{{ state }}` for entity state and `{{ name }}` for entity name
-5. **Icons**: Enable globally with `show_icons: true`, then customize placement, size, and per-entity icons
-6. **Click Behavior**: By default, lights/switches toggle and sensors show more-info
-7. **Responsive Width**: Leave `cell_width` blank or use percentages (e.g., `25%`) for responsive layouts. Use pixels (e.g., `100` or `"100px"`) for fixed widths
-8. **Cell Height**: Use pixel values for `cell_height` (e.g., `100` or `"100px"`). The card automatically calculates its total height to prevent overlapping with cards below
 
 ## Support
 
