@@ -25,6 +25,7 @@ export interface EntityConfig {
   entity?: string; // Entity ID, omit for blank cell
   text?: string; // Custom text to display, defaults to entity friendly name
   text_template?: string; // Template for dynamic text
+  text_align?: 'left' | 'center' | 'right'; // Text alignment (default: center)
   colors?: ColorConfig; // Per-entity color overrides
   show_icon?: boolean; // Per-entity override to show/hide icon
   icon?: IconConfig; // Per-entity custom icon (on/off states)
@@ -63,6 +64,7 @@ export interface IndicatorCell {
   backgroundColor: string;
   textColor: string;
   textOpacity: number;
+  textAlign?: 'left' | 'center' | 'right'; // Text alignment (default: center)
   fontWeight?: string | number; // Font weight override from threshold
   icon?: string; // Icon to display (if any)
   state?: string;

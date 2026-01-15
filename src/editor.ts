@@ -622,6 +622,23 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
             .selector=${{
               select: {
                 options: [
+                  { value: '', label: 'Center (default)' },
+                  { value: 'left', label: 'Left' },
+                  { value: 'right', label: 'Right' },
+                ],
+              },
+            }}
+            .value=${entity.text_align || ''}
+            @value-changed=${(ev: CustomEvent) =>
+              this._entityChanged(index, 'text_align', ev.detail.value || undefined)}
+            .label=${'Text Alignment'}
+          ></ha-selector>
+
+          <ha-selector
+            .hass=${this.hass}
+            .selector=${{
+              select: {
+                options: [
                   { value: '', label: 'Auto (toggle or more-info)' },
                   { value: 'toggle', label: 'Toggle' },
                   { value: 'more-info', label: 'More Info' },

@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-01-14
+
+### Added
+- **Text Alignment for Entity Cells**: Control text alignment within entity cells
+  - `text_align` property accepts `left`, `center`, or `right`
+  - Works for all cell types: text-only cells, entity cells, and blank cells
+  - Visual editor support with dropdown selector
+  - Useful for creating table-like layouts with row labels
+
+### Fixed
+- **Text-only Cells**: Cells with `text` property but no `entity` now correctly display their text
+  - Previously these cells appeared blank
+  - Enables row labels and static text cells without requiring an entity
+
 ## [1.3.0] - 2025-12-18
 
 ### Added

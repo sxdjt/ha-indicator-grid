@@ -3,7 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { HomeAssistant, LovelaceCardEditor, fireEvent } from 'custom-card-helpers';
 import { IndicatorGridCardConfig, EntityConfig, ColorConfig, IconConfig, IndicatorCell, HeaderRowConfig, HeaderCellConfig } from './types';
 
-const CARD_VERSION = '1.3.0';
+const CARD_VERSION = '1.4.0';
 
 console.info(
   `%c  INDICATOR-GRID-CARD  \n%c  Version ${CARD_VERSION}  `,
@@ -169,12 +169,13 @@ export class IndicatorGridCard extends LitElement {
       const entityConfig = this.config.entities[i];
 
       if (!entityConfig || !entityConfig.entity) {
-        // Empty/blank cell
+        // Text-only or blank cell
         cells.push({
-          displayText: '',
+          displayText: entityConfig?.text || '',
           backgroundColor: this._getColor('blank', entityConfig?.colors),
           textColor: this._getColor('text', entityConfig?.colors),
           textOpacity: 1,
+          textAlign: entityConfig?.text_align,
           clickable: false,
           clickAction: 'none',
           colspan: entityConfig?.colspan || 1,
@@ -206,6 +207,7 @@ export class IndicatorGridCard extends LitElement {
         backgroundColor: this._getColor('unavailable', entityConfig.colors),
         textColor: this._getColor('text', entityConfig.colors),
         textOpacity: 1,
+        textAlign: entityConfig.text_align,
         state: stateObj?.state,
         clickable: false,
         clickAction: 'none',
@@ -245,6 +247,7 @@ export class IndicatorGridCard extends LitElement {
       backgroundColor,
       textColor,
       textOpacity,
+      textAlign: entityConfig.text_align,
       fontWeight,
       icon,
       state,
@@ -586,12 +589,13 @@ export class IndicatorGridCard extends LitElement {
           // Create and render the cell
           let cell: IndicatorCell;
           if (!entityConfig || !entityConfig.entity) {
-            // Empty/blank cell
+            // Text-only or blank cell
             cell = {
-              displayText: '',
+              displayText: entityConfig?.text || '',
               backgroundColor: this._getColor('blank', entityConfig?.colors),
               textColor: this._getColor('text', entityConfig?.colors),
               textOpacity: 1,
+              textAlign: entityConfig?.text_align,
               clickable: false,
               clickAction: 'none',
               colspan: colspan,
@@ -789,6 +793,19 @@ export class IndicatorGridCard extends LitElement {
       cellStyle['grid-column'] = `span ${cell.colspan}`;
     }
 
+    // Map text alignment to flexbox justify-content and text-align
+    // justify-content: positions content block within the flex cell
+    // text-align: controls how wrapped text aligns within text divs
+    const alignmentMap: Record<string, string> = {
+      'left': 'flex-start',
+      'center': 'center',
+      'right': 'flex-end',
+    };
+    if (cell.textAlign) {
+      cellStyle['justify-content'] = alignmentMap[cell.textAlign] || 'center';
+      cellStyle['text-align'] = cell.textAlign;
+    }
+
     // Determine icon placement class
     const iconPlacementClass = cell.icon
       ? `icon-${this.config.icon_placement}`
@@ -797,6 +814,12 @@ export class IndicatorGridCard extends LitElement {
     const iconStyle = {
       '--mdc-icon-size': this._normalizeSize(this.config.icon_size, '24px'),
     };
+
+    // Style for cell-text to match alignment
+    const cellTextStyle: Record<string, string> = {};
+    if (cell.textAlign) {
+      cellTextStyle['align-items'] = alignmentMap[cell.textAlign] || 'center';
+    }
 
     // Check if text contains newlines for multi-line display
     const textLines = cell.displayText.split('\n');
@@ -808,7 +831,7 @@ export class IndicatorGridCard extends LitElement {
         @click=${() => this._handleClick(cell)}
       >
         ${cell.icon ? html`<ha-icon class="cell-icon" .icon=${cell.icon} style=${this._styleMap(iconStyle)}></ha-icon>` : ''}
-        <div class="cell-text">
+        <div class="cell-text" style=${this._styleMap(cellTextStyle)}>
           ${textLines.map(line => html`<div class="text-line">${line}</div>`)}
         </div>
       </div>

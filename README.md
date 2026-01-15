@@ -138,6 +138,49 @@ entities:
   # ... etc
 ```
 
+### Table Layout with Row Labels Example
+
+```yaml
+type: custom:indicator-grid-card
+columns: 3
+rows: 4
+cell_height: 40
+cell_gap: 4
+font_weight: normal
+global_colors:
+  "off": "#1a1a1a"
+  text: white
+header_rows:
+  - row_index: 0
+    cells:
+      - text: Room
+        text_align: left
+      - text: Temp
+      - text: Humidity
+entities:
+  # Row 1: Kitchen
+  - text: Kitchen
+    text_align: left
+  - entity: sensor.kitchen_temperature
+    text_template: "{{ state }}F"
+  - entity: sensor.kitchen_humidity
+    text_template: "{{ state }}%"
+  # Row 2: Bedroom
+  - text: Bedroom
+    text_align: left
+  - entity: sensor.bedroom_temperature
+    text_template: "{{ state }}F"
+  - entity: sensor.bedroom_humidity
+    text_template: "{{ state }}%"
+  # Row 3: Garage
+  - text: Garage
+    text_align: left
+  - entity: sensor.garage_temperature
+    text_template: "{{ state }}F"
+  - entity: sensor.garage_humidity
+    text_template: "{{ state }}%"
+```
+
 ## Configuration Options
 
 ### Card Options
@@ -178,10 +221,11 @@ entities:
 
 | Name | Type | Default | Description |
 |------|------|---------|-------------|
-| `entity` | string | - | Entity ID (omit for blank cell) |
-| `text` | string | entity name | Custom static text to display |
+| `entity` | string | - | Entity ID (omit for blank cell or text-only cell) |
+| `text` | string | entity name | Custom static text to display (works without entity for text-only cells) |
 | `text_template` | string | - | Template for dynamic text (use `{{ state }}` for state) |
-| `colspan` | number | `1` | **NEW in v1.1.0:** Number of columns this cell spans |
+| `text_align` | string | `center` | Text alignment: `left`, `center`, or `right` |
+| `colspan` | number | `1` | Number of columns this cell spans |
 | `click_action` | string | auto | Action on click: `toggle`, `more-info`, or `none` |
 | `dim_off_text` | number | - | Per-entity override for dim_off_text (0-100) |
 | `decimals` | number | - | Per-entity override for decimals (0-10) |
