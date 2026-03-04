@@ -7,8 +7,8 @@ const CARD_VERSION = '1.4.0';
 
 console.info(
   `%c  INDICATOR-GRID-CARD  \n%c  Version ${CARD_VERSION}  `,
-  'color: orange; font-weight: bold; background: black',
-  'color: white; font-weight: bold; background: dimgray'
+  'color: black; background: #F2720C; font-weight: 600;',
+  'color: black; background: #00a5c9; font-weight: 600;'
 );
 
 (window as any).customCards = (window as any).customCards || [];
