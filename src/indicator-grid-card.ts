@@ -3,7 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { HomeAssistant, LovelaceCardEditor, fireEvent } from 'custom-card-helpers';
 import { IndicatorGridCardConfig, EntityConfig, ColorConfig, IconConfig, IndicatorCell, HeaderRowConfig, HeaderCellConfig } from './types';
 
-const CARD_VERSION = '1.4.0';
+const CARD_VERSION = '1.5.0-beta.1';
 
 console.info(
   `%c  INDICATOR-GRID-CARD  \n%c  Version ${CARD_VERSION}  `,
@@ -263,15 +263,13 @@ export class IndicatorGridCard extends LitElement {
       return entityConfig.text;
     }
 
+    // Template with Jinja2-style filter support
+    if (entityConfig.text_template) {
+      return this._renderTemplate(entityConfig.text_template, stateObj, entityConfig);
+    }
+
     // Format state value for numeric sensors
     const formattedState = this._formatNumericState(stateObj.state, entityConfig);
-
-    // Template with formatted state
-    if (entityConfig.text_template) {
-      return entityConfig.text_template
-        .replace(/\{\{\s*state\s*\}\}/g, formattedState)
-        .replace(/\{\{\s*name\s*\}\}/g, stateObj.attributes.friendly_name || entityConfig.entity);
-    }
 
     // Default display: if decimals configured and state is numeric, show formatted number
     // Otherwise show friendly name (existing behavior)
@@ -283,6 +281,76 @@ export class IndicatorGridCard extends LitElement {
     }
 
     return stateObj.attributes.friendly_name || entityConfig.entity || '';
+  }
+
+  // Render a text_template string, supporting Jinja2-style {{ variable | filter }} syntax.
+  // Supported variables: state, name, attributes.<attr>
+  // Supported filters: upper, lower, title, round(n), int, float, replace('a','b'), truncate(n), default('val')
+  private _renderTemplate(template: string, stateObj: any, entityConfig: EntityConfig): string {
+    return template.replace(/\{\{\s*(.+?)\s*\}\}/g, (_match, expression) => {
+      const parts = expression.split('|').map((s: string) => s.trim());
+      let value = this._resolveTemplateVariable(parts[0], stateObj, entityConfig);
+      for (let i = 1; i < parts.length; i++) {
+        value = this._applyTemplateFilter(value, parts[i]);
+      }
+      return value;
+    });
+  }
+
+  private _resolveTemplateVariable(variable: string, stateObj: any, entityConfig: EntityConfig): string {
+    const formattedState = this._formatNumericState(stateObj.state, entityConfig);
+    if (variable === 'state') return formattedState;
+    if (variable === 'name') return stateObj.attributes.friendly_name || entityConfig.entity || '';
+    // Support attributes.xxx
+    if (variable.startsWith('attributes.')) {
+      const attr = variable.slice('attributes.'.length);
+      const val = stateObj.attributes[attr];
+      return val !== undefined && val !== null ? String(val) : '';
+    }
+    return variable;
+  }
+
+  private _applyTemplateFilter(value: string, filter: string): string {
+    // Parse filter name and optional args: e.g. round(2), replace('a','b'), default('N/A')
+    const parenIdx = filter.indexOf('(');
+    const filterName = parenIdx >= 0 ? filter.slice(0, parenIdx).trim() : filter.trim();
+    let args: string[] = [];
+    if (parenIdx >= 0) {
+      const argsStr = filter.slice(parenIdx + 1, filter.lastIndexOf(')'));
+      // Split on commas, strip surrounding quotes/spaces from each arg
+      args = argsStr.split(',').map(s => s.trim().replace(/^['"]|['"]$/g, ''));
+    }
+
+    switch (filterName) {
+      case 'upper':    return value.toUpperCase();
+      case 'lower':    return value.toLowerCase();
+      case 'title':    return value.replace(/\b\w/g, c => c.toUpperCase());
+      case 'round': {
+        const decimals = args.length > 0 ? parseInt(args[0], 10) : 0;
+        const num = parseFloat(value);
+        return isNaN(num) ? value : num.toFixed(isNaN(decimals) ? 0 : decimals);
+      }
+      case 'int': {
+        const num = parseInt(value, 10);
+        return isNaN(num) ? (args.length > 0 ? args[0] : '0') : String(num);
+      }
+      case 'float': {
+        const num = parseFloat(value);
+        return isNaN(num) ? (args.length > 0 ? args[0] : '0') : String(num);
+      }
+      case 'replace':
+        if (args.length >= 2) return value.split(args[0]).join(args[1]);
+        return value;
+      case 'truncate': {
+        const len = args.length > 0 ? parseInt(args[0], 10) : 255;
+        const limit = isNaN(len) ? 255 : len;
+        return value.length > limit ? value.slice(0, limit) + '...' : value;
+      }
+      case 'default':
+        return value !== '' ? value : (args.length > 0 ? args[0] : '');
+      default:
+        return value; // Unknown filter: pass through unchanged
+    }
   }
 
   private _getBackgroundColor(state: string, entityConfig: EntityConfig): string {

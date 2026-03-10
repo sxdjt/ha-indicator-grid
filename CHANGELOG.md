@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0-beta.1] - 2026-03-09
+
+### Added
+- **Jinja2-style template filters for `text_template`**: The `text_template` field now supports
+  a filter pipeline using `{{ variable | filter }}` syntax, compatible with common Jinja2 filters
+  - Variables: `state`, `name`, `attributes.<attr>`
+  - Filters: `upper`, `lower`, `title`, `round(n)`, `int`, `float`, `replace('a','b')`,
+    `truncate(n)`, `default('value')`
+  - Filters can be chained: `{{ state | upper | truncate(8) }}`
+  - Example: `text_template: "Charging:\n {{ state | upper }}"`
+  - Fully backward compatible with existing `{{ state }}` and `{{ name }}` templates
+
 ## [1.4.0] - 2026-01-14
 
 ### Added
