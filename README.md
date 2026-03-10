@@ -98,7 +98,7 @@ entities:
 | `icon` | object | - | Custom icon configuration (on/off states) |
 | `show_icon` | boolean | - | Override global `show_icons` setting for this entity |
 | `text_align` | string | `center` | Text alignment: `left`, `center`, or `right` |
-| `text_template` | string | - | Template for dynamic text (use `{{ state }}` for state) |
+| `text_template` | string | - | Template for dynamic text with Jinja2-style filter support (see [Text Templates](#text-templates)) |
 | `text` | string | entity name | Custom static text to display (works without entity for text-only cells) |
 
 ### Header Row Configuration
@@ -189,12 +189,59 @@ entities:
 4. Otherwise, use entity's default icon from Home Assistant
 5. If no icon available, fall back to domain-based default
 
+## Text Templates
+
+The `text_template` field supports Jinja2-style filter pipelines using `{{ variable | filter }}` syntax.
+
+### Variables
+
+| Variable | Description |
+|----------|-------------|
+| `state` | Entity state value (respects `decimals` config) |
+| `name` | Entity friendly name |
+| `attributes.<attr>` | Any entity attribute, e.g. `attributes.unit_of_measurement` |
+
+### Filters
+
+| Filter | Example | Result |
+|--------|---------|--------|
+| `upper` | `{{ state \| upper }}` | `CHARGING` |
+| `lower` | `{{ state \| lower }}` | `charging` |
+| `title` | `{{ state \| title }}` | `Charging` |
+| `round(n)` | `{{ state \| round(1) }}` | `23.5` |
+| `int` | `{{ state \| int }}` | `23` |
+| `float` | `{{ state \| float }}` | `23.0` |
+| `replace('a','b')` | `{{ state \| replace('_',' ') }}` | `not home` |
+| `truncate(n)` | `{{ state \| truncate(8) }}` | `Chargi...` |
+| `default('val')` | `{{ state \| default('N/A') }}` | fallback if empty |
+
+Filters can be chained: `{{ state | upper | truncate(8) }}`
+
+### Examples
+
+```yaml
+# Show state in uppercase with a label
+text_template: "Charging:\n {{ state | upper }}"
+
+# Show sensor value with unit
+text_template: "{{ state | round(1) }} {{ attributes.unit_of_measurement }}"
+
+# Replace underscores and title-case
+text_template: "{{ state | replace('_', ' ') | title }}"
+
+# Chained filters
+text_template: "{{ state | upper | truncate(8) }}"
+
+# Fallback for empty state
+text_template: "{{ state | default('Unknown') }}"
+```
+
 ## Usage Tips
 
 1. **Simplified Configuration**: Size values can be specified as numbers (auto-convert to `px`) or strings. For example, `cell_height: 100` is equivalent to `cell_height: "100px"`
 2. **Blank Cells**: Create blank spaces with `{}`. Customize their color with `global_colors.blank` or per-cell with `colors.blank`
 3. **Cell Order**: Entities fill the grid left-to-right, top-to-bottom in the order listed
-4. **Text Templates**: Use `{{ state }}` for entity state and `{{ name }}` for entity name
+4. **Text Templates**: Use `{{ state }}` for entity state and `{{ name }}` for entity name. Supports Jinja2-style filters (see [Text Templates](#text-templates))
 5. **Icons**: Enable globally with `show_icons: true`, then customize placement, size, and per-entity icons
 6. **Click Behavior**: By default, lights/switches toggle and sensors show more-info
 7. **Responsive Width**: Leave `cell_width` blank or use percentages (e.g., `25%`) for responsive layouts. Use pixels (e.g., `100` or `"100px"`) for fixed widths
