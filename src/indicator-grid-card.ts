@@ -145,13 +145,19 @@ export class IndicatorGridCard extends LitElement {
         return true;
       }
 
-      // Get all entity IDs from config
+      // Get all entity IDs from config (direct entities + template-referenced entities)
       const entityIds = this.config.entities
         .filter((e): e is EntityConfig => e && !!e.entity)
         .map(e => e.entity!);
 
+      const templateEntityIds = this.config.entities
+        .filter((e): e is EntityConfig => e && !!e.text_template)
+        .flatMap(e => this._extractTemplateEntityIds(e.text_template!));
+
+      const allEntityIds = [...new Set([...entityIds, ...templateEntityIds])];
+
       // Check if any of our entities changed
-      return entityIds.some(entityId => {
+      return allEntityIds.some(entityId => {
         const oldState = oldHass.states[entityId];
         const newState = this.hass.states[entityId];
         return oldState !== newState;
@@ -307,7 +313,24 @@ export class IndicatorGridCard extends LitElement {
       const val = stateObj.attributes[attr];
       return val !== undefined && val !== null ? String(val) : '';
     }
+    // Support states('entity_id') to reference any entity's state
+    const statesMatch = variable.match(/^states\(['"]([^'"]+)['"]\)$/);
+    if (statesMatch) {
+      const entity = this.hass.states[statesMatch[1]];
+      return entity ? entity.state : '';
+    }
     return variable;
+  }
+
+  // Extract entity IDs referenced via states('entity_id') in a template string
+  private _extractTemplateEntityIds(template: string): string[] {
+    const entityIds: string[] = [];
+    const regex = /\{\{\s*states\(['"]([^'"]+)['"]\)/g;
+    let match;
+    while ((match = regex.exec(template)) !== null) {
+      entityIds.push(match[1]);
+    }
+    return entityIds;
   }
 
   private _applyTemplateFilter(value: string, filter: string): string {
