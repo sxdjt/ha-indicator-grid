@@ -200,6 +200,7 @@ The `text_template` field supports Jinja2-style filter pipelines using `{{ varia
 | `state` | Entity state value (respects `decimals` config) |
 | `name` | Entity friendly name |
 | `attributes.<attr>` | Any entity attribute, e.g. `attributes.unit_of_measurement` |
+| `states('entity_id')` | State of any other entity, e.g. `states('sensor.wind_dir')` |
 
 ### Filters
 
@@ -234,6 +235,9 @@ text_template: "{{ state | upper | truncate(8) }}"
 
 # Fallback for empty state
 text_template: "{{ state | default('Unknown') }}"
+
+# Combine two entities in one cell (speed + direction)
+text_template: "{{state|round(0)}} mph @ {{states('sensor.tempest_wind_direction')|round(0)}}"
 ```
 
 ## Usage Tips
