@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.6.0-beta.1] - 2026-03-11
+## [1.6.0] - 2026-03-31
 
 ### Added
 - **Cross-entity references in templates**: Templates can now reference any entity's state using
@@ -14,6 +14,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Supports all existing filters: `{{ states('sensor.wind_dir') | round(0) }}`
   - Example: `text_template: "{{state|round(0)}} mph @ {{states('sensor.wind_dir')|round(0)}}"`
   - Card automatically re-renders when any template-referenced entity changes state
+
+### Changed
+- Updated all dependencies to latest versions (lit 3.3.2, rollup 4.60.1, typescript 6, eslint 9,
+  typescript-eslint 8, all @rollup/plugin-* to latest majors, custom-card-helpers 2.0.0)
+- Migrated ESLint config to flat config format (eslint.config.js) required by ESLint 9
+- Updated TypeScript moduleResolution from deprecated `node` to `bundler`
+- Updated softprops/action-gh-release GitHub Action to v2
+
+### Fixed
+- Removed unused `IconConfig` import in indicator-grid-card.ts
 
 ## [1.5.0] - 2026-03-09
 
