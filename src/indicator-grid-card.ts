@@ -128,6 +128,16 @@ export class IndicatorGridCard extends LitElement {
     return Math.ceil(totalHeight / 50);
   }
 
+  // Sections view (grid layout) sizing - 12-column grid system
+  public getGridOptions() {
+    return {
+      rows: 3,
+      columns: 12,
+      min_rows: 1,
+      min_columns: 3,
+    };
+  }
+
   protected shouldUpdate(changedProps: PropertyValues): boolean {
     if (!this.config) {
       return false;
@@ -710,6 +720,7 @@ export class IndicatorGridCard extends LitElement {
     return css`
       :host {
         display: block;
+        height: 100%;
         position: relative;
         contain: layout;
       }
