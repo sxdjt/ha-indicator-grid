@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2026-04-15
+
+### Added
+- **Template expressions in header cell text**: Header row `text` fields now support
+  `{{ states('entity_id') }}` syntax to display live entity state values
+  - Supports all existing filters: `{{ states('sensor.mode') | title }}`
+  - Filters can be chained: `{{ states('sensor.precip_type') | upper | truncate(8) }}`
+  - Card automatically re-renders when any header-referenced entity changes state
+  - Example: `text: "PRECIP {{ states('sensor.tempest_precipitation_type') }}"`
+
+### Fixed
+- Sections view dashboard layout: added `getGridOptions()` for proper card sizing
+- Card height calculation now uses `height: 100%` for correct sections view rendering
+
+### Changed
+- CI: updated Node.js from 18 to 20
+
+### Documentation
+- Added `grid_options: rows: auto` tip for sections view dashboards
+- Documented template support for header cell `text` field
+
 ## [1.6.0] - 2026-03-31
 
 ### Added

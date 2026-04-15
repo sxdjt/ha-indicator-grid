@@ -3,7 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { HomeAssistant, LovelaceCardEditor, fireEvent } from 'custom-card-helpers';
 import { IndicatorGridCardConfig, EntityConfig, ColorConfig, IndicatorCell, HeaderRowConfig, HeaderCellConfig } from './types';
 
-const CARD_VERSION = '1.6.0';
+const CARD_VERSION = '1.7.0';
 
 console.info(
   `%c  INDICATOR-GRID-CARD  \n%c  Version ${CARD_VERSION}  `,
@@ -164,7 +164,12 @@ export class IndicatorGridCard extends LitElement {
         .filter((e): e is EntityConfig => e && !!e.text_template)
         .flatMap(e => this._extractTemplateEntityIds(e.text_template!));
 
-      const allEntityIds = [...new Set([...entityIds, ...templateEntityIds])];
+      // Also track entities referenced in header row cell text templates
+      const headerEntityIds = (this.config.header_rows || [])
+        .flatMap(hr => hr.cells)
+        .flatMap(cell => this._extractTemplateEntityIds(cell.text));
+
+      const allEntityIds = [...new Set([...entityIds, ...templateEntityIds, ...headerEntityIds])];
 
       // Check if any of our entities changed
       return allEntityIds.some(entityId => {
@@ -640,6 +645,26 @@ export class IndicatorGridCard extends LitElement {
     return this.config.header_rows.find(hr => hr.row_index === rowIndex);
   }
 
+  // Process template expressions in header cell text.
+  // Supports {{ states('entity_id') }} with optional filters (e.g., | upper).
+  private _processHeaderText(text: string): string {
+    return text.replace(/\{\{\s*(.+?)\s*\}\}/g, (_match, expression) => {
+      const parts = expression.split('|').map((s: string) => s.trim());
+      const statesMatch = parts[0].match(/^states\(['"]([^'"]+)['"]\)$/);
+      let value = '';
+      if (statesMatch) {
+        const entity = this.hass.states[statesMatch[1]];
+        value = entity ? entity.state : '';
+      } else {
+        value = parts[0]; // Unknown expression: return as-is
+      }
+      for (let i = 1; i < parts.length; i++) {
+        value = this._applyTemplateFilter(value, parts[i]);
+      }
+      return value;
+    });
+  }
+
   private _renderHeaderCell(headerCell: HeaderCellConfig) {
     const colspan = headerCell.colspan || 1;
     const textAlign = headerCell.text_align || 'center';
@@ -648,6 +673,7 @@ export class IndicatorGridCard extends LitElement {
     const fontWeight = headerCell.font_weight || this.config.font_weight || 'bold';
     const textColor = headerCell.text_color || this._getColor('text', undefined);
     const backgroundColor = headerCell.background_color || this._getColor('blank', undefined);
+    const displayText = this._processHeaderText(headerCell.text);
 
     const cellStyle = {
       'background-color': backgroundColor,
@@ -661,7 +687,7 @@ export class IndicatorGridCard extends LitElement {
     return html`
       <div class="cell header-cell" style=${this._styleMap(cellStyle)}>
         <div class="cell-text">
-          <div class="text-line">${headerCell.text}</div>
+          <div class="text-line">${displayText}</div>
         </div>
       </div>
     `;

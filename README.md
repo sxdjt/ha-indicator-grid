@@ -112,7 +112,7 @@ entities:
 
 | Name | Type | Default | Description |
 |------|------|---------|-------------|
-| `text` | string | **required** | Text to display in header |
+| `text` | string | **required** | Text to display in header. Supports `{{ states('entity_id') }}` with filters (e.g., `{{ states('sensor.mode') \| title }}`) |
 | `background_color` | string | global blank | Background color override |
 | `colspan` | number | `1` | Number of columns this cell spans |
 | `font_size` | string/number | card default | Font size override (e.g., `20` or `"20px"`) - numbers auto-convert to px |
@@ -250,6 +250,11 @@ text_template: "{{state|round(0)}} mph @ {{states('sensor.tempest_wind_direction
 6. **Click Behavior**: By default, lights/switches toggle and sensors show more-info
 7. **Responsive Width**: Leave `cell_width` blank or use percentages (e.g., `25%`) for responsive layouts. Use pixels (e.g., `100` or `"100px"`) for fixed widths
 8. **Cell Height**: Use pixel values for `cell_height` (e.g., `100` or `"100px"`). The card automatically calculates its total height to prevent overlapping with cards below
+9. **Sections View**: If using the HA Sections dashboard layout, add `grid_options: rows: auto` to each card to prevent content clipping:
+   ```yaml
+   grid_options:
+     rows: auto
+   ```
 
 ### Full Example
 
