@@ -33,7 +33,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
   }
 
   private _globalColorChanged(ev: CustomEvent, colorType: string): void {
-    const value = (ev.target as any).value;
+    const value = ev.detail.value;
     const newConfig = { ...this._config };
 
     if (!newConfig.global_colors) {
@@ -218,7 +218,6 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
 
   static get styles() {
     return css`
-      ha-textfield,
       ha-selector {
         display: block;
         margin-bottom: 8px;
@@ -276,33 +275,37 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
         @value-changed=${this._valueChanged}
       ></ha-form>
 
-      <ha-textfield
-        label="Cell Width"
+      <ha-selector
+        .hass=${this.hass}
+        .label=${'Cell Width'}
         .value=${this._config.cell_width || ''}
-        @input=${(ev: Event) => this._configValueChanged('cell_width', (ev.target as HTMLInputElement).value)}
-        helper-text="Leave blank for auto (100% width), or use 100px, 25%, etc."
-      ></ha-textfield>
+        .selector=${{text: {}}}
+        @value-changed=${(ev: CustomEvent) => this._configValueChanged('cell_width', ev.detail.value)}
+      ></ha-selector>
 
-      <ha-textfield
-        label="Cell Height"
+      <ha-selector
+        .hass=${this.hass}
+        .label=${'Cell Height'}
         .value=${this._config.cell_height || '100px'}
-        @input=${(ev: Event) => this._configValueChanged('cell_height', (ev.target as HTMLInputElement).value)}
-        helper-text="Examples: 100px, 10vh, 5rem"
-      ></ha-textfield>
+        .selector=${{text: {}}}
+        @value-changed=${(ev: CustomEvent) => this._configValueChanged('cell_height', ev.detail.value)}
+      ></ha-selector>
 
-      <ha-textfield
-        label="Cell Gap"
+      <ha-selector
+        .hass=${this.hass}
+        .label=${'Cell Gap'}
         .value=${this._config.cell_gap || '5px'}
-        @input=${(ev: Event) => this._configValueChanged('cell_gap', (ev.target as HTMLInputElement).value)}
-        helper-text="Gap between cells. Examples: 5px, 0.5rem, 1%"
-      ></ha-textfield>
+        .selector=${{text: {}}}
+        @value-changed=${(ev: CustomEvent) => this._configValueChanged('cell_gap', ev.detail.value)}
+      ></ha-selector>
 
-      <ha-textfield
-        label="Font Size"
+      <ha-selector
+        .hass=${this.hass}
+        .label=${'Font Size'}
         .value=${this._config.font_size || '16px'}
-        @input=${(ev: Event) => this._configValueChanged('font_size', (ev.target as HTMLInputElement).value)}
-        helper-text="Examples: 16px, 1.2rem, 14pt"
-      ></ha-textfield>
+        .selector=${{text: {}}}
+        @value-changed=${(ev: CustomEvent) => this._configValueChanged('font_size', ev.detail.value)}
+      ></ha-selector>
 
       <ha-selector
         .hass=${this.hass}
@@ -324,32 +327,29 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
         .label=${'Font Weight'}
       ></ha-selector>
 
-      <ha-textfield
-        label="Unavailable Text"
+      <ha-selector
+        .hass=${this.hass}
+        .label=${'Unavailable Text'}
         .value=${this._config.unavailable_text || 'INOP'}
-        @input=${(ev: Event) => this._configValueChanged('unavailable_text', (ev.target as HTMLInputElement).value)}
-        helper-text="Text to display when entity is unavailable"
-      ></ha-textfield>
+        .selector=${{text: {}}}
+        @value-changed=${(ev: CustomEvent) => this._configValueChanged('unavailable_text', ev.detail.value)}
+      ></ha-selector>
 
-      <ha-textfield
-        label="Dim Off Text (%)"
-        type="number"
-        min="0"
-        max="100"
+      <ha-selector
+        .hass=${this.hass}
+        .label=${'Dim Off Text (%)'}
         .value=${this._config.dim_off_text ?? ''}
-        @input=${(ev: Event) => this._configValueChanged('dim_off_text', (ev.target as HTMLInputElement).value ? Number((ev.target as HTMLInputElement).value) : undefined)}
-        helper-text="Opacity percentage for text when entity is off (0-100). Leave blank for no dimming. Example: 50"
-      ></ha-textfield>
+        .selector=${{number: {min: 0, max: 100, mode: 'box', step: 1}}}
+        @value-changed=${(ev: CustomEvent) => this._configValueChanged('dim_off_text', ev.detail.value !== '' && ev.detail.value !== undefined ? Number(ev.detail.value) : undefined)}
+      ></ha-selector>
 
-      <ha-textfield
-        label="Decimals"
-        type="number"
-        min="0"
-        max="10"
+      <ha-selector
+        .hass=${this.hass}
+        .label=${'Decimals'}
         .value=${this._config.decimals ?? ''}
-        @input=${(ev: Event) => this._configValueChanged('decimals', (ev.target as HTMLInputElement).value ? Number((ev.target as HTMLInputElement).value) : undefined)}
-        helper-text="Number of decimal places for numeric sensors (0-10). Leave blank for no rounding."
-      ></ha-textfield>
+        .selector=${{number: {min: 0, max: 10, mode: 'box', step: 1}}}
+        @value-changed=${(ev: CustomEvent) => this._configValueChanged('decimals', ev.detail.value !== '' && ev.detail.value !== undefined ? Number(ev.detail.value) : undefined)}
+      ></ha-selector>
 
       <ha-selector
         .hass=${this.hass}
@@ -376,48 +376,54 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
         .label=${'Icon Placement'}
       ></ha-selector>
 
-      <ha-textfield
-        label="Icon Size"
+      <ha-selector
+        .hass=${this.hass}
+        .label=${'Icon Size'}
         .value=${this._config.icon_size || '24px'}
-        @input=${(ev: Event) => this._configValueChanged('icon_size', (ev.target as HTMLInputElement).value)}
-        helper-text="Examples: 24px, 2rem, 32px"
-      ></ha-textfield>
+        .selector=${{text: {}}}
+        @value-changed=${(ev: CustomEvent) => this._configValueChanged('icon_size', ev.detail.value)}
+      ></ha-selector>
 
       <ha-expansion-panel header="Global Colors" .expanded=${false}>
-        <ha-textfield
-          label="On Color"
+        <ha-selector
+          .hass=${this.hass}
+          .label=${'On Color'}
           .value=${this._config.global_colors?.on || 'green'}
-          @input=${(ev: CustomEvent) => this._globalColorChanged(ev, 'on')}
-          helper-text="e.g., green, #00FF00"
-        ></ha-textfield>
+          .selector=${{text: {}}}
+          @value-changed=${(ev: CustomEvent) => this._globalColorChanged(ev, 'on')}
+        ></ha-selector>
 
-        <ha-textfield
-          label="Off Color"
+        <ha-selector
+          .hass=${this.hass}
+          .label=${'Off Color'}
           .value=${this._config.global_colors?.off || 'gray'}
-          @input=${(ev: CustomEvent) => this._globalColorChanged(ev, 'off')}
-          helper-text="e.g., gray, #808080"
-        ></ha-textfield>
+          .selector=${{text: {}}}
+          @value-changed=${(ev: CustomEvent) => this._globalColorChanged(ev, 'off')}
+        ></ha-selector>
 
-        <ha-textfield
-          label="Unavailable Color"
+        <ha-selector
+          .hass=${this.hass}
+          .label=${'Unavailable Color'}
           .value=${this._config.global_colors?.unavailable || 'orange'}
-          @input=${(ev: CustomEvent) => this._globalColorChanged(ev, 'unavailable')}
-          helper-text="e.g., orange, #FFA500"
-        ></ha-textfield>
+          .selector=${{text: {}}}
+          @value-changed=${(ev: CustomEvent) => this._globalColorChanged(ev, 'unavailable')}
+        ></ha-selector>
 
-        <ha-textfield
-          label="Text Color"
+        <ha-selector
+          .hass=${this.hass}
+          .label=${'Text Color'}
           .value=${this._config.global_colors?.text || 'white'}
-          @input=${(ev: CustomEvent) => this._globalColorChanged(ev, 'text')}
-          helper-text="e.g., white, #FFFFFF"
-        ></ha-textfield>
+          .selector=${{text: {}}}
+          @value-changed=${(ev: CustomEvent) => this._globalColorChanged(ev, 'text')}
+        ></ha-selector>
 
-        <ha-textfield
-          label="Blank Cell Color"
+        <ha-selector
+          .hass=${this.hass}
+          .label=${'Blank Cell Color'}
           .value=${this._config.global_colors?.blank || '#333333'}
-          @input=${(ev: CustomEvent) => this._globalColorChanged(ev, 'blank')}
-          helper-text="e.g., #333333, darkgray"
-        ></ha-textfield>
+          .selector=${{text: {}}}
+          @value-changed=${(ev: CustomEvent) => this._globalColorChanged(ev, 'blank')}
+        ></ha-selector>
       </ha-expansion-panel>
 
       <div style="margin-top: 16px;">
@@ -449,16 +455,14 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
         </div>
 
         <div class="entity-details">
-          <ha-textfield
-            label="Row Index (0-based)"
-            type="number"
-            min="0"
-            .max=${this._config.rows - 1}
+          <ha-selector
+            .hass=${this.hass}
+            .label=${'Row Index (0-based)'}
             .value=${headerRow.row_index}
-            @input=${(ev: Event) =>
-              this._headerRowChanged(rowIndex, 'row_index', Number((ev.target as HTMLInputElement).value))}
-            helper-text="Which row this header occupies (0 = first row)"
-          ></ha-textfield>
+            .selector=${{number: {min: 0, max: this._config.rows - 1, mode: 'box', step: 1}}}
+            @value-changed=${(ev: CustomEvent) =>
+              this._headerRowChanged(rowIndex, 'row_index', Number(ev.detail.value))}
+          ></ha-selector>
 
           <h4>Header Cells</h4>
           ${headerRow.cells.map((cell, cellIndex) => this._renderHeaderCellConfig(rowIndex, cell, cellIndex))}
@@ -479,23 +483,23 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
           <mwc-button @click=${() => this._removeHeaderCell(rowIndex, cellIndex)}>Remove</mwc-button>
         </div>
 
-        <ha-textfield
-          label="Text"
+        <ha-selector
+          .hass=${this.hass}
+          .label=${'Text'}
           .value=${cell.text || ''}
-          @input=${(ev: Event) =>
-            this._headerCellChanged(rowIndex, cellIndex, 'text', (ev.target as HTMLInputElement).value)}
-        ></ha-textfield>
+          .selector=${{text: {}}}
+          @value-changed=${(ev: CustomEvent) =>
+            this._headerCellChanged(rowIndex, cellIndex, 'text', ev.detail.value)}
+        ></ha-selector>
 
-        <ha-textfield
-          label="Column Span"
-          type="number"
-          min="1"
-          .max=${this._config.columns}
+        <ha-selector
+          .hass=${this.hass}
+          .label=${'Column Span'}
           .value=${cell.colspan || 1}
-          @input=${(ev: Event) =>
-            this._headerCellChanged(rowIndex, cellIndex, 'colspan', Number((ev.target as HTMLInputElement).value))}
-          helper-text="Number of columns this cell spans"
-        ></ha-textfield>
+          .selector=${{number: {min: 1, max: this._config.columns, mode: 'box', step: 1}}}
+          @value-changed=${(ev: CustomEvent) =>
+            this._headerCellChanged(rowIndex, cellIndex, 'colspan', Number(ev.detail.value))}
+        ></ha-selector>
 
         <ha-selector
           .hass=${this.hass}
@@ -515,13 +519,14 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
         ></ha-selector>
 
         <ha-expansion-panel header="Advanced Styling (optional)" .expanded=${false}>
-          <ha-textfield
-            label="Font Size"
+          <ha-selector
+            .hass=${this.hass}
+            .label=${'Font Size'}
             .value=${cell.font_size || ''}
-            @input=${(ev: Event) =>
-              this._headerCellChanged(rowIndex, cellIndex, 'font_size', (ev.target as HTMLInputElement).value)}
-            helper-text="Leave blank to use card font size"
-          ></ha-textfield>
+            .selector=${{text: {}}}
+            @value-changed=${(ev: CustomEvent) =>
+              this._headerCellChanged(rowIndex, cellIndex, 'font_size', ev.detail.value)}
+          ></ha-selector>
 
           <ha-selector
             .hass=${this.hass}
@@ -545,21 +550,23 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
             .label=${'Font Weight'}
           ></ha-selector>
 
-          <ha-textfield
-            label="Text Color"
+          <ha-selector
+            .hass=${this.hass}
+            .label=${'Text Color'}
             .value=${cell.text_color || ''}
-            @input=${(ev: Event) =>
-              this._headerCellChanged(rowIndex, cellIndex, 'text_color', (ev.target as HTMLInputElement).value)}
-            helper-text="Leave blank to use global text color"
-          ></ha-textfield>
+            .selector=${{text: {}}}
+            @value-changed=${(ev: CustomEvent) =>
+              this._headerCellChanged(rowIndex, cellIndex, 'text_color', ev.detail.value)}
+          ></ha-selector>
 
-          <ha-textfield
-            label="Background Color"
+          <ha-selector
+            .hass=${this.hass}
+            .label=${'Background Color'}
             .value=${cell.background_color || ''}
-            @input=${(ev: Event) =>
-              this._headerCellChanged(rowIndex, cellIndex, 'background_color', (ev.target as HTMLInputElement).value)}
-            helper-text="Leave blank to use global blank color"
-          ></ha-textfield>
+            .selector=${{text: {}}}
+            @value-changed=${(ev: CustomEvent) =>
+              this._headerCellChanged(rowIndex, cellIndex, 'background_color', ev.detail.value)}
+          ></ha-selector>
         </ha-expansion-panel>
       </div>
     `;
@@ -591,31 +598,32 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
             .label=${'Entity (leave empty for blank cell)'}
           ></ha-selector>
 
-          <ha-textfield
-            label="Custom text (optional)"
+          <ha-selector
+            .hass=${this.hass}
+            .label=${'Custom text (optional)'}
             .value=${entity.text || ''}
-            @input=${(ev: Event) =>
-              this._entityChanged(index, 'text', (ev.target as HTMLInputElement).value)}
-          ></ha-textfield>
+            .selector=${{text: {}}}
+            @value-changed=${(ev: CustomEvent) =>
+              this._entityChanged(index, 'text', ev.detail.value)}
+          ></ha-selector>
 
-          <ha-textfield
-            label="Text template"
+          <ha-selector
+            .hass=${this.hass}
+            .label=${'Text template'}
             .value=${entity.text_template || ''}
-            @input=${(ev: Event) =>
-              this._entityChanged(index, 'text_template', (ev.target as HTMLInputElement).value)}
-            helper-text="e.g., {{ state }}"
-          ></ha-textfield>
+            .selector=${{text: {}}}
+            @value-changed=${(ev: CustomEvent) =>
+              this._entityChanged(index, 'text_template', ev.detail.value)}
+          ></ha-selector>
 
-          <ha-textfield
-            label="Column Span"
-            type="number"
-            min="1"
-            .max=${this._config.columns}
+          <ha-selector
+            .hass=${this.hass}
+            .label=${'Column Span'}
             .value=${entity.colspan || 1}
-            @input=${(ev: Event) =>
-              this._entityChanged(index, 'colspan', Number((ev.target as HTMLInputElement).value))}
-            helper-text="Number of columns this cell spans (default: 1)"
-          ></ha-textfield>
+            .selector=${{number: {min: 1, max: this._config.columns, mode: 'box', step: 1}}}
+            @value-changed=${(ev: CustomEvent) =>
+              this._entityChanged(index, 'colspan', Number(ev.detail.value))}
+          ></ha-selector>
 
           <ha-selector
             .hass=${this.hass}
@@ -663,59 +671,59 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
 
           <ha-expansion-panel header="Per-Entity Colors (optional)" .expanded=${false}>
             <div class="color-grid">
-              <ha-textfield
-                label="On Color"
+              <ha-selector
+                .hass=${this.hass}
+                .label=${'On Color'}
                 .value=${entity.colors?.on || ''}
-                @input=${(ev: Event) =>
-                  this._entityColorChanged(index, 'on', (ev.target as HTMLInputElement).value)}
-                helper-text="Override global on color"
-              ></ha-textfield>
+                .selector=${{text: {}}}
+                @value-changed=${(ev: CustomEvent) =>
+                  this._entityColorChanged(index, 'on', ev.detail.value)}
+              ></ha-selector>
 
-              <ha-textfield
-                label="Off Color"
+              <ha-selector
+                .hass=${this.hass}
+                .label=${'Off Color'}
                 .value=${entity.colors?.off || ''}
-                @input=${(ev: Event) =>
-                  this._entityColorChanged(index, 'off', (ev.target as HTMLInputElement).value)}
-                helper-text="Override global off color"
-              ></ha-textfield>
+                .selector=${{text: {}}}
+                @value-changed=${(ev: CustomEvent) =>
+                  this._entityColorChanged(index, 'off', ev.detail.value)}
+              ></ha-selector>
 
-              <ha-textfield
-                label="Text Color"
+              <ha-selector
+                .hass=${this.hass}
+                .label=${'Text Color'}
                 .value=${entity.colors?.text || ''}
-                @input=${(ev: Event) =>
-                  this._entityColorChanged(index, 'text', (ev.target as HTMLInputElement).value)}
-                helper-text="Override global text color"
-              ></ha-textfield>
+                .selector=${{text: {}}}
+                @value-changed=${(ev: CustomEvent) =>
+                  this._entityColorChanged(index, 'text', ev.detail.value)}
+              ></ha-selector>
 
-              <ha-textfield
-                label="Blank Cell Color"
+              <ha-selector
+                .hass=${this.hass}
+                .label=${'Blank Cell Color'}
                 .value=${entity.colors?.blank || ''}
-                @input=${(ev: Event) =>
-                  this._entityColorChanged(index, 'blank', (ev.target as HTMLInputElement).value)}
-                helper-text="Override global blank color (for blank cells only)"
-              ></ha-textfield>
+                .selector=${{text: {}}}
+                @value-changed=${(ev: CustomEvent) =>
+                  this._entityColorChanged(index, 'blank', ev.detail.value)}
+              ></ha-selector>
 
-              <ha-textfield
-                label="Dim Off Text (%)"
-                type="number"
-                min="0"
-                max="100"
+              <ha-selector
+                .hass=${this.hass}
+                .label=${'Dim Off Text (%)'}
                 .value=${entity.dim_off_text ?? ''}
-                @input=${(ev: Event) =>
-                  this._entityChanged(index, 'dim_off_text', (ev.target as HTMLInputElement).value ? Number((ev.target as HTMLInputElement).value) : undefined)}
-                helper-text="Override global dim setting (0-100)"
-              ></ha-textfield>
+                .selector=${{number: {min: 0, max: 100, mode: 'box', step: 1}}}
+                @value-changed=${(ev: CustomEvent) =>
+                  this._entityChanged(index, 'dim_off_text', ev.detail.value !== '' && ev.detail.value !== undefined ? Number(ev.detail.value) : undefined)}
+              ></ha-selector>
 
-              <ha-textfield
-                label="Decimals"
-                type="number"
-                min="0"
-                max="10"
+              <ha-selector
+                .hass=${this.hass}
+                .label=${'Decimals'}
                 .value=${entity.decimals ?? ''}
-                @input=${(ev: Event) =>
-                  this._entityChanged(index, 'decimals', (ev.target as HTMLInputElement).value ? Number((ev.target as HTMLInputElement).value) : undefined)}
-                helper-text="Override global decimals setting (0-10)"
-              ></ha-textfield>
+                .selector=${{number: {min: 0, max: 10, mode: 'box', step: 1}}}
+                @value-changed=${(ev: CustomEvent) =>
+                  this._entityChanged(index, 'decimals', ev.detail.value !== '' && ev.detail.value !== undefined ? Number(ev.detail.value) : undefined)}
+              ></ha-selector>
             </div>
           </ha-expansion-panel>
 
