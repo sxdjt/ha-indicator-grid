@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.2] - 2026-05-24
+
+### Added
+- New template variables for `text_template`:
+  - `unit` - shorthand for `attributes.unit_of_measurement`
+  - `state_with_unit` - state value and unit combined, e.g. `105 degF`
+  - `entity_id` - the entity's ID
+  - `last_changed` - relative time since state last changed, e.g. `5 minutes ago`
+  - `last_updated` - relative time since entity last updated
+
 ## [1.7.1] - 2026-05-13
 
 ### Fixed

@@ -305,7 +305,7 @@ export class IndicatorGridCard extends LitElement {
   }
 
   // Render a text_template string, supporting Jinja2-style {{ variable | filter }} syntax.
-  // Supported variables: state, name, attributes.<attr>
+  // Supported variables: state, name, unit, state_with_unit, entity_id, last_changed, last_updated, attributes.<attr>
   // Supported filters: upper, lower, title, round(n), int, float, replace('a','b'), truncate(n), default('val')
   private _renderTemplate(template: string, stateObj: any, entityConfig: EntityConfig): string {
     return template.replace(/\{\{\s*(.+?)\s*\}\}/g, (_match, expression) => {
@@ -322,6 +322,14 @@ export class IndicatorGridCard extends LitElement {
     const formattedState = this._formatNumericState(stateObj.state, entityConfig);
     if (variable === 'state') return formattedState;
     if (variable === 'name') return stateObj.attributes.friendly_name || entityConfig.entity || '';
+    if (variable === 'entity_id') return stateObj.entity_id || entityConfig.entity || '';
+    if (variable === 'unit') return stateObj.attributes.unit_of_measurement || '';
+    if (variable === 'state_with_unit') {
+      const unit = stateObj.attributes.unit_of_measurement;
+      return unit ? `${formattedState} ${unit}` : formattedState;
+    }
+    if (variable === 'last_changed') return this._relativeTime(stateObj.last_changed);
+    if (variable === 'last_updated') return this._relativeTime(stateObj.last_updated);
     // Support attributes.xxx
     if (variable.startsWith('attributes.')) {
       const attr = variable.slice('attributes.'.length);
@@ -335,6 +343,20 @@ export class IndicatorGridCard extends LitElement {
       return entity ? entity.state : '';
     }
     return variable;
+  }
+
+  // Convert an ISO 8601 timestamp to a human-readable relative time string.
+  // e.g. "just now", "5 minutes ago", "2 hours ago", "3 days ago"
+  private _relativeTime(isoTimestamp: string): string {
+    if (!isoTimestamp) return '';
+    const diffSeconds = Math.floor((Date.now() - new Date(isoTimestamp).getTime()) / 1000);
+    if (diffSeconds < 60) return 'just now';
+    const diffMinutes = Math.floor(diffSeconds / 60);
+    if (diffMinutes < 60) return `${diffMinutes} minute${diffMinutes === 1 ? '' : 's'} ago`;
+    const diffHours = Math.floor(diffMinutes / 60);
+    if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
+    const diffDays = Math.floor(diffHours / 24);
+    return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
   }
 
   // Extract entity IDs referenced via states('entity_id') in a template string

@@ -199,6 +199,11 @@ The `text_template` field supports Jinja2-style filter pipelines using `{{ varia
 |----------|-------------|
 | `state` | Entity state value (respects `decimals` config) |
 | `name` | Entity friendly name |
+| `unit` | Unit of measurement (shorthand for `attributes.unit_of_measurement`) |
+| `state_with_unit` | State value and unit combined, e.g. `105 °F` |
+| `entity_id` | Entity ID, e.g. `sensor.temperature` |
+| `last_changed` | Relative time since state last changed, e.g. `5 minutes ago` |
+| `last_updated` | Relative time since entity last updated, e.g. `2 hours ago` |
 | `attributes.<attr>` | Any entity attribute, e.g. `attributes.unit_of_measurement` |
 | `states('entity_id')` | State of any other entity, e.g. `states('sensor.wind_dir')` |
 
@@ -224,8 +229,11 @@ Filters can be chained: `{{ state | upper | truncate(8) }}`
 # Show state in uppercase with a label
 text_template: "Charging:\n {{ state | upper }}"
 
-# Show sensor value with unit
-text_template: "{{ state | round(1) }} {{ attributes.unit_of_measurement }}"
+# Show sensor value with unit (shorthand)
+text_template: "{{ state_with_unit }}"
+
+# Show sensor value with unit (manual formatting)
+text_template: "{{ state | round(1) }} {{ unit }}"
 
 # Replace underscores and title-case
 text_template: "{{ state | replace('_', ' ') | title }}"
@@ -235,6 +243,9 @@ text_template: "{{ state | upper | truncate(8) }}"
 
 # Fallback for empty state
 text_template: "{{ state | default('Unknown') }}"
+
+# Show reading and age
+text_template: "{{ state_with_unit }}\n{{ last_changed }}"
 
 # Combine two entities in one cell (speed + direction)
 text_template: "{{state|round(0)}} mph @ {{states('sensor.tempest_wind_direction')|round(0)}}"
