@@ -3,7 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { HomeAssistant, LovelaceCardEditor, fireEvent } from 'custom-card-helpers';
 import { IndicatorGridCardConfig, EntityConfig, ColorConfig, IndicatorCell, HeaderRowConfig, HeaderCellConfig } from './types';
 
-const CARD_VERSION = '1.7.2';
+const CARD_VERSION = '1.8.0';
 
 console.info(
   `%c  INDICATOR-GRID-CARD  \n%c  Version ${CARD_VERSION}  `,
@@ -16,6 +16,21 @@ console.info(
   type: 'indicator-grid-card',
   name: 'Indicator Grid Card',
   description: 'A card displaying a grid of indicator lights showing entity status',
+
+  // Suggest this card for entities that naturally map to on/off indicator lights:
+  // binary sensors, switches, lights, and input booleans. Other domains (sensors,
+  // climate, etc.) are not a clear fit for an indicator grid display.
+  getEntitySuggestion: (hass: any, entityId: string) => {
+    const entityState = hass.states[entityId];
+    if (!entityState) return null;
+
+    const domain = entityId.split('.')[0];
+    const indicatorDomains = ['binary_sensor', 'switch', 'light', 'input_boolean'];
+
+    if (!indicatorDomains.includes(domain)) return null;
+
+    return { config: { type: 'custom:indicator-grid-card', entities: [{ entity: entityId }] } };
+  },
 });
 
 @customElement('indicator-grid-card')
