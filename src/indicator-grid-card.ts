@@ -16,6 +16,7 @@ console.info(
   type: 'indicator-grid-card',
   name: 'Indicator Grid Card',
   description: 'A card displaying a grid of indicator lights showing entity status',
+  preview: true,
 
   // Suggest this card for entities that naturally map to on/off indicator lights:
   // binary sensors, switches, lights, and input booleans. Other domains (sensors,
@@ -51,7 +52,15 @@ export class IndicatorGridCard extends LitElement {
     return document.createElement('indicator-grid-card-editor') as LovelaceCardEditor;
   }
 
-  public static getStubConfig(): Partial<IndicatorGridCardConfig> {
+  public static getStubConfig(hass?: any): Partial<IndicatorGridCardConfig> {
+    const indicatorDomains = ['binary_sensor', 'switch', 'light', 'input_boolean'];
+    const entities = hass
+      ? Object.keys(hass.states)
+          .filter((id) => indicatorDomains.includes(id.split('.')[0]))
+          .slice(0, 6)
+          .map((id) => ({ entity: id }))
+      : [];
+
     return {
       columns: 3,
       rows: 2,
@@ -63,7 +72,7 @@ export class IndicatorGridCard extends LitElement {
       show_icons: false,
       icon_placement: 'above',
       icon_size: 24,
-      entities: [],
+      entities,
       unavailable_text: 'INOP',
       global_colors: {
         on: 'green',
