@@ -6,7 +6,7 @@
   "main": "dist/indicator-grid-card.js",
   "scripts": {
     "prebuild": "npm audit --audit-level=high",
-    "build": "rollup -c",
+    "build": "rollup -c && cp dist/indicator-grid-card.js indicator-grid-card.js",
     "watch": "rollup -c --watch",
     "lint": "eslint src"
   },
