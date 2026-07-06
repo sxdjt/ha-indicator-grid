@@ -5,10 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2026.7.6] - 2026-07-06
 
 ### Added
 - Card picker preview: added `preview: true` to card registration and updated `getStubConfig()` to accept the `hass` object, populating the grid with real binary sensor, switch, light, and input boolean entities for a meaningful preview thumbnail.
+
+### Changed
+- Adopted CalVer versioning (`YYYY.M.D`); this release follows 1.8.0.
+- Updated dependencies: lit 3.3.2 -> 3.3.3 (bundled into the card), rollup 4.60.3 -> 4.62.2, eslint 10.3.0 -> 10.6.0, typescript-eslint 8.59.3 -> 8.63.0, @rollup/plugin-commonjs 29.0.2 -> 29.0.3.
 
 ## [1.8.0] - 2026-06-04
 

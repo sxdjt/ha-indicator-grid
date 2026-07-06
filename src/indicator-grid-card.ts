@@ -3,7 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { HomeAssistant, LovelaceCardEditor, fireEvent } from 'custom-card-helpers';
 import { IndicatorGridCardConfig, EntityConfig, ColorConfig, IndicatorCell, HeaderRowConfig, HeaderCellConfig } from './types';
 
-const CARD_VERSION = '1.8.0';
+const CARD_VERSION = '2026.7.6';
 
 console.info(
   `%c  INDICATOR-GRID-CARD  \n%c  Version ${CARD_VERSION}  `,
