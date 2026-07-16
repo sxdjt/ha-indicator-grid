@@ -22,7 +22,7 @@ console.info(
   // binary sensors, switches, lights, and input booleans. Other domains (sensors,
   // climate, etc.) are not a clear fit for an indicator grid display.
   getEntitySuggestion: (hass: any, entityId: string) => {
-    const entityState = hass.states[entityId];
+    const entityState = hass?.states?.[entityId];
     if (!entityState) return null;
 
     const domain = entityId.split('.')[0];
@@ -54,7 +54,7 @@ export class IndicatorGridCard extends LitElement {
 
   public static getStubConfig(hass?: any): Partial<IndicatorGridCardConfig> {
     const indicatorDomains = ['binary_sensor', 'switch', 'light', 'input_boolean'];
-    const entities = hass
+    const entities = hass?.states
       ? Object.keys(hass.states)
           .filter((id) => indicatorDomains.includes(id.split('.')[0]))
           .slice(0, 6)
@@ -374,6 +374,8 @@ export class IndicatorGridCard extends LitElement {
   private _relativeTime(isoTimestamp: string): string {
     if (!isoTimestamp) return '';
     const diffSeconds = Math.floor((Date.now() - new Date(isoTimestamp).getTime()) / 1000);
+    // Invalid timestamps produce NaN here; return empty rather than render "NaN days ago"
+    if (isNaN(diffSeconds)) return '';
     if (diffSeconds < 60) return 'just now';
     const diffMinutes = Math.floor(diffSeconds / 60);
     if (diffMinutes < 60) return `${diffMinutes} minute${diffMinutes === 1 ? '' : 's'} ago`;
@@ -936,8 +938,14 @@ export class IndicatorGridCard extends LitElement {
     const temp = document.createElement('div');
     temp.style.color = color;
     document.body.appendChild(temp);
-    const computed = getComputedStyle(temp).color;
-    document.body.removeChild(temp);
+    let computed: string;
+    try {
+      computed = getComputedStyle(temp).color;
+    } finally {
+      // Ensure the temporary element is always removed, even if reading the
+      // computed style throws for some reason.
+      temp.remove();
+    }
 
     // Extract RGB from computed rgb() or rgba()
     const computedMatch = computed.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/);
