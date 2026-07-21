@@ -7,7 +7,6 @@ import { IndicatorGridCardConfig, EntityConfig, HeaderRowConfig, HeaderCellConfi
 export class IndicatorGridCardEditor extends LitElement implements LovelaceCardEditor {
   @property({ attribute: false }) public hass!: HomeAssistant;
   @state() private _config!: IndicatorGridCardConfig;
-  @state() private _selectedEntityIndex: number = -1;
 
 
   public setConfig(config: IndicatorGridCardConfig): void {
@@ -64,10 +63,6 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
     const newConfig = { ...this._config };
     newConfig.entities = [...newConfig.entities];
     newConfig.entities.splice(index, 1);
-
-    if (this._selectedEntityIndex === index) {
-      this._selectedEntityIndex = -1;
-    }
 
     fireEvent(this, 'config-changed', { config: newConfig });
   }

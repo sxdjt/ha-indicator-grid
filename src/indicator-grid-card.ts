@@ -3,7 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { HomeAssistant, LovelaceCardEditor, fireEvent } from 'custom-card-helpers';
 import { IndicatorGridCardConfig, EntityConfig, ColorConfig, IndicatorCell, HeaderRowConfig, HeaderCellConfig } from './types';
 
-const CARD_VERSION = '2026.7.6';
+const CARD_VERSION = '1.9.0';
 
 console.info(
   `%c  INDICATOR-GRID-CARD  \n%c  Version ${CARD_VERSION}  `,
@@ -89,14 +89,6 @@ export class IndicatorGridCard extends LitElement {
       throw new Error('Invalid configuration');
     }
 
-    // Helper to normalize size values - add "px" if just a number
-    const normalizeSize = (value: string | number | undefined, defaultValue: string): string => {
-      if (value === undefined) return defaultValue;
-      const str = String(value);
-      // If it's just digits (with optional decimal), append "px"
-      return /^\d+(\.\d+)?$/.test(str) ? `${str}px` : str;
-    };
-
     // Backward compatibility: if cell_size is set, use it for width and height
     let cellWidth = config.cell_width;
     let cellHeight = config.cell_height;
@@ -110,14 +102,14 @@ export class IndicatorGridCard extends LitElement {
       ...config,
       columns: config.columns ?? 3,
       rows: config.rows ?? 2,
-      cell_width: normalizeSize(cellWidth, ''),
-      cell_height: normalizeSize(cellHeight, '100px'),
-      cell_gap: normalizeSize(config.cell_gap, '5px'),
-      font_size: normalizeSize(config.font_size, '16px'),
+      cell_width: this._normalizeSize(cellWidth, ''),
+      cell_height: this._normalizeSize(cellHeight, '100px'),
+      cell_gap: this._normalizeSize(config.cell_gap, '5px'),
+      font_size: this._normalizeSize(config.font_size, '16px'),
       font_weight: config.font_weight ?? 'bold',
       show_icons: config.show_icons ?? false,
       icon_placement: config.icon_placement ?? 'above',
-      icon_size: normalizeSize(config.icon_size, '24px'),
+      icon_size: this._normalizeSize(config.icon_size, '24px'),
       unavailable_text: config.unavailable_text ?? 'INOP',
       global_colors: {
         on: 'green',
@@ -152,10 +144,29 @@ export class IndicatorGridCard extends LitElement {
     return Math.ceil(totalHeight / 50);
   }
 
-  // Sections view (grid layout) sizing - 12-column grid system
+  // Sections view (grid layout) sizing - 12-column grid system.
+  // Reports how many section grid rows the card needs so HA reserves the
+  // correct height. A fixed value here clips taller grids, so derive it from
+  // the configured rows / cell height the same way getCardSize does.
   public getGridOptions() {
+    // HA sections grid geometry: each row is 56px tall with an 8px gap between
+    // rows (defaults for --ha-section-grid-row-height / --ha-section-grid-row-gap).
+    // A card given N rows is allocated N*56 + (N-1)*8 pixels of height.
+    const SECTION_ROW_HEIGHT = 56;
+    const SECTION_ROW_GAP = 8;
+
+    const rows = this.config?.rows ?? 2;
+    const cellHeight = parseFloat(this._normalizeSize(this.config?.cell_height, '100px'));
+    const cellGap = parseFloat(this._normalizeSize(this.config?.cell_gap, '5px'));
+    const cardHeight = (rows * cellHeight) + ((rows - 1) * cellGap);
+
+    // Solve N*56 + (N-1)*8 >= cardHeight for N, rounding up so we never clip.
+    const gridRows = Math.ceil(
+      (cardHeight + SECTION_ROW_GAP) / (SECTION_ROW_HEIGHT + SECTION_ROW_GAP)
+    );
+
     return {
-      rows: 3,
+      rows: gridRows,
       columns: 12,
       min_rows: 1,
       min_columns: 3,
@@ -204,36 +215,6 @@ export class IndicatorGridCard extends LitElement {
     }
 
     return true;
-  }
-
-  private _getCells(): IndicatorCell[] {
-    const totalCells = this.config.columns * this.config.rows;
-    const cells: IndicatorCell[] = [];
-
-    for (let i = 0; i < totalCells; i++) {
-      const entityConfig = this.config.entities[i];
-
-      if (!entityConfig || !entityConfig.entity) {
-        // Text-only or blank cell
-        cells.push({
-          displayText: entityConfig?.text || '',
-          backgroundColor: this._getColor('blank', entityConfig?.colors),
-          textColor: this._getColor('text', entityConfig?.colors),
-          textOpacity: 1,
-          textAlign: entityConfig?.text_align,
-          clickable: false,
-          clickAction: 'none',
-          colspan: entityConfig?.colspan || 1,
-        });
-        continue;
-      }
-
-      const stateObj = this.hass.states[entityConfig.entity];
-      const cell = this._computeCell(entityConfig, stateObj);
-      cells.push(cell);
-    }
-
-    return cells;
   }
 
   private _computeCell(entityConfig: EntityConfig, stateObj: any): IndicatorCell {

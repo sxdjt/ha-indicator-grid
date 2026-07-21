@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] - 2026-07-20
+
+### Fixed
+- Sections view sizing: `getGridOptions()` now derives the number of section grid rows from the configured `rows`, `cell_height`, and `cell_gap` (using HA's 56px row height and 8px row gap) instead of a hardcoded value that clipped taller grids. Per-card `grid_options: rows: auto` workarounds are no longer needed.
+
+### Changed
+- Reverted to Semantic Versioning (`X.Y.Z`); this release follows `2026.7.6` and continues the pre-CalVer `1.8.0` line.
+
+### Removed
+- Internal cleanup: removed the unused `_getCells()` method, a duplicated size-normalization helper in `setConfig()`, and an unused editor state field. No behavior change.
+
 ## [2026.7.6] - 2026-07-06
 
 ### Added
