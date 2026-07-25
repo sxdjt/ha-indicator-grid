@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2026.7.25] - 2026-07-25
+
+### Changed
+- Version-only release to correct a versioning mistake. This card was briefly switched from CalVer (`2026.x`) to SemVer (`1.x`) and back, which broke HACS update detection (HACS compares versions numerically, so `2026.x` outranks `1.x` and installs pinned to the earlier CalVer build stopped seeing new releases). Returning to CalVer with a later date restores a single monotonic version line so updates flow normally again. No functional changes to the card.
+
 ## [1.9.0] - 2026-07-20
 
 ### Fixed
