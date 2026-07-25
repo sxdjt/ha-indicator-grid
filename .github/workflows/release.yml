@@ -20,22 +20,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '24'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
-
       - name: Upload JS to Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.inputs.tag_name || github.event.release.tag_name }}
-          files: dist/indicator-grid-card.js
+          files: indicator-grid-card.js
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
