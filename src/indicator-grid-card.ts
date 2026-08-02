@@ -460,13 +460,33 @@ export class IndicatorGridCard extends LitElement {
       return null;
     }
 
-    // Sort thresholds by value
-    const sorted = [...colors.thresholds].sort((a, b) => a.value - b.value);
+    // Helper to normalize operator (default to '<=' as documentation/type says)
+    const opOf = (t: any) => (t.operator || '<=').trim();
 
-    for (const threshold of sorted) {
-      const operator = threshold.operator || '<=';
+    // Separate thresholds into groups so we can evaluate in a safe order:
+    // 1) greater-than thresholds (>, >=) - check from highest to lowest
+    // 2) less-than thresholds (<, <=) - check from lowest to highest
+    // 3) equality thresholds (==) - check last
+    const gt = colors.thresholds
+      .filter(t => {
+        const op = opOf(t);
+        return op === '>' || op === '>=';
+      })
+      .sort((a, b) => b.value - a.value); // descending
+
+    const lt = colors.thresholds
+      .filter(t => {
+        const op = opOf(t);
+        return op === '<' || op === '<=';
+      })
+      .sort((a, b) => a.value - b.value); // ascending
+
+    const eq = colors.thresholds
+      .filter(t => opOf(t) === '==');
+
+    const testThreshold = (threshold: any) => {
+      const operator = opOf(threshold);
       let matches = false;
-
       switch (operator) {
         case '<':
           matches = value < threshold.value;
@@ -484,7 +504,6 @@ export class IndicatorGridCard extends LitElement {
           matches = value === threshold.value;
           break;
       }
-
       if (matches) {
         return {
           backgroundColor: threshold.color,
@@ -492,6 +511,25 @@ export class IndicatorGridCard extends LitElement {
           fontWeight: threshold.font_weight,
         };
       }
+      return null;
+    };
+
+    // Check greater-than thresholds first (highest value first).
+    for (const threshold of gt) {
+      const res = testThreshold(threshold);
+      if (res) return res;
+    }
+
+    // Then check less-than thresholds (smallest value first).
+    for (const threshold of lt) {
+      const res = testThreshold(threshold);
+      if (res) return res;
+    }
+
+    // Finally, check equality thresholds.
+    for (const threshold of eq) {
+      const res = testThreshold(threshold);
+      if (res) return res;
     }
 
     return null;
