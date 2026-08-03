@@ -9,7 +9,7 @@
     "build": "rollup -c && cp dist/indicator-grid-card.js indicator-grid-card.js",
     "watch": "rollup -c --watch",
     "lint": "eslint src",
-    "test": "node --test src/thresholds.test.ts"
+    "test": "rollup -c && node --test src/thresholds.test.ts src/indicator-grid-card.test.ts"
   },
   "keywords": [
     "home-assistant",
@@ -34,10 +34,11 @@
     "@typescript-eslint/eslint-plugin": "^8.58.0",
     "@typescript-eslint/parser": "^8.58.0",
     "eslint": "^10.0.0",
-    "typescript-eslint": "^8.58.0",
+    "jsdom": "^30.0.1",
     "rollup": "^4.60.1",
     "tslib": "^2.6.2",
-    "typescript": "^6.0.2"
+    "typescript": "^6.0.2",
+    "typescript-eslint": "^8.58.0"
   },
   "dependencies": {
     "custom-card-helpers": "^2.0.0",
