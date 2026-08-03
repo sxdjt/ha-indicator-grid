@@ -2,8 +2,9 @@ import { LitElement, html, css, PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { HomeAssistant, LovelaceCardEditor, fireEvent } from 'custom-card-helpers';
 import { IndicatorGridCardConfig, EntityConfig, ColorConfig, IndicatorCell, HeaderRowConfig, HeaderCellConfig } from './types';
+import { evaluateThresholds, ThresholdStyles } from './thresholds';
 
-const CARD_VERSION = '2026.7.25';
+const CARD_VERSION = '2026.8.3';
 
 console.info(
   `%c  INDICATOR-GRID-CARD  \n%c  Version ${CARD_VERSION}  `,
@@ -455,46 +456,10 @@ export class IndicatorGridCard extends LitElement {
     return this._getColor('off', colors);
   }
 
-  private _getThresholdStyles(value: number, colors?: ColorConfig): { backgroundColor?: string; textColor?: string; fontWeight?: string | number } | null {
-    if (!colors?.thresholds || colors.thresholds.length === 0) {
-      return null;
-    }
-
-    // Sort thresholds by value
-    const sorted = [...colors.thresholds].sort((a, b) => a.value - b.value);
-
-    for (const threshold of sorted) {
-      const operator = threshold.operator || '<=';
-      let matches = false;
-
-      switch (operator) {
-        case '<':
-          matches = value < threshold.value;
-          break;
-        case '<=':
-          matches = value <= threshold.value;
-          break;
-        case '>':
-          matches = value > threshold.value;
-          break;
-        case '>=':
-          matches = value >= threshold.value;
-          break;
-        case '==':
-          matches = value === threshold.value;
-          break;
-      }
-
-      if (matches) {
-        return {
-          backgroundColor: threshold.color,
-          textColor: threshold.text_color,
-          fontWeight: threshold.font_weight,
-        };
-      }
-    }
-
-    return null;
+  private _getThresholdStyles(value: number, colors?: ColorConfig): ThresholdStyles | null {
+    // Delegates to the operator-aware evaluator so mixed operators (e.g. a
+    // ">=60" band alongside "<40") resolve correctly. See src/thresholds.ts.
+    return evaluateThresholds(value, colors?.thresholds);
   }
 
   private _getColor(type: 'on' | 'off' | 'unavailable' | 'text' | 'blank', entityColors?: ColorConfig): string {

@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2026.8.3] - 2026-08-03
+
+### Fixed
+- Threshold colors with mixed comparison operators now resolve correctly.
+  Previously all thresholds were sorted by value and the first match won, so
+  an open-ended low `>=` band could override a more specific higher band
+  (e.g. a `>=0` band swallowing values that should have matched `>=60`).
+  Greater-than bands (`>`, `>=`) are now evaluated highest-value first,
+  less-than bands (`<`, `<=`) lowest-value first, and equality (`==`) last.
+  Plain ascending `<=` ladders are unaffected. Thanks to @dmindfuse (#9, #10)
+  for the diagnosis and fix.
+
 ## [2026.7.25] - 2026-07-25
 
 ### Changed

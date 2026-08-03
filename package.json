@@ -1,6 +1,6 @@
 {
   "name": "indicator-grid-card",
-  "version": "2026.7.25",
+  "version": "2026.8.3",
   "description": "A Home Assistant Lovelace card displaying a grid of indicator lights",
   "type": "module",
   "main": "dist/indicator-grid-card.js",
@@ -8,7 +8,8 @@
     "prebuild": "npm audit --audit-level=high",
     "build": "rollup -c && cp dist/indicator-grid-card.js indicator-grid-card.js",
     "watch": "rollup -c --watch",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "test": "node --test src/thresholds.test.ts"
   },
   "keywords": [
     "home-assistant",
