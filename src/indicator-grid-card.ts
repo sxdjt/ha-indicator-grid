@@ -645,7 +645,7 @@ export class IndicatorGridCard extends LitElement {
     return text.replace(/\{\{\s*(.+?)\s*\}\}/g, (_match, expression) => {
       const parts = expression.split('|').map((s: string) => s.trim());
       const statesMatch = parts[0].match(/^states\(['"]([^'"]+)['"]\)$/);
-      let value = '';
+      let value: string;
       if (statesMatch) {
         const entity = this.hass.states[statesMatch[1]];
         value = entity ? entity.state : '';
