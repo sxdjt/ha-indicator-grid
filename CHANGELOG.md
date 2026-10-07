@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- Behavioural test suite for the card class (`src/indicator-grid-card.test.ts`, 106 tests) covering sizing, color resolution, numeric formatting, templates and filters, cell computation, icons, `shouldUpdate`, and rendering (colspan, text-only, unavailable, and header cells). Tests load the built bundle in jsdom, so `npm test` now runs `rollup -c` first. Running the tests requires Node 22.6+ (native TypeScript type stripping).
+
+### Security
+- Updated development dependencies to resolve Dependabot and `npm audit` advisories. None of these packages are bundled into the card, so the shipped JS is unchanged:
+  - undici 8.10.0 -> 8.11.2 (via jsdom): TLS certificate validation bypass in BalancedPool, cross-origin cache poisoning, cross-user cookie disclosure via shared caches, RetryHandler denial of service, retry-interceptor response splitting, dump-interceptor response truncation, and caching of unsafe-method responses.
+  - source-map-js 1.2.1 -> 1.2.2 (via jsdom): event-loop denial of service through indexed source-map section offsets (GHSA-68fv-2mgg-jv7q).
+  - brace-expansion 5.0.8 -> 5.0.12.
+
 ## [2026.8.3] - 2026-08-03
 
 ### Fixed
