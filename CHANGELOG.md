@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 - Updated development dependencies to resolve Dependabot and `npm audit` advisories. None of these packages are bundled into the card, so the shipped JS is unchanged:
-  - undici 8.10.0 -> 8.11.2 (via jsdom): TLS certificate validation bypass in BalancedPool, cross-origin cache poisoning, cross-user cookie disclosure via shared caches, RetryHandler denial of service, retry-interceptor response splitting, dump-interceptor response truncation, and caching of unsafe-method responses.
+  - undici 8.10.0 -> 8.12.3 (via jsdom): TLS certificate validation bypass in BalancedPool, cross-origin cache poisoning, cross-user cookie disclosure via shared caches, RetryHandler denial of service, retry-interceptor response splitting, dump-interceptor response truncation, and caching of unsafe-method responses. 8.12.3 additionally fixes TLS certificate validation bypass via dropped tls options in Agent (GHSA-2m5v-pch6-74hx), denial of service via TLS 1.2 certificate-changing renegotiation (GHSA-qrxm-fqhp-jwvm), denial of service via excessive content-encodings (GHSA-xjj6-f33q-929c), and unbounded WebSocket PONG buffering (GHSA-9fm3-97px-rjf6).
   - source-map-js 1.2.1 -> 1.2.2 (via jsdom): event-loop denial of service through indexed source-map section offsets (GHSA-68fv-2mgg-jv7q).
   - brace-expansion 5.0.8 -> 5.0.12.
 
