@@ -1,4 +1,4 @@
-import { LitElement, html, css } from 'lit';
+import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { HomeAssistant, fireEvent, LovelaceCardEditor } from 'custom-card-helpers';
 import { IndicatorGridCardConfig, EntityConfig, HeaderRowConfig, HeaderCellConfig } from './types';
@@ -31,8 +31,13 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
     fireEvent(this, 'config-changed', { config: newConfig });
   }
 
-  private _globalColorChanged(ev: CustomEvent, colorType: string): void {
-    const value = ev.detail.value;
+  // Move keyboard focus to a control that survives re-render (the list's Add button),
+  // so focus is not lost to <body> when the row holding the clicked Remove button disappears
+  private _focusControl(key: string): void {
+    this.shadowRoot?.querySelector<HTMLElement>(`[data-focus-key="${key}"]`)?.focus();
+  }
+
+  private _globalColorChanged(colorType: string, value: string): void {
     const newConfig = { ...this._config };
 
     if (!newConfig.global_colors) {
@@ -65,6 +70,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
     newConfig.entities.splice(index, 1);
 
     fireEvent(this, 'config-changed', { config: newConfig });
+    this._focusControl('add-entity');
   }
 
   private _entityChanged(index: number, key: keyof EntityConfig, value: any): void {
@@ -147,6 +153,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
     newConfig.header_rows.splice(index, 1);
 
     fireEvent(this, 'config-changed', { config: newConfig });
+    this._focusControl('add-header-row');
   }
 
   private _headerRowChanged(index: number, key: keyof HeaderRowConfig, value: any): void {
@@ -191,6 +198,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
     newConfig.header_rows[rowIndex] = headerRow;
 
     fireEvent(this, 'config-changed', { config: newConfig });
+    this._focusControl(`add-header-cell-${rowIndex}`);
   }
 
   private _headerCellChanged(rowIndex: number, cellIndex: number, key: keyof HeaderCellConfig, value: any): void {
@@ -250,6 +258,71 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
         gap: 8px;
         margin-top: 8px;
       }
+
+      .color-field {
+        margin-bottom: 8px;
+      }
+
+      .color-field ha-selector {
+        margin-bottom: 0;
+      }
+
+      /* Text stays primary color for 4.5:1; red is used only on non-text parts
+         (bar, icon), which need 3:1 */
+      .error-text {
+        display: flex;
+        align-items: flex-start;
+        gap: 6px;
+        font-size: 12px;
+        color: var(--primary-text-color);
+        margin: 6px 0 0 0;
+        padding: 4px 8px;
+        border-left: 3px solid var(--error-color, #db4437);
+      }
+
+      .error-text:empty {
+        display: none;
+      }
+
+      .error-text ha-icon {
+        flex: 0 0 auto;
+        color: var(--error-color, #db4437);
+        --mdc-icon-size: 16px;
+      }
+
+      .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+    `;
+  }
+
+  // Color text field with an inline error for invalid colors. ha-selector keeps its input
+  // in a shadow root, so aria-describedby cannot reach it; the error is a live region instead.
+  // It is always rendered, and Lit only rewrites its content when validity flips, so it is
+  // announced once per change rather than on every keystroke.
+  private _renderColorField(label: string, value: string, onChange: (value: string) => void, helper?: string) {
+    const invalid = !!value && !CSS.supports('color', value);
+    return html`
+      <div class="color-field">
+        <ha-selector
+          .hass=${this.hass}
+          .required=${false}
+          .label=${label}
+          .value=${value}
+          .helper=${helper}
+          .selector=${{text: {}}}
+          @value-changed=${(ev: CustomEvent) => onChange(ev.detail.value)}
+        ></ha-selector>
+        <div class="error-text" aria-live="polite">${invalid ? html`<ha-icon icon="mdi:alert-circle" aria-hidden="true"></ha-icon><span><strong>Error:</strong> ${label} is not a valid color. Use a hex code (#FF0000), a color name (red), or var(--token).</span>` : nothing}</div>
+      </div>
     `;
   }
 
@@ -271,6 +344,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
       ></ha-form>
 
       <ha-selector
+        .required=${false}
         .hass=${this.hass}
         .label=${'Cell Width'}
         .value=${this._config.cell_width || ''}
@@ -279,6 +353,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
       ></ha-selector>
 
       <ha-selector
+        .required=${false}
         .hass=${this.hass}
         .label=${'Cell Height'}
         .value=${this._config.cell_height || '100px'}
@@ -287,6 +362,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
       ></ha-selector>
 
       <ha-selector
+        .required=${false}
         .hass=${this.hass}
         .label=${'Cell Gap'}
         .value=${this._config.cell_gap || '5px'}
@@ -295,6 +371,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
       ></ha-selector>
 
       <ha-selector
+        .required=${false}
         .hass=${this.hass}
         .label=${'Font Size'}
         .value=${this._config.font_size || '16px'}
@@ -303,6 +380,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
       ></ha-selector>
 
       <ha-selector
+        .required=${false}
         .hass=${this.hass}
         .selector=${{
           select: {
@@ -323,6 +401,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
       ></ha-selector>
 
       <ha-selector
+        .required=${false}
         .hass=${this.hass}
         .label=${'Unavailable Text'}
         .value=${this._config.unavailable_text || 'INOP'}
@@ -331,6 +410,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
       ></ha-selector>
 
       <ha-selector
+        .required=${false}
         .hass=${this.hass}
         .label=${'Dim Off Text (%)'}
         .value=${this._config.dim_off_text ?? ''}
@@ -339,6 +419,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
       ></ha-selector>
 
       <ha-selector
+        .required=${false}
         .hass=${this.hass}
         .label=${'Decimals'}
         .value=${this._config.decimals ?? ''}
@@ -347,6 +428,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
       ></ha-selector>
 
       <ha-selector
+        .required=${false}
         .hass=${this.hass}
         .selector=${{ boolean: {} }}
         .value=${this._config.show_icons ?? false}
@@ -355,6 +437,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
       ></ha-selector>
 
       <ha-selector
+        .required=${false}
         .hass=${this.hass}
         .selector=${{
           select: {
@@ -372,6 +455,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
       ></ha-selector>
 
       <ha-selector
+        .required=${false}
         .hass=${this.hass}
         .label=${'Icon Size'}
         .value=${this._config.icon_size || '24px'}
@@ -380,63 +464,39 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
       ></ha-selector>
 
       <ha-expansion-panel header="Global Colors" .expanded=${false}>
-        <ha-selector
-          .hass=${this.hass}
-          .label=${'On Color'}
-          .value=${this._config.global_colors?.on || 'green'}
-          .selector=${{text: {}}}
-          @value-changed=${(ev: CustomEvent) => this._globalColorChanged(ev, 'on')}
-        ></ha-selector>
+        ${this._renderColorField('On Color', this._config.global_colors?.on || 'green', (value) =>
+          this._globalColorChanged('on', value))}
 
-        <ha-selector
-          .hass=${this.hass}
-          .label=${'Off Color'}
-          .value=${this._config.global_colors?.off || 'gray'}
-          .selector=${{text: {}}}
-          @value-changed=${(ev: CustomEvent) => this._globalColorChanged(ev, 'off')}
-        ></ha-selector>
+        ${this._renderColorField('Off Color', this._config.global_colors?.off || 'gray', (value) =>
+          this._globalColorChanged('off', value))}
 
-        <ha-selector
-          .hass=${this.hass}
-          .label=${'Unavailable Color'}
-          .value=${this._config.global_colors?.unavailable || 'orange'}
-          .selector=${{text: {}}}
-          @value-changed=${(ev: CustomEvent) => this._globalColorChanged(ev, 'unavailable')}
-        ></ha-selector>
+        ${this._renderColorField('Unavailable Color', this._config.global_colors?.unavailable || 'orange', (value) =>
+          this._globalColorChanged('unavailable', value))}
 
-        <ha-selector
-          .hass=${this.hass}
-          .label=${'Text Color'}
-          .value=${this._config.global_colors?.text || 'white'}
-          .selector=${{text: {}}}
-          @value-changed=${(ev: CustomEvent) => this._globalColorChanged(ev, 'text')}
-        ></ha-selector>
+        ${this._renderColorField('Text Color', this._config.global_colors?.text || '', (value) =>
+          this._globalColorChanged('text', value),
+          'Leave empty for black or white, whichever contrasts more with each cell')}
 
-        <ha-selector
-          .hass=${this.hass}
-          .label=${'Blank Cell Color'}
-          .value=${this._config.global_colors?.blank || '#333333'}
-          .selector=${{text: {}}}
-          @value-changed=${(ev: CustomEvent) => this._globalColorChanged(ev, 'blank')}
-        ></ha-selector>
+        ${this._renderColorField('Blank Cell Color', this._config.global_colors?.blank || '#333333', (value) =>
+          this._globalColorChanged('blank', value))}
       </ha-expansion-panel>
 
       <div style="margin-top: 16px;">
         <h3>Header Rows</h3>
         ${(this._config.header_rows || []).map((headerRow, index) => this._renderHeaderRowConfig(headerRow, index))}
 
-        <mwc-button @click=${this._addHeaderRow}>
+        <ha-button data-focus-key="add-header-row" @click=${this._addHeaderRow}>
           Add Header Row
-        </mwc-button>
+        </ha-button>
       </div>
 
       <div style="margin-top: 16px;">
         <h3>Entities</h3>
         ${(this._config.entities || []).map((entity, index) => this._renderEntityConfig(entity, index))}
 
-        <mwc-button @click=${this._addEntity}>
+        <ha-button data-focus-key="add-entity" @click=${this._addEntity}>
           Add Entity
-        </mwc-button>
+        </ha-button>
       </div>
     `;
   }
@@ -446,11 +506,14 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
       <div class="entity-item">
         <div class="entity-header">
           <strong>Header Row ${rowIndex + 1}</strong>
-          <mwc-button @click=${() => this._removeHeaderRow(rowIndex)}>Remove</mwc-button>
+          <ha-button appearance="plain" variant="danger" @click=${() => this._removeHeaderRow(rowIndex)}>
+            Remove<span class="visually-hidden"> header row ${rowIndex + 1}</span>
+          </ha-button>
         </div>
 
         <div class="entity-details">
           <ha-selector
+            .required=${false}
             .hass=${this.hass}
             .label=${'Row Index (0-based)'}
             .value=${headerRow.row_index}
@@ -462,9 +525,10 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
           <h4>Header Cells</h4>
           ${headerRow.cells.map((cell, cellIndex) => this._renderHeaderCellConfig(rowIndex, cell, cellIndex))}
 
-          <mwc-button @click=${() => this._addHeaderCell(rowIndex)}>
-            Add Header Cell
-          </mwc-button>
+          <ha-button appearance="plain" data-focus-key="add-header-cell-${rowIndex}"
+            @click=${() => this._addHeaderCell(rowIndex)}>
+            Add Header Cell<span class="visually-hidden"> to header row ${rowIndex + 1}</span>
+          </ha-button>
         </div>
       </div>
     `;
@@ -475,10 +539,13 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
       <div style="border: 1px dashed var(--divider-color); padding: 8px; margin: 8px 0; border-radius: 4px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
           <strong>Cell ${cellIndex + 1}</strong>
-          <mwc-button @click=${() => this._removeHeaderCell(rowIndex, cellIndex)}>Remove</mwc-button>
+          <ha-button appearance="plain" variant="danger" @click=${() => this._removeHeaderCell(rowIndex, cellIndex)}>
+            Remove<span class="visually-hidden"> cell ${cellIndex + 1} of header row ${rowIndex + 1}</span>
+          </ha-button>
         </div>
 
         <ha-selector
+          .required=${false}
           .hass=${this.hass}
           .label=${'Text'}
           .value=${cell.text || ''}
@@ -488,6 +555,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
         ></ha-selector>
 
         <ha-selector
+          .required=${false}
           .hass=${this.hass}
           .label=${'Column Span'}
           .value=${cell.colspan || 1}
@@ -497,6 +565,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
         ></ha-selector>
 
         <ha-selector
+          .required=${false}
           .hass=${this.hass}
           .selector=${{
             select: {
@@ -515,6 +584,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
 
         <ha-expansion-panel header="Advanced Styling (optional)" .expanded=${false}>
           <ha-selector
+            .required=${false}
             .hass=${this.hass}
             .label=${'Font Size'}
             .value=${cell.font_size || ''}
@@ -524,6 +594,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
           ></ha-selector>
 
           <ha-selector
+            .required=${false}
             .hass=${this.hass}
             .selector=${{
               select: {
@@ -545,23 +616,11 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
             .label=${'Font Weight'}
           ></ha-selector>
 
-          <ha-selector
-            .hass=${this.hass}
-            .label=${'Text Color'}
-            .value=${cell.text_color || ''}
-            .selector=${{text: {}}}
-            @value-changed=${(ev: CustomEvent) =>
-              this._headerCellChanged(rowIndex, cellIndex, 'text_color', ev.detail.value)}
-          ></ha-selector>
+          ${this._renderColorField('Text Color', cell.text_color || '', (value) =>
+            this._headerCellChanged(rowIndex, cellIndex, 'text_color', value))}
 
-          <ha-selector
-            .hass=${this.hass}
-            .label=${'Background Color'}
-            .value=${cell.background_color || ''}
-            .selector=${{text: {}}}
-            @value-changed=${(ev: CustomEvent) =>
-              this._headerCellChanged(rowIndex, cellIndex, 'background_color', ev.detail.value)}
-          ></ha-selector>
+          ${this._renderColorField('Background Color', cell.background_color || '', (value) =>
+            this._headerCellChanged(rowIndex, cellIndex, 'background_color', value))}
         </ha-expansion-panel>
       </div>
     `;
@@ -580,11 +639,14 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
       <div class="entity-item">
         <div class="entity-header">
           <strong>Cell ${index + 1} (Row ${row}, Col ${col})</strong>
-          <mwc-button @click=${() => this._removeEntity(index)}>Remove</mwc-button>
+          <ha-button appearance="plain" variant="danger" @click=${() => this._removeEntity(index)}>
+            Remove<span class="visually-hidden"> cell ${index + 1}</span>
+          </ha-button>
         </div>
 
         <div class="entity-details">
           <ha-selector
+            .required=${false}
             .hass=${this.hass}
             .selector=${{ entity: {} }}
             .value=${entity.entity || ''}
@@ -594,6 +656,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
           ></ha-selector>
 
           <ha-selector
+            .required=${false}
             .hass=${this.hass}
             .label=${'Custom text (optional)'}
             .value=${entity.text || ''}
@@ -603,8 +666,10 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
           ></ha-selector>
 
           <ha-selector
+            .required=${false}
             .hass=${this.hass}
             .label=${'Text template'}
+            .helper=${'Use {{ name }}, {{ state }}, {{ unit }}, {{ last_changed }} or {{ attributes.<name> }}, e.g. {{ name }}: {{ state }}'}
             .value=${entity.text_template || ''}
             .selector=${{text: {}}}
             @value-changed=${(ev: CustomEvent) =>
@@ -612,6 +677,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
           ></ha-selector>
 
           <ha-selector
+            .required=${false}
             .hass=${this.hass}
             .label=${'Column Span'}
             .value=${entity.colspan || 1}
@@ -621,6 +687,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
           ></ha-selector>
 
           <ha-selector
+            .required=${false}
             .hass=${this.hass}
             .selector=${{
               select: {
@@ -638,6 +705,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
           ></ha-selector>
 
           <ha-selector
+            .required=${false}
             .hass=${this.hass}
             .selector=${{
               select: {
@@ -656,6 +724,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
           ></ha-selector>
 
           <ha-selector
+            .required=${false}
             .hass=${this.hass}
             .selector=${{ boolean: {} }}
             .value=${entity.show_icon ?? false}
@@ -666,43 +735,20 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
 
           <ha-expansion-panel header="Per-Entity Colors (optional)" .expanded=${false}>
             <div class="color-grid">
-              <ha-selector
-                .hass=${this.hass}
-                .label=${'On Color'}
-                .value=${entity.colors?.on || ''}
-                .selector=${{text: {}}}
-                @value-changed=${(ev: CustomEvent) =>
-                  this._entityColorChanged(index, 'on', ev.detail.value)}
-              ></ha-selector>
+              ${this._renderColorField('On Color', entity.colors?.on || '', (value) =>
+                this._entityColorChanged(index, 'on', value))}
+
+              ${this._renderColorField('Off Color', entity.colors?.off || '', (value) =>
+                this._entityColorChanged(index, 'off', value))}
+
+              ${this._renderColorField('Text Color', entity.colors?.text || '', (value) =>
+                this._entityColorChanged(index, 'text', value))}
+
+              ${this._renderColorField('Blank Cell Color', entity.colors?.blank || '', (value) =>
+                this._entityColorChanged(index, 'blank', value))}
 
               <ha-selector
-                .hass=${this.hass}
-                .label=${'Off Color'}
-                .value=${entity.colors?.off || ''}
-                .selector=${{text: {}}}
-                @value-changed=${(ev: CustomEvent) =>
-                  this._entityColorChanged(index, 'off', ev.detail.value)}
-              ></ha-selector>
-
-              <ha-selector
-                .hass=${this.hass}
-                .label=${'Text Color'}
-                .value=${entity.colors?.text || ''}
-                .selector=${{text: {}}}
-                @value-changed=${(ev: CustomEvent) =>
-                  this._entityColorChanged(index, 'text', ev.detail.value)}
-              ></ha-selector>
-
-              <ha-selector
-                .hass=${this.hass}
-                .label=${'Blank Cell Color'}
-                .value=${entity.colors?.blank || ''}
-                .selector=${{text: {}}}
-                @value-changed=${(ev: CustomEvent) =>
-                  this._entityColorChanged(index, 'blank', ev.detail.value)}
-              ></ha-selector>
-
-              <ha-selector
+                .required=${false}
                 .hass=${this.hass}
                 .label=${'Dim Off Text (%)'}
                 .value=${entity.dim_off_text ?? ''}
@@ -712,6 +758,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
               ></ha-selector>
 
               <ha-selector
+                .required=${false}
                 .hass=${this.hass}
                 .label=${'Decimals'}
                 .value=${entity.decimals ?? ''}
@@ -724,6 +771,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
 
           <ha-expansion-panel header="Custom Icons (optional)" .expanded=${false}>
             <ha-selector
+              .required=${false}
               .hass=${this.hass}
               .selector=${{ icon: {} }}
               .value=${entity.icon?.on || ''}
@@ -733,6 +781,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
             ></ha-selector>
 
             <ha-selector
+              .required=${false}
               .hass=${this.hass}
               .selector=${{ icon: {} }}
               .value=${entity.icon?.off || ''}

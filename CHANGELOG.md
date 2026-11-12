@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2026.11.11] - 2026-11-11
+
+### Fixed
+- Default text color: with no text color set, cells use black or white, whichever contrasts more with the fill. White was unreadable on the default off (gray) and unavailable (orange) fills.
+- Keyboard: clickable cells are buttons; Enter or Space runs the click action.
+- Visual editor: `mwc-button` replaced with `ha-button`, distinct Remove button names, no false required markers, errors for invalid colors, text template hint, and focus moves to the Add button after Remove.
+
 ### Added
 - Behavioural test suite for the card class (`src/indicator-grid-card.test.ts`, 106 tests) covering sizing, color resolution, numeric formatting, templates and filters, cell computation, icons, `shouldUpdate`, and rendering (colspan, text-only, unavailable, and header cells). Tests load the built bundle in jsdom, so `npm test` now runs `rollup -c` first. Running the tests requires Node 22.6+ (native TypeScript type stripping).
 

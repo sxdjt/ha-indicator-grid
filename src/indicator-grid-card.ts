@@ -1,10 +1,10 @@
-import { LitElement, html, css, PropertyValues } from 'lit';
+import { LitElement, html, css, PropertyValues, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { HomeAssistant, LovelaceCardEditor, fireEvent } from 'custom-card-helpers';
 import { IndicatorGridCardConfig, EntityConfig, ColorConfig, IndicatorCell, HeaderRowConfig, HeaderCellConfig } from './types';
 import { evaluateThresholds, ThresholdStyles } from './thresholds';
 
-const CARD_VERSION = '2026.8.3';
+const CARD_VERSION = '2026.11.11';
 
 console.info(
   `%c  INDICATOR-GRID-CARD  \n%c  Version ${CARD_VERSION}  `,
@@ -112,10 +112,11 @@ export class IndicatorGridCard extends LitElement {
       icon_placement: config.icon_placement ?? 'above',
       icon_size: this._normalizeSize(config.icon_size, '24px'),
       unavailable_text: config.unavailable_text ?? 'INOP',
+      // No text default here: an unset text color means "black or white, whichever
+      // contrasts more with the cell fill" (see _getTextColor)
       global_colors: {
         on: 'green',
         off: 'gray',
-        text: 'white',
         unavailable: 'orange',
         blank: '#333333',
         ...config.global_colors,
@@ -227,12 +228,13 @@ export class IndicatorGridCard extends LitElement {
                         'Unknown';
       const unavailableText = this.config.unavailable_text || 'INOP';
       const displayText = `${entityName}\n${unavailableText}`;
+      const unavailableBackground = this._getColor('unavailable', entityConfig.colors);
 
       return {
         entity: entityConfig.entity,
         displayText,
-        backgroundColor: this._getColor('unavailable', entityConfig.colors),
-        textColor: this._getColor('text', entityConfig.colors),
+        backgroundColor: unavailableBackground,
+        textColor: this._getTextColor(entityConfig.colors, unavailableBackground),
         textOpacity: 1,
         textAlign: entityConfig.text_align,
         state: stateObj?.state,
@@ -247,7 +249,7 @@ export class IndicatorGridCard extends LitElement {
     const backgroundColor = this._getBackgroundColor(state, entityConfig);
 
     // Check for threshold styles (text_color and font_weight)
-    let textColor = this._getColor('text', entityConfig.colors);
+    let textColor = this._getTextColor(entityConfig.colors, backgroundColor);
     let fontWeight: string | number | undefined = undefined;
 
     const numericState = parseFloat(state);
@@ -485,6 +487,46 @@ export class IndicatorGridCard extends LitElement {
     return defaults[type];
   }
 
+  // Text color for a cell: entity color, then global color, then black or white,
+  // whichever has the higher WCAG contrast against the fill. The old default was always
+  // white, which is under 4.5:1 on the default off (gray) and unavailable (orange) fills.
+  private _getTextColor(entityColors: ColorConfig | undefined, background: string): string {
+    if (entityColors?.text) return entityColors.text;
+    if (this.config.global_colors?.text) return this.config.global_colors.text;
+    const rgb = this._resolveRgb(background);
+    if (!rgb) return 'white';
+    const lin = (c: number) => {
+      const v = c / 255;
+      return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    };
+    const lum = 0.2126 * lin(rgb[0]) + 0.7152 * lin(rgb[1]) + 0.0722 * lin(rgb[2]);
+    return (lum + 0.05) / 0.05 >= 1.05 / (lum + 0.05) ? 'black' : 'white';
+  }
+
+  // [r, g, b] for a hex, rgb() or named color, or undefined when it cannot be resolved
+  // here (e.g. var(--token), which only resolves inside the card)
+  private _resolveRgb(color: string): [number, number, number] | undefined {
+    const hex6 = color.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
+    if (hex6) return [parseInt(hex6[1], 16), parseInt(hex6[2], 16), parseInt(hex6[3], 16)];
+    const hex3 = color.match(/^#([0-9a-f])([0-9a-f])([0-9a-f])$/i);
+    if (hex3) return [parseInt(hex3[1] + hex3[1], 16), parseInt(hex3[2] + hex3[2], 16), parseInt(hex3[3] + hex3[3], 16)];
+    const rgb = color.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+    if (rgb) return [Number(rgb[1]), Number(rgb[2]), Number(rgb[3])];
+    if (color.startsWith('var(') || typeof document === 'undefined' || typeof getComputedStyle !== 'function') return undefined;
+    // Named colors: let the browser resolve them
+    const temp = document.createElement('div');
+    temp.style.color = color;
+    document.body.appendChild(temp);
+    let computed: string;
+    try {
+      computed = getComputedStyle(temp).color;
+    } finally {
+      temp.remove();
+    }
+    const resolved = computed.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+    return resolved ? [Number(resolved[1]), Number(resolved[2]), Number(resolved[3])] : undefined;
+  }
+
   private _getIcon(state: string, entityConfig: EntityConfig, stateObj: any): string | undefined {
     // Check entity-specific override first
     if (entityConfig && entityConfig.show_icon !== undefined) {
@@ -614,6 +656,15 @@ export class IndicatorGridCard extends LitElement {
     }
   }
 
+  private _handleCellKeydown(e: KeyboardEvent, cell: IndicatorCell): void {
+    if (!cell.clickable || (e.key !== 'Enter' && e.key !== ' ')) {
+      return;
+    }
+    // Space would otherwise scroll the page
+    e.preventDefault();
+    this._handleClick(cell);
+  }
+
   private _toggleEntity(entityId: string): void {
     const domain = entityId.split('.')[0];
     this.hass.callService(domain, 'toggle', {
@@ -665,8 +716,8 @@ export class IndicatorGridCard extends LitElement {
     const defaultFontSize = this._normalizeSize(this.config.font_size, '16px');
     const fontSize = this._normalizeSize(headerCell.font_size, defaultFontSize);
     const fontWeight = headerCell.font_weight || this.config.font_weight || 'bold';
-    const textColor = headerCell.text_color || this._getColor('text', undefined);
     const backgroundColor = headerCell.background_color || this._getColor('blank', undefined);
+    const textColor = headerCell.text_color || this._getTextColor(undefined, backgroundColor);
     const displayText = this._processHeaderText(headerCell.text);
 
     const cellStyle = {
@@ -711,10 +762,11 @@ export class IndicatorGridCard extends LitElement {
           let cell: IndicatorCell;
           if (!entityConfig || !entityConfig.entity) {
             // Text-only or blank cell
+            const blankBackground = this._getColor('blank', entityConfig?.colors);
             cell = {
               displayText: entityConfig?.text || '',
-              backgroundColor: this._getColor('blank', entityConfig?.colors),
-              textColor: this._getColor('text', entityConfig?.colors),
+              backgroundColor: blankBackground,
+              textColor: this._getTextColor(entityConfig?.colors, blankBackground),
               textOpacity: 1,
               textAlign: entityConfig?.text_align,
               clickable: false,
@@ -830,6 +882,11 @@ export class IndicatorGridCard extends LitElement {
 
       .cell.clickable:active {
         filter: brightness(0.8);
+      }
+
+      .cell.clickable:focus-visible {
+        outline: 2px solid var(--primary-text-color);
+        outline-offset: 2px;
       }
     `;
   }
@@ -952,11 +1009,18 @@ export class IndicatorGridCard extends LitElement {
     // Check if text contains newlines for multi-line display
     const textLines = cell.displayText.split('\n');
 
+    // Clickable cells are keyboard buttons (Tab to reach, Enter or Space to activate);
+    // their accessible name is the cell text. Lit keeps the element across updates, so
+    // focus survives state changes.
     return html`
       <div
         class="cell ${cell.clickable ? 'clickable' : ''} ${iconPlacementClass}"
         style=${this._styleMap(cellStyle)}
+        role=${cell.clickable ? 'button' : nothing}
+        tabindex=${cell.clickable ? '0' : nothing}
+        aria-haspopup=${cell.clickable && cell.clickAction === 'more-info' ? 'dialog' : nothing}
         @click=${() => this._handleClick(cell)}
+        @keydown=${(e: KeyboardEvent) => this._handleCellKeydown(e, cell)}
       >
         ${cell.icon ? html`<ha-icon class="cell-icon" .icon=${cell.icon} style=${this._styleMap(iconStyle)}></ha-icon>` : ''}
         <div class="cell-text" style=${this._styleMap(cellTextStyle)}>

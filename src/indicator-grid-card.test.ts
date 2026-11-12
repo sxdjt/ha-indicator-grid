@@ -664,6 +664,35 @@ describe('render layer (_renderAllCells / _renderCell)', () => {
     el.remove();
   });
 
+  test('a clickable cell is a keyboard button; a non-clickable cell is not', async () => {
+    const el = await mount(
+      { columns: 2, rows: 1, entities: [{ entity: 'light.a' }, { entity: 'light.b', click_action: 'none' }] },
+      { states: { 'light.a': stateObj('light.a', 'on'), 'light.b': stateObj('light.b', 'on') } }
+    );
+    const [clickable, plain] = el.shadowRoot.querySelectorAll('.cell');
+    assert.equal(clickable.getAttribute('role'), 'button');
+    assert.equal(clickable.getAttribute('tabindex'), '0');
+    assert.equal(plain.hasAttribute('role'), false);
+    assert.equal(plain.hasAttribute('tabindex'), false);
+    el.remove();
+  });
+
+  test('Enter and Space on a clickable cell run its action; other keys do not', async () => {
+    const el = await mount(
+      { columns: 1, rows: 1, entities: [{ entity: 'light.a' }] },
+      { states: { 'light.a': stateObj('light.a', 'on') } }
+    );
+    const calls = [];
+    el._handleClick = (cell) => calls.push(cell.entity);
+    await el.updateComplete;
+    const cell = el.shadowRoot.querySelector('.cell');
+    for (const key of ['Enter', ' ', 'a']) {
+      cell.dispatchEvent(new window.KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
+    }
+    assert.deepEqual(calls, ['light.a', 'light.a']);
+    el.remove();
+  });
+
   test('a header row renders header cells with their text and colspan', async () => {
     const el = await mount({
       columns: 2, rows: 1,
@@ -712,5 +741,27 @@ describe('header row helpers', () => {
     const card = makeCard(config);
     assert.deepEqual(card._getHeaderRow(0), config.header_rows[0]);
     assert.equal(card._getHeaderRow(1), undefined);
+  });
+});
+
+describe('_getTextColor', () => {
+  test('with no text color set, picks black or white for the higher contrast', () => {
+    const card = makeCard({});
+    assert.equal(card._getTextColor(undefined, '#808080'), 'black'); // gray: white is 3.9:1
+    assert.equal(card._getTextColor(undefined, '#ffa500'), 'black'); // orange: white is 2.0:1
+    assert.equal(card._getTextColor(undefined, '#008000'), 'white'); // green: white is 5.1:1
+    assert.equal(card._getTextColor(undefined, '#333'), 'white');
+    assert.equal(card._getTextColor(undefined, 'rgb(255, 235, 59)'), 'black');
+  });
+
+  test('configured entity and global text colors win', () => {
+    const card = makeCard({ global_colors: { text: 'yellow' } });
+    assert.equal(card._getTextColor(undefined, '#808080'), 'yellow');
+    assert.equal(card._getTextColor({ text: 'red' }, '#808080'), 'red');
+  });
+
+  test('falls back to white when the fill cannot be resolved', () => {
+    const card = makeCard({});
+    assert.equal(card._getTextColor(undefined, 'var(--state-on-color)'), 'white');
   });
 });
