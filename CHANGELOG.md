@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- The built `indicator-grid-card.js` is no longer minified, so it stays readable when troubleshooting in the browser. The "Last changed" build timestamp header is removed.
+
 ### Security
 - Updated development dependencies to resolve Dependabot and `npm audit` advisories. None of these packages are bundled into the card:
   - minimatch 10.2.5 -> 11.0.9 (via eslint and typescript-eslint): denial of service via globparts amplification (GHSA-g3hv-75wg-m249).

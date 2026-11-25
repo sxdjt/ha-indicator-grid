@@ -1,11 +1,942 @@
-/* Last changed: 11/11/2026, 20:13:17 */
-function e(e,t,i,s){var o,n=arguments.length,r=n<3?t:null===s?s=Object.getOwnPropertyDescriptor(t,i):s;if("object"==typeof Reflect&&"function"==typeof Reflect.decorate)r=Reflect.decorate(e,t,i,s);else for(var l=e.length-1;l>=0;l--)(o=e[l])&&(r=(n<3?o(r):n>3?o(t,i,r):o(t,i))||r);return n>3&&r&&Object.defineProperty(t,i,r),r}"function"==typeof SuppressedError&&SuppressedError;const t=globalThis,i=t.ShadowRoot&&(void 0===t.ShadyCSS||t.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,s=Symbol(),o=new WeakMap;let n=class{constructor(e,t,i){if(this._$cssResult$=!0,i!==s)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=e,this.t=t}get styleSheet(){let e=this.o;const t=this.t;if(i&&void 0===e){const i=void 0!==t&&1===t.length;i&&(e=o.get(t)),void 0===e&&((this.o=e=new CSSStyleSheet).replaceSync(this.cssText),i&&o.set(t,e))}return e}toString(){return this.cssText}};const r=(e,...t)=>{const i=1===e.length?e[0]:t.reduce((t,i,s)=>t+(e=>{if(!0===e._$cssResult$)return e.cssText;if("number"==typeof e)return e;throw Error("Value passed to 'css' function must be a 'css' function result: "+e+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(i)+e[s+1],e[0]);return new n(i,e,s)},l=i?e=>e:e=>e instanceof CSSStyleSheet?(e=>{let t="";for(const i of e.cssRules)t+=i.cssText;return(e=>new n("string"==typeof e?e:e+"",void 0,s))(t)})(e):e,{is:a,defineProperty:c,getOwnPropertyDescriptor:h,getOwnPropertyNames:d,getOwnPropertySymbols:u,getPrototypeOf:g}=Object,p=globalThis,_=p.trustedTypes,f=_?_.emptyScript:"",$=p.reactiveElementPolyfillSupport,m=(e,t)=>e,v={toAttribute(e,t){switch(t){case Boolean:e=e?f:null;break;case Object:case Array:e=null==e?e:JSON.stringify(e)}return e},fromAttribute(e,t){let i=e;switch(t){case Boolean:i=null!==e;break;case Number:i=null===e?null:Number(e);break;case Object:case Array:try{i=JSON.parse(e)}catch(e){i=null}}return i}},b=(e,t)=>!a(e,t),y={attribute:!0,type:String,converter:v,reflect:!1,useDefault:!1,hasChanged:b};Symbol.metadata??=Symbol("metadata"),p.litPropertyMetadata??=new WeakMap;let x=class extends HTMLElement{static addInitializer(e){this._$Ei(),(this.l??=[]).push(e)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(e,t=y){if(t.state&&(t.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(e)&&((t=Object.create(t)).wrapped=!0),this.elementProperties.set(e,t),!t.noAccessor){const i=Symbol(),s=this.getPropertyDescriptor(e,i,t);void 0!==s&&c(this.prototype,e,s)}}static getPropertyDescriptor(e,t,i){const{get:s,set:o}=h(this.prototype,e)??{get(){return this[t]},set(e){this[t]=e}};return{get:s,set(t){const n=s?.call(this);o?.call(this,t),this.requestUpdate(e,n,i)},configurable:!0,enumerable:!0}}static getPropertyOptions(e){return this.elementProperties.get(e)??y}static _$Ei(){if(this.hasOwnProperty(m("elementProperties")))return;const e=g(this);e.finalize(),void 0!==e.l&&(this.l=[...e.l]),this.elementProperties=new Map(e.elementProperties)}static finalize(){if(this.hasOwnProperty(m("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(m("properties"))){const e=this.properties,t=[...d(e),...u(e)];for(const i of t)this.createProperty(i,e[i])}const e=this[Symbol.metadata];if(null!==e){const t=litPropertyMetadata.get(e);if(void 0!==t)for(const[e,i]of t)this.elementProperties.set(e,i)}this._$Eh=new Map;for(const[e,t]of this.elementProperties){const i=this._$Eu(e,t);void 0!==i&&this._$Eh.set(i,e)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(e){const t=[];if(Array.isArray(e)){const i=new Set(e.flat(1/0).reverse());for(const e of i)t.unshift(l(e))}else void 0!==e&&t.push(l(e));return t}static _$Eu(e,t){const i=t.attribute;return!1===i?void 0:"string"==typeof i?i:"string"==typeof e?e.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(e=>this.enableUpdating=e),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(e=>e(this))}addController(e){(this._$EO??=new Set).add(e),void 0!==this.renderRoot&&this.isConnected&&e.hostConnected?.()}removeController(e){this._$EO?.delete(e)}_$E_(){const e=new Map,t=this.constructor.elementProperties;for(const i of t.keys())this.hasOwnProperty(i)&&(e.set(i,this[i]),delete this[i]);e.size>0&&(this._$Ep=e)}createRenderRoot(){const e=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return((e,s)=>{if(i)e.adoptedStyleSheets=s.map(e=>e instanceof CSSStyleSheet?e:e.styleSheet);else for(const i of s){const s=document.createElement("style"),o=t.litNonce;void 0!==o&&s.setAttribute("nonce",o),s.textContent=i.cssText,e.appendChild(s)}})(e,this.constructor.elementStyles),e}connectedCallback(){this.renderRoot??=this.createRenderRoot(),this.enableUpdating(!0),this._$EO?.forEach(e=>e.hostConnected?.())}enableUpdating(e){}disconnectedCallback(){this._$EO?.forEach(e=>e.hostDisconnected?.())}attributeChangedCallback(e,t,i){this._$AK(e,i)}_$ET(e,t){const i=this.constructor.elementProperties.get(e),s=this.constructor._$Eu(e,i);if(void 0!==s&&!0===i.reflect){const o=(void 0!==i.converter?.toAttribute?i.converter:v).toAttribute(t,i.type);this._$Em=e,null==o?this.removeAttribute(s):this.setAttribute(s,o),this._$Em=null}}_$AK(e,t){const i=this.constructor,s=i._$Eh.get(e);if(void 0!==s&&this._$Em!==s){const e=i.getPropertyOptions(s),o="function"==typeof e.converter?{fromAttribute:e.converter}:void 0!==e.converter?.fromAttribute?e.converter:v;this._$Em=s;const n=o.fromAttribute(t,e.type);this[s]=n??this._$Ej?.get(s)??n,this._$Em=null}}requestUpdate(e,t,i,s=!1,o){if(void 0!==e){const n=this.constructor;if(!1===s&&(o=this[e]),i??=n.getPropertyOptions(e),!((i.hasChanged??b)(o,t)||i.useDefault&&i.reflect&&o===this._$Ej?.get(e)&&!this.hasAttribute(n._$Eu(e,i))))return;this.C(e,t,i)}!1===this.isUpdatePending&&(this._$ES=this._$EP())}C(e,t,{useDefault:i,reflect:s,wrapped:o},n){i&&!(this._$Ej??=new Map).has(e)&&(this._$Ej.set(e,n??t??this[e]),!0!==o||void 0!==n)||(this._$AL.has(e)||(this.hasUpdated||i||(t=void 0),this._$AL.set(e,t)),!0===s&&this._$Em!==e&&(this._$Eq??=new Set).add(e))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(e){Promise.reject(e)}const e=this.scheduleUpdate();return null!=e&&await e,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??=this.createRenderRoot(),this._$Ep){for(const[e,t]of this._$Ep)this[e]=t;this._$Ep=void 0}const e=this.constructor.elementProperties;if(e.size>0)for(const[t,i]of e){const{wrapped:e}=i,s=this[t];!0!==e||this._$AL.has(t)||void 0===s||this.C(t,void 0,i,s)}}let e=!1;const t=this._$AL;try{e=this.shouldUpdate(t),e?(this.willUpdate(t),this._$EO?.forEach(e=>e.hostUpdate?.()),this.update(t)):this._$EM()}catch(t){throw e=!1,this._$EM(),t}e&&this._$AE(t)}willUpdate(e){}_$AE(e){this._$EO?.forEach(e=>e.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(e)),this.updated(e)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(e){return!0}update(e){this._$Eq&&=this._$Eq.forEach(e=>this._$ET(e,this[e])),this._$EM()}updated(e){}firstUpdated(e){}};x.elementStyles=[],x.shadowRootOptions={mode:"open"},x[m("elementProperties")]=new Map,x[m("finalized")]=new Map,$?.({ReactiveElement:x}),(p.reactiveElementVersions??=[]).push("2.1.2");const C=globalThis,w=e=>e,A=C.trustedTypes,S=A?A.createPolicy("lit-html",{createHTML:e=>e}):void 0,E="$lit$",k=`lit$${Math.random().toFixed(9).slice(2)}$`,T="?"+k,z=`<${T}>`,N=document,O=()=>N.createComment(""),H=e=>null===e||"object"!=typeof e&&"function"!=typeof e,P=Array.isArray,R="[ \t\n\f\r]",M=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,I=/-->/g,U=/>/g,q=RegExp(`>|${R}(?:([^\\s"'>=/]+)(${R}*=${R}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),F=/'/g,D=/"/g,j=/^(?:script|style|textarea|title)$/i,B=(e=>(t,...i)=>({_$litType$:e,strings:t,values:i}))(1),L=Symbol.for("lit-noChange"),V=Symbol.for("lit-nothing"),W=new WeakMap,G=N.createTreeWalker(N,129);function K(e,t){if(!P(e)||!e.hasOwnProperty("raw"))throw Error("invalid template strings array");return void 0!==S?S.createHTML(t):t}const J=(e,t)=>{const i=e.length-1,s=[];let o,n=2===t?"<svg>":3===t?"<math>":"",r=M;for(let t=0;t<i;t++){const i=e[t];let l,a,c=-1,h=0;for(;h<i.length&&(r.lastIndex=h,a=r.exec(i),null!==a);)h=r.lastIndex,r===M?"!--"===a[1]?r=I:void 0!==a[1]?r=U:void 0!==a[2]?(j.test(a[2])&&(o=RegExp("</"+a[2],"g")),r=q):void 0!==a[3]&&(r=q):r===q?">"===a[0]?(r=o??M,c=-1):void 0===a[1]?c=-2:(c=r.lastIndex-a[2].length,l=a[1],r=void 0===a[3]?q:'"'===a[3]?D:F):r===D||r===F?r=q:r===I||r===U?r=M:(r=q,o=void 0);const d=r===q&&e[t+1].startsWith("/>")?" ":"";n+=r===M?i+z:c>=0?(s.push(l),i.slice(0,c)+E+i.slice(c)+k+d):i+k+(-2===c?t:d)}return[K(e,n+(e[i]||"<?>")+(2===t?"</svg>":3===t?"</math>":"")),s]};class Z{constructor({strings:e,_$litType$:t},i){let s;this.parts=[];let o=0,n=0;const r=e.length-1,l=this.parts,[a,c]=J(e,t);if(this.el=Z.createElement(a,i),G.currentNode=this.el.content,2===t||3===t){const e=this.el.content.firstChild;e.replaceWith(...e.childNodes)}for(;null!==(s=G.nextNode())&&l.length<r;){if(1===s.nodeType){if(s.hasAttributes())for(const e of s.getAttributeNames())if(e.endsWith(E)){const t=c[n++],i=s.getAttribute(e).split(k),r=/([.?@])?(.*)/.exec(t);l.push({type:1,index:o,name:r[2],strings:i,ctor:"."===r[1]?te:"?"===r[1]?ie:"@"===r[1]?se:ee}),s.removeAttribute(e)}else e.startsWith(k)&&(l.push({type:6,index:o}),s.removeAttribute(e));if(j.test(s.tagName)){const e=s.textContent.split(k),t=e.length-1;if(t>0){s.textContent=A?A.emptyScript:"";for(let i=0;i<t;i++)s.append(e[i],O()),G.nextNode(),l.push({type:2,index:++o});s.append(e[t],O())}}}else if(8===s.nodeType)if(s.data===T)l.push({type:2,index:o});else{let e=-1;for(;-1!==(e=s.data.indexOf(k,e+1));)l.push({type:7,index:o}),e+=k.length-1}o++}}static createElement(e,t){const i=N.createElement("template");return i.innerHTML=e,i}}function Q(e,t,i=e,s){if(t===L)return t;let o=void 0!==s?i._$Co?.[s]:i._$Cl;const n=H(t)?void 0:t._$litDirective$;return o?.constructor!==n&&(o?._$AO?.(!1),void 0===n?o=void 0:(o=new n(e),o._$AT(e,i,s)),void 0!==s?(i._$Co??=[])[s]=o:i._$Cl=o),void 0!==o&&(t=Q(e,o._$AS(e,t.values),o,s)),t}class X{constructor(e,t){this._$AV=[],this._$AN=void 0,this._$AD=e,this._$AM=t}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(e){const{el:{content:t},parts:i}=this._$AD,s=(e?.creationScope??N).importNode(t,!0);G.currentNode=s;let o=G.nextNode(),n=0,r=0,l=i[0];for(;void 0!==l;){if(n===l.index){let t;2===l.type?t=new Y(o,o.nextSibling,this,e):1===l.type?t=new l.ctor(o,l.name,l.strings,this,e):6===l.type&&(t=new oe(o,this,e)),this._$AV.push(t),l=i[++r]}n!==l?.index&&(o=G.nextNode(),n++)}return G.currentNode=N,s}p(e){let t=0;for(const i of this._$AV)void 0!==i&&(void 0!==i.strings?(i._$AI(e,i,t),t+=i.strings.length-2):i._$AI(e[t])),t++}}class Y{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(e,t,i,s){this.type=2,this._$AH=V,this._$AN=void 0,this._$AA=e,this._$AB=t,this._$AM=i,this.options=s,this._$Cv=s?.isConnected??!0}get parentNode(){let e=this._$AA.parentNode;const t=this._$AM;return void 0!==t&&11===e?.nodeType&&(e=t.parentNode),e}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(e,t=this){e=Q(this,e,t),H(e)?e===V||null==e||""===e?(this._$AH!==V&&this._$AR(),this._$AH=V):e!==this._$AH&&e!==L&&this._(e):void 0!==e._$litType$?this.$(e):void 0!==e.nodeType?this.T(e):(e=>P(e)||"function"==typeof e?.[Symbol.iterator])(e)?this.k(e):this._(e)}O(e){return this._$AA.parentNode.insertBefore(e,this._$AB)}T(e){this._$AH!==e&&(this._$AR(),this._$AH=this.O(e))}_(e){this._$AH!==V&&H(this._$AH)?this._$AA.nextSibling.data=e:this.T(N.createTextNode(e)),this._$AH=e}$(e){const{values:t,_$litType$:i}=e,s="number"==typeof i?this._$AC(e):(void 0===i.el&&(i.el=Z.createElement(K(i.h,i.h[0]),this.options)),i);if(this._$AH?._$AD===s)this._$AH.p(t);else{const e=new X(s,this),i=e.u(this.options);e.p(t),this.T(i),this._$AH=e}}_$AC(e){let t=W.get(e.strings);return void 0===t&&W.set(e.strings,t=new Z(e)),t}k(e){P(this._$AH)||(this._$AH=[],this._$AR());const t=this._$AH;let i,s=0;for(const o of e)s===t.length?t.push(i=new Y(this.O(O()),this.O(O()),this,this.options)):i=t[s],i._$AI(o),s++;s<t.length&&(this._$AR(i&&i._$AB.nextSibling,s),t.length=s)}_$AR(e=this._$AA.nextSibling,t){for(this._$AP?.(!1,!0,t);e!==this._$AB;){const t=w(e).nextSibling;w(e).remove(),e=t}}setConnected(e){void 0===this._$AM&&(this._$Cv=e,this._$AP?.(e))}}class ee{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(e,t,i,s,o){this.type=1,this._$AH=V,this._$AN=void 0,this.element=e,this.name=t,this._$AM=s,this.options=o,i.length>2||""!==i[0]||""!==i[1]?(this._$AH=Array(i.length-1).fill(new String),this.strings=i):this._$AH=V}_$AI(e,t=this,i,s){const o=this.strings;let n=!1;if(void 0===o)e=Q(this,e,t,0),n=!H(e)||e!==this._$AH&&e!==L,n&&(this._$AH=e);else{const s=e;let r,l;for(e=o[0],r=0;r<o.length-1;r++)l=Q(this,s[i+r],t,r),l===L&&(l=this._$AH[r]),n||=!H(l)||l!==this._$AH[r],l===V?e=V:e!==V&&(e+=(l??"")+o[r+1]),this._$AH[r]=l}n&&!s&&this.j(e)}j(e){e===V?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,e??"")}}class te extends ee{constructor(){super(...arguments),this.type=3}j(e){this.element[this.name]=e===V?void 0:e}}class ie extends ee{constructor(){super(...arguments),this.type=4}j(e){this.element.toggleAttribute(this.name,!!e&&e!==V)}}class se extends ee{constructor(e,t,i,s,o){super(e,t,i,s,o),this.type=5}_$AI(e,t=this){if((e=Q(this,e,t,0)??V)===L)return;const i=this._$AH,s=e===V&&i!==V||e.capture!==i.capture||e.once!==i.once||e.passive!==i.passive,o=e!==V&&(i===V||s);s&&this.element.removeEventListener(this.name,this,i),o&&this.element.addEventListener(this.name,this,e),this._$AH=e}handleEvent(e){"function"==typeof this._$AH?this._$AH.call(this.options?.host??this.element,e):this._$AH.handleEvent(e)}}class oe{constructor(e,t,i){this.element=e,this.type=6,this._$AN=void 0,this._$AM=t,this.options=i}get _$AU(){return this._$AM._$AU}_$AI(e){Q(this,e)}}const ne=C.litHtmlPolyfillSupport;ne?.(Z,Y),(C.litHtmlVersions??=[]).push("3.3.3");const re=globalThis;class le extends x{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0}createRenderRoot(){const e=super.createRenderRoot();return this.renderOptions.renderBefore??=e.firstChild,e}update(e){const t=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(e),this._$Do=((e,t,i)=>{const s=i?.renderBefore??t;let o=s._$litPart$;if(void 0===o){const e=i?.renderBefore??null;s._$litPart$=o=new Y(t.insertBefore(O(),e),e,void 0,i??{})}return o._$AI(e),o})(t,this.renderRoot,this.renderOptions)}connectedCallback(){super.connectedCallback(),this._$Do?.setConnected(!0)}disconnectedCallback(){super.disconnectedCallback(),this._$Do?.setConnected(!1)}render(){return L}}le._$litElement$=!0,le.finalized=!0,re.litElementHydrateSupport?.({LitElement:le});const ae=re.litElementPolyfillSupport;ae?.({LitElement:le}),(re.litElementVersions??=[]).push("4.2.2");const ce=e=>(t,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(e,t)}):customElements.define(e,t)},he={attribute:!0,type:String,converter:v,reflect:!1,hasChanged:b},de=(e=he,t,i)=>{const{kind:s,metadata:o}=i;let n=globalThis.litPropertyMetadata.get(o);if(void 0===n&&globalThis.litPropertyMetadata.set(o,n=new Map),"setter"===s&&((e=Object.create(e)).wrapped=!0),n.set(i.name,e),"accessor"===s){const{name:s}=i;return{set(i){const o=t.get.call(this);t.set.call(this,i),this.requestUpdate(s,o,e,!0,i)},init(t){return void 0!==t&&this.C(s,void 0,e,t),t}}}if("setter"===s){const{name:s}=i;return function(i){const o=this[s];t.call(this,i),this.requestUpdate(s,o,e,!0,i)}}throw Error("Unsupported decorator location: "+s)};function ue(e){return(t,i)=>"object"==typeof i?de(e,t,i):((e,t,i)=>{const s=t.hasOwnProperty(i);return t.constructor.createProperty(i,e),s?Object.getOwnPropertyDescriptor(t,i):void 0})(e,t,i)}function ge(e){return ue({...e,state:!0,attribute:!1})}var pe,_e;!function(e){e.language="language",e.system="system",e.comma_decimal="comma_decimal",e.decimal_comma="decimal_comma",e.space_comma="space_comma",e.none="none"}(pe||(pe={})),function(e){e.language="language",e.system="system",e.am_pm="12",e.twenty_four="24"}(_e||(_e={}));const fe=(e,t,i,s)=>{s=s||{},i=null==i?{}:i;const o=new Event(t,{bubbles:void 0===s.bubbles||s.bubbles,cancelable:Boolean(s.cancelable),composed:void 0===s.composed||s.composed});return o.detail=i,e.dispatchEvent(o),o};function $e(e){return(e.operator??"<=").trim()}function me(e,t){switch($e(t)){case"<":return e<t.value;case"<=":return e<=t.value;case">":return e>t.value;case">=":return e>=t.value;case"==":return e===t.value;default:return!1}}function ve(e){return{backgroundColor:e.color,textColor:e.text_color,fontWeight:e.font_weight}}console.info("%c  INDICATOR-GRID-CARD  \n%c  Version 2026.11.11  ","color: black; background: #F2720C; font-weight: 600;","color: black; background: #00a5c9; font-weight: 600;"),window.customCards=window.customCards||[],window.customCards.push({type:"indicator-grid-card",name:"Indicator Grid Card",description:"A card displaying a grid of indicator lights showing entity status",preview:!0,getEntitySuggestion:(e,t)=>{const i=e?.states?.[t];if(!i)return null;const s=t.split(".")[0];return["binary_sensor","switch","light","input_boolean"].includes(s)?{config:{type:"custom:indicator-grid-card",entities:[{entity:t}]}}:null}});let be=class extends le{_normalizeSize(e,t){if(void 0===e)return t;const i=String(e);return/^\d+(\.\d+)?$/.test(i)?`${i}px`:i}static async getConfigElement(){return await Promise.resolve().then(function(){return xe}),document.createElement("indicator-grid-card-editor")}static getStubConfig(e){const t=["binary_sensor","switch","light","input_boolean"];return{columns:3,rows:2,cell_width:"",cell_height:100,cell_gap:5,font_size:16,font_weight:"bold",show_icons:!1,icon_placement:"above",icon_size:24,entities:e?.states?Object.keys(e.states).filter(e=>t.includes(e.split(".")[0])).slice(0,6).map(e=>({entity:e})):[],unavailable_text:"INOP",global_colors:{on:"green",off:"gray",text:"white",unavailable:"orange",blank:"#333333"}}}setConfig(e){if(!e)throw new Error("Invalid configuration");let t=e.cell_width,i=e.cell_height;void 0!==e.cell_size&&(t=t??`${e.cell_size}px`,i=i??`${e.cell_size}px`),this.config={...e,columns:e.columns??3,rows:e.rows??2,cell_width:this._normalizeSize(t,""),cell_height:this._normalizeSize(i,"100px"),cell_gap:this._normalizeSize(e.cell_gap,"5px"),font_size:this._normalizeSize(e.font_size,"16px"),font_weight:e.font_weight??"bold",show_icons:e.show_icons??!1,icon_placement:e.icon_placement??"above",icon_size:this._normalizeSize(e.icon_size,"24px"),unavailable_text:e.unavailable_text??"INOP",global_colors:{on:"green",off:"gray",unavailable:"orange",blank:"#333333",...e.global_colors}}}getCardSize(){if(!this.config)return 2;const e=this._normalizeSize(this.config.cell_height,"100px"),t=parseFloat(e),i=this._normalizeSize(this.config.cell_gap,"5px"),s=parseFloat(i),o=this.config.rows||2,n=o*t+(o-1)*s;return Math.ceil(n/50)}getGridOptions(){const e=this.config?.rows??2,t=e*parseFloat(this._normalizeSize(this.config?.cell_height,"100px"))+(e-1)*parseFloat(this._normalizeSize(this.config?.cell_gap,"5px"));return{rows:Math.ceil((t+8)/64),columns:12,min_rows:1,min_columns:3}}shouldUpdate(e){if(!this.config)return!1;if(e.has("config"))return!0;if(e.has("hass")){const t=e.get("hass");if(!t)return!0;const i=this.config.entities.filter(e=>e&&!!e.entity).map(e=>e.entity),s=this.config.entities.filter(e=>e&&!!e.text_template).flatMap(e=>this._extractTemplateEntityIds(e.text_template)),o=(this.config.header_rows||[]).flatMap(e=>e.cells).flatMap(e=>this._extractTemplateEntityIds(e.text));return[...new Set([...i,...s,...o])].some(e=>t.states[e]!==this.hass.states[e])}return!0}_computeCell(e,t){if(!t||"unavailable"===t.state||"unknown"===t.state){const i=`${e.text||t?.attributes?.friendly_name||e.entity||"Unknown"}\n${this.config.unavailable_text||"INOP"}`,s=this._getColor("unavailable",e.colors);return{entity:e.entity,displayText:i,backgroundColor:s,textColor:this._getTextColor(e.colors,s),textOpacity:1,textAlign:e.text_align,state:t?.state,clickable:!1,clickAction:"none",colspan:e.colspan||1}}const i=t.state,s=this._getDisplayText(e,t),o=this._getBackgroundColor(i,e);let n,r=this._getTextColor(e.colors,o);const l=parseFloat(i);if(!isNaN(l)){const t=this._getThresholdStyles(l,e.colors)||this._getThresholdStyles(l,this.config.global_colors);t&&(t.textColor&&(r=t.textColor),t.fontWeight&&(n=t.fontWeight))}const a=this._getTextOpacity(i,e),c=this._getIcon(i,e,t),h=e.click_action||this._getDefaultClickAction(t);return{entity:e.entity,displayText:s,backgroundColor:o,textColor:r,textOpacity:a,textAlign:e.text_align,fontWeight:n,icon:c,state:i,clickable:"none"!==h,clickAction:h,colspan:e.colspan||1}}_getDisplayText(e,t){if(e.text)return e.text;if(e.text_template)return this._renderTemplate(e.text_template,t,e);const i=this._formatNumericState(t.state,e),s=parseFloat(t.state),o=void 0!==e.decimals||void 0!==this.config.decimals;return!isNaN(s)&&o?i:t.attributes.friendly_name||e.entity||""}_renderTemplate(e,t,i){return e.replace(/\{\{\s*(.+?)\s*\}\}/g,(e,s)=>{const o=s.split("|").map(e=>e.trim());let n=this._resolveTemplateVariable(o[0],t,i);for(let e=1;e<o.length;e++)n=this._applyTemplateFilter(n,o[e]);return n})}_resolveTemplateVariable(e,t,i){const s=this._formatNumericState(t.state,i);if("state"===e)return s;if("name"===e)return t.attributes.friendly_name||i.entity||"";if("entity_id"===e)return t.entity_id||i.entity||"";if("unit"===e)return t.attributes.unit_of_measurement||"";if("state_with_unit"===e){const e=t.attributes.unit_of_measurement;return e?`${s} ${e}`:s}if("last_changed"===e)return this._relativeTime(t.last_changed);if("last_updated"===e)return this._relativeTime(t.last_updated);if(e.startsWith("attributes.")){const i=e.slice(11),s=t.attributes[i];return null!=s?String(s):""}const o=e.match(/^states\(['"]([^'"]+)['"]\)$/);if(o){const e=this.hass.states[o[1]];return e?e.state:""}return e}_relativeTime(e){if(!e)return"";const t=Math.floor((Date.now()-new Date(e).getTime())/1e3);if(isNaN(t))return"";if(t<60)return"just now";const i=Math.floor(t/60);if(i<60)return`${i} minute${1===i?"":"s"} ago`;const s=Math.floor(i/60);if(s<24)return`${s} hour${1===s?"":"s"} ago`;const o=Math.floor(s/24);return`${o} day${1===o?"":"s"} ago`}_extractTemplateEntityIds(e){const t=[],i=/\{\{\s*states\(['"]([^'"]+)['"]\)/g;let s;for(;null!==(s=i.exec(e));)t.push(s[1]);return t}_applyTemplateFilter(e,t){const i=t.indexOf("("),s=i>=0?t.slice(0,i).trim():t.trim();let o=[];if(i>=0){o=t.slice(i+1,t.lastIndexOf(")")).split(",").map(e=>e.trim().replace(/^['"]|['"]$/g,""))}switch(s){case"upper":return e.toUpperCase();case"lower":return e.toLowerCase();case"title":return e.replace(/\b\w/g,e=>e.toUpperCase());case"round":{const t=o.length>0?parseInt(o[0],10):0,i=parseFloat(e);return isNaN(i)?e:i.toFixed(isNaN(t)?0:t)}case"int":{const t=parseInt(e,10);return isNaN(t)?o.length>0?o[0]:"0":String(t)}case"float":{const t=parseFloat(e);return isNaN(t)?o.length>0?o[0]:"0":String(t)}case"replace":return o.length>=2?e.split(o[0]).join(o[1]):e;case"truncate":{const t=o.length>0?parseInt(o[0],10):255,i=isNaN(t)?255:t;return e.length>i?e.slice(0,i)+"...":e}case"default":return""!==e?e:o.length>0?o[0]:"";default:return e}}_getBackgroundColor(e,t){const i=t.colors;if(i?.states&&i.states[e])return i.states[e];if(this.config.global_colors?.states&&this.config.global_colors.states[e])return this.config.global_colors.states[e];const s=parseFloat(e);if(!isNaN(s)){const e=this._getThresholdStyles(s,i)||this._getThresholdStyles(s,this.config.global_colors);if(e?.backgroundColor)return e.backgroundColor}return"on"===e?this._getColor("on",i):this._getColor("off",i)}_getThresholdStyles(e,t){return function(e,t){if(!t||0===t.length)return null;const i=t.filter(e=>{const t=$e(e);return">"===t||">="===t}).sort((e,t)=>t.value-e.value),s=t.filter(e=>{const t=$e(e);return"<"===t||"<="===t}).sort((e,t)=>e.value-t.value),o=t.filter(e=>"=="===$e(e));for(const t of[...i,...s,...o])if(me(e,t))return ve(t);return null}(e,t?.thresholds)}_getColor(e,t){if(t&&t[e])return t[e];if(this.config.global_colors&&this.config.global_colors[e])return this.config.global_colors[e];return{on:"green",off:"gray",unavailable:"orange",text:"white",blank:"#333333"}[e]}_getTextColor(e,t){if(e?.text)return e.text;if(this.config.global_colors?.text)return this.config.global_colors.text;const i=this._resolveRgb(t);if(!i)return"white";const s=e=>{const t=e/255;return t<=.03928?t/12.92:Math.pow((t+.055)/1.055,2.4)},o=.2126*s(i[0])+.7152*s(i[1])+.0722*s(i[2]);return(o+.05)/.05>=1.05/(o+.05)?"black":"white"}_resolveRgb(e){const t=e.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);if(t)return[parseInt(t[1],16),parseInt(t[2],16),parseInt(t[3],16)];const i=e.match(/^#([0-9a-f])([0-9a-f])([0-9a-f])$/i);if(i)return[parseInt(i[1]+i[1],16),parseInt(i[2]+i[2],16),parseInt(i[3]+i[3],16)];const s=e.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/);if(s)return[Number(s[1]),Number(s[2]),Number(s[3])];if(e.startsWith("var(")||"undefined"==typeof document||"function"!=typeof getComputedStyle)return;const o=document.createElement("div");let n;o.style.color=e,document.body.appendChild(o);try{n=getComputedStyle(o).color}finally{o.remove()}const r=n.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/);return r?[Number(r[1]),Number(r[2]),Number(r[3])]:void 0}_getIcon(e,t,i){if(t&&void 0!==t.show_icon){if(!t.show_icon)return}else if(!this.config.show_icons)return;const s="on"===e?"on":"off";if(t&&t.icon&&t.icon[s])return t.icon[s];if(i&&i.attributes){if(i.attributes.icon)return i.attributes.icon;const t=i.entity_id.split(".")[0],s={light:"on"===e?"mdi:lightbulb-on":"mdi:lightbulb",switch:"on"===e?"mdi:toggle-switch":"mdi:toggle-switch-off",binary_sensor:"on"===e?"mdi:checkbox-marked-circle":"mdi:checkbox-blank-circle-outline",sensor:"mdi:eye"};if(s[t])return s[t]}}_getTextOpacity(e,t){return"off"!==e?1:void 0!==t.dim_off_text?t.dim_off_text/100:void 0!==this.config.dim_off_text?this.config.dim_off_text/100:1}_formatNumericState(e,t){const i=parseFloat(e);if(isNaN(i))return e;let s;if(void 0!==t.decimals?s=t.decimals:void 0!==this.config.decimals&&(s=this.config.decimals),void 0===s)return e;const o=Math.max(0,Math.min(10,Math.floor(s)));return isFinite(i)?i.toFixed(o):e}_getDefaultClickAction(e){const t=e.entity_id.split(".")[0];return["light","switch","input_boolean","automation","fan"].includes(t)?"toggle":"more-info"}_handleClick(e){e.clickable&&e.entity&&("toggle"===e.clickAction?this._toggleEntity(e.entity):"more-info"===e.clickAction&&this._showMoreInfo(e.entity))}_handleCellKeydown(e,t){!t.clickable||"Enter"!==e.key&&" "!==e.key||(e.preventDefault(),this._handleClick(t))}_toggleEntity(e){const t=e.split(".")[0];this.hass.callService(t,"toggle",{entity_id:e})}_showMoreInfo(e){fe(this,"hass-more-info",{entityId:e})}_isHeaderRow(e){return!!this.config.header_rows&&this.config.header_rows.some(t=>t.row_index===e)}_getHeaderRow(e){if(this.config.header_rows)return this.config.header_rows.find(t=>t.row_index===e)}_processHeaderText(e){return e.replace(/\{\{\s*(.+?)\s*\}\}/g,(e,t)=>{const i=t.split("|").map(e=>e.trim()),s=i[0].match(/^states\(['"]([^'"]+)['"]\)$/);let o;if(s){const e=this.hass.states[s[1]];o=e?e.state:""}else o=i[0];for(let e=1;e<i.length;e++)o=this._applyTemplateFilter(o,i[e]);return o})}_renderHeaderCell(e){const t=e.colspan||1,i=e.text_align||"center",s=this._normalizeSize(this.config.font_size,"16px"),o=this._normalizeSize(e.font_size,s),n=e.font_weight||this.config.font_weight||"bold",r=e.background_color||this._getColor("blank",void 0),l=e.text_color||this._getTextColor(void 0,r),a=this._processHeaderText(e.text),c={"background-color":r,color:l,"font-size":o,"font-weight":String(n),"text-align":i,"grid-column":`span ${t}`};return B`
-      <div class="cell header-cell" style=${this._styleMap(c)}>
+/******************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+/* global Reflect, Promise, SuppressedError, Symbol, Iterator */
+
+
+function __decorate(decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+}
+
+typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
+    var e = new Error(message);
+    return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
+};
+
+/**
+ * @license
+ * Copyright 2019 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+const t$2=globalThis,e$2=t$2.ShadowRoot&&(void 0===t$2.ShadyCSS||t$2.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,s$2=Symbol(),o$4=new WeakMap;let n$3 = class n{constructor(t,e,o){if(this._$cssResult$=true,o!==s$2)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=t,this.t=e;}get styleSheet(){let t=this.o;const s=this.t;if(e$2&&void 0===t){const e=void 0!==s&&1===s.length;e&&(t=o$4.get(s)),void 0===t&&((this.o=t=new CSSStyleSheet).replaceSync(this.cssText),e&&o$4.set(s,t));}return t}toString(){return this.cssText}};const r$4=t=>new n$3("string"==typeof t?t:t+"",void 0,s$2),i$3=(t,...e)=>{const o=1===t.length?t[0]:e.reduce((e,s,o)=>e+(t=>{if(true===t._$cssResult$)return t.cssText;if("number"==typeof t)return t;throw Error("Value passed to 'css' function must be a 'css' function result: "+t+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(s)+t[o+1],t[0]);return new n$3(o,t,s$2)},S$1=(s,o)=>{if(e$2)s.adoptedStyleSheets=o.map(t=>t instanceof CSSStyleSheet?t:t.styleSheet);else for(const e of o){const o=document.createElement("style"),n=t$2.litNonce;void 0!==n&&o.setAttribute("nonce",n),o.textContent=e.cssText,s.appendChild(o);}},c$2=e$2?t=>t:t=>t instanceof CSSStyleSheet?(t=>{let e="";for(const s of t.cssRules)e+=s.cssText;return r$4(e)})(t):t;
+
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */const{is:i$2,defineProperty:e$1,getOwnPropertyDescriptor:h$1,getOwnPropertyNames:r$3,getOwnPropertySymbols:o$3,getPrototypeOf:n$2}=Object,a$1=globalThis,c$1=a$1.trustedTypes,l$1=c$1?c$1.emptyScript:"",p$1=a$1.reactiveElementPolyfillSupport,d$1=(t,s)=>t,u$1={toAttribute(t,s){switch(s){case Boolean:t=t?l$1:null;break;case Object:case Array:t=null==t?t:JSON.stringify(t);}return t},fromAttribute(t,s){let i=t;switch(s){case Boolean:i=null!==t;break;case Number:i=null===t?null:Number(t);break;case Object:case Array:try{i=JSON.parse(t);}catch(t){i=null;}}return i}},f$1=(t,s)=>!i$2(t,s),b$1={attribute:true,type:String,converter:u$1,reflect:false,useDefault:false,hasChanged:f$1};Symbol.metadata??=Symbol("metadata"),a$1.litPropertyMetadata??=new WeakMap;let y$1 = class y extends HTMLElement{static addInitializer(t){this._$Ei(),(this.l??=[]).push(t);}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(t,s=b$1){if(s.state&&(s.attribute=false),this._$Ei(),this.prototype.hasOwnProperty(t)&&((s=Object.create(s)).wrapped=true),this.elementProperties.set(t,s),!s.noAccessor){const i=Symbol(),h=this.getPropertyDescriptor(t,i,s);void 0!==h&&e$1(this.prototype,t,h);}}static getPropertyDescriptor(t,s,i){const{get:e,set:r}=h$1(this.prototype,t)??{get(){return this[s]},set(t){this[s]=t;}};return {get:e,set(s){const h=e?.call(this);r?.call(this,s),this.requestUpdate(t,h,i);},configurable:true,enumerable:true}}static getPropertyOptions(t){return this.elementProperties.get(t)??b$1}static _$Ei(){if(this.hasOwnProperty(d$1("elementProperties")))return;const t=n$2(this);t.finalize(),void 0!==t.l&&(this.l=[...t.l]),this.elementProperties=new Map(t.elementProperties);}static finalize(){if(this.hasOwnProperty(d$1("finalized")))return;if(this.finalized=true,this._$Ei(),this.hasOwnProperty(d$1("properties"))){const t=this.properties,s=[...r$3(t),...o$3(t)];for(const i of s)this.createProperty(i,t[i]);}const t=this[Symbol.metadata];if(null!==t){const s=litPropertyMetadata.get(t);if(void 0!==s)for(const[t,i]of s)this.elementProperties.set(t,i);}this._$Eh=new Map;for(const[t,s]of this.elementProperties){const i=this._$Eu(t,s);void 0!==i&&this._$Eh.set(i,t);}this.elementStyles=this.finalizeStyles(this.styles);}static finalizeStyles(s){const i=[];if(Array.isArray(s)){const e=new Set(s.flat(1/0).reverse());for(const s of e)i.unshift(c$2(s));}else void 0!==s&&i.push(c$2(s));return i}static _$Eu(t,s){const i=s.attribute;return  false===i?void 0:"string"==typeof i?i:"string"==typeof t?t.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=false,this.hasUpdated=false,this._$Em=null,this._$Ev();}_$Ev(){this._$ES=new Promise(t=>this.enableUpdating=t),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(t=>t(this));}addController(t){(this._$EO??=new Set).add(t),void 0!==this.renderRoot&&this.isConnected&&t.hostConnected?.();}removeController(t){this._$EO?.delete(t);}_$E_(){const t=new Map,s=this.constructor.elementProperties;for(const i of s.keys())this.hasOwnProperty(i)&&(t.set(i,this[i]),delete this[i]);t.size>0&&(this._$Ep=t);}createRenderRoot(){const t=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return S$1(t,this.constructor.elementStyles),t}connectedCallback(){this.renderRoot??=this.createRenderRoot(),this.enableUpdating(true),this._$EO?.forEach(t=>t.hostConnected?.());}enableUpdating(t){}disconnectedCallback(){this._$EO?.forEach(t=>t.hostDisconnected?.());}attributeChangedCallback(t,s,i){this._$AK(t,i);}_$ET(t,s){const i=this.constructor.elementProperties.get(t),e=this.constructor._$Eu(t,i);if(void 0!==e&&true===i.reflect){const h=(void 0!==i.converter?.toAttribute?i.converter:u$1).toAttribute(s,i.type);this._$Em=t,null==h?this.removeAttribute(e):this.setAttribute(e,h),this._$Em=null;}}_$AK(t,s){const i=this.constructor,e=i._$Eh.get(t);if(void 0!==e&&this._$Em!==e){const t=i.getPropertyOptions(e),h="function"==typeof t.converter?{fromAttribute:t.converter}:void 0!==t.converter?.fromAttribute?t.converter:u$1;this._$Em=e;const r=h.fromAttribute(s,t.type);this[e]=r??this._$Ej?.get(e)??r,this._$Em=null;}}requestUpdate(t,s,i,e=false,h){if(void 0!==t){const r=this.constructor;if(false===e&&(h=this[t]),i??=r.getPropertyOptions(t),!((i.hasChanged??f$1)(h,s)||i.useDefault&&i.reflect&&h===this._$Ej?.get(t)&&!this.hasAttribute(r._$Eu(t,i))))return;this.C(t,s,i);} false===this.isUpdatePending&&(this._$ES=this._$EP());}C(t,s,{useDefault:i,reflect:e,wrapped:h},r){i&&!(this._$Ej??=new Map).has(t)&&(this._$Ej.set(t,r??s??this[t]),true!==h||void 0!==r)||(this._$AL.has(t)||(this.hasUpdated||i||(s=void 0),this._$AL.set(t,s)),true===e&&this._$Em!==t&&(this._$Eq??=new Set).add(t));}async _$EP(){this.isUpdatePending=true;try{await this._$ES;}catch(t){Promise.reject(t);}const t=this.scheduleUpdate();return null!=t&&await t,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??=this.createRenderRoot(),this._$Ep){for(const[t,s]of this._$Ep)this[t]=s;this._$Ep=void 0;}const t=this.constructor.elementProperties;if(t.size>0)for(const[s,i]of t){const{wrapped:t}=i,e=this[s];true!==t||this._$AL.has(s)||void 0===e||this.C(s,void 0,i,e);}}let t=false;const s=this._$AL;try{t=this.shouldUpdate(s),t?(this.willUpdate(s),this._$EO?.forEach(t=>t.hostUpdate?.()),this.update(s)):this._$EM();}catch(s){throw t=false,this._$EM(),s}t&&this._$AE(s);}willUpdate(t){}_$AE(t){this._$EO?.forEach(t=>t.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=true,this.firstUpdated(t)),this.updated(t);}_$EM(){this._$AL=new Map,this.isUpdatePending=false;}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(t){return  true}update(t){this._$Eq&&=this._$Eq.forEach(t=>this._$ET(t,this[t])),this._$EM();}updated(t){}firstUpdated(t){}};y$1.elementStyles=[],y$1.shadowRootOptions={mode:"open"},y$1[d$1("elementProperties")]=new Map,y$1[d$1("finalized")]=new Map,p$1?.({ReactiveElement:y$1}),(a$1.reactiveElementVersions??=[]).push("2.1.2");
+
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+const t$1=globalThis,i$1=t=>t,s$1=t$1.trustedTypes,e=s$1?s$1.createPolicy("lit-html",{createHTML:t=>t}):void 0,h="$lit$",o$2=`lit$${Math.random().toFixed(9).slice(2)}$`,n$1="?"+o$2,r$2=`<${n$1}>`,l=document,c=()=>l.createComment(""),a=t=>null===t||"object"!=typeof t&&"function"!=typeof t,u=Array.isArray,d=t=>u(t)||"function"==typeof t?.[Symbol.iterator],f="[ \t\n\f\r]",v=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,_=/-->/g,m=/>/g,p=RegExp(`>|${f}(?:([^\\s"'>=/]+)(${f}*=${f}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),g=/'/g,$=/"/g,y=/^(?:script|style|textarea|title)$/i,x=t=>(i,...s)=>({_$litType$:t,strings:i,values:s}),b=x(1),E=Symbol.for("lit-noChange"),A=Symbol.for("lit-nothing"),C=new WeakMap,P=l.createTreeWalker(l,129);function V(t,i){if(!u(t)||!t.hasOwnProperty("raw"))throw Error("invalid template strings array");return void 0!==e?e.createHTML(i):i}const N=(t,i)=>{const s=t.length-1,e=[];let n,l=2===i?"<svg>":3===i?"<math>":"",c=v;for(let i=0;i<s;i++){const s=t[i];let a,u,d=-1,f=0;for(;f<s.length&&(c.lastIndex=f,u=c.exec(s),null!==u);)f=c.lastIndex,c===v?"!--"===u[1]?c=_:void 0!==u[1]?c=m:void 0!==u[2]?(y.test(u[2])&&(n=RegExp("</"+u[2],"g")),c=p):void 0!==u[3]&&(c=p):c===p?">"===u[0]?(c=n??v,d=-1):void 0===u[1]?d=-2:(d=c.lastIndex-u[2].length,a=u[1],c=void 0===u[3]?p:'"'===u[3]?$:g):c===$||c===g?c=p:c===_||c===m?c=v:(c=p,n=void 0);const x=c===p&&t[i+1].startsWith("/>")?" ":"";l+=c===v?s+r$2:d>=0?(e.push(a),s.slice(0,d)+h+s.slice(d)+o$2+x):s+o$2+(-2===d?i:x);}return [V(t,l+(t[s]||"<?>")+(2===i?"</svg>":3===i?"</math>":"")),e]};class S{constructor({strings:t,_$litType$:i},e){let r;this.parts=[];let l=0,a=0;const u=t.length-1,d=this.parts,[f,v]=N(t,i);if(this.el=S.createElement(f,e),P.currentNode=this.el.content,2===i||3===i){const t=this.el.content.firstChild;t.replaceWith(...t.childNodes);}for(;null!==(r=P.nextNode())&&d.length<u;){if(1===r.nodeType){if(r.hasAttributes())for(const t of r.getAttributeNames())if(t.endsWith(h)){const i=v[a++],s=r.getAttribute(t).split(o$2),e=/([.?@])?(.*)/.exec(i);d.push({type:1,index:l,name:e[2],strings:s,ctor:"."===e[1]?I:"?"===e[1]?L:"@"===e[1]?z:H}),r.removeAttribute(t);}else t.startsWith(o$2)&&(d.push({type:6,index:l}),r.removeAttribute(t));if(y.test(r.tagName)){const t=r.textContent.split(o$2),i=t.length-1;if(i>0){r.textContent=s$1?s$1.emptyScript:"";for(let s=0;s<i;s++)r.append(t[s],c()),P.nextNode(),d.push({type:2,index:++l});r.append(t[i],c());}}}else if(8===r.nodeType)if(r.data===n$1)d.push({type:2,index:l});else {let t=-1;for(;-1!==(t=r.data.indexOf(o$2,t+1));)d.push({type:7,index:l}),t+=o$2.length-1;}l++;}}static createElement(t,i){const s=l.createElement("template");return s.innerHTML=t,s}}function M(t,i,s=t,e){if(i===E)return i;let h=void 0!==e?s._$Co?.[e]:s._$Cl;const o=a(i)?void 0:i._$litDirective$;return h?.constructor!==o&&(h?._$AO?.(false),void 0===o?h=void 0:(h=new o(t),h._$AT(t,s,e)),void 0!==e?(s._$Co??=[])[e]=h:s._$Cl=h),void 0!==h&&(i=M(t,h._$AS(t,i.values),h,e)),i}class R{constructor(t,i){this._$AV=[],this._$AN=void 0,this._$AD=t,this._$AM=i;}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(t){const{el:{content:i},parts:s}=this._$AD,e=(t?.creationScope??l).importNode(i,true);P.currentNode=e;let h=P.nextNode(),o=0,n=0,r=s[0];for(;void 0!==r;){if(o===r.index){let i;2===r.type?i=new k(h,h.nextSibling,this,t):1===r.type?i=new r.ctor(h,r.name,r.strings,this,t):6===r.type&&(i=new Z(h,this,t)),this._$AV.push(i),r=s[++n];}o!==r?.index&&(h=P.nextNode(),o++);}return P.currentNode=l,e}p(t){let i=0;for(const s of this._$AV) void 0!==s&&(void 0!==s.strings?(s._$AI(t,s,i),i+=s.strings.length-2):s._$AI(t[i])),i++;}}class k{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(t,i,s,e){this.type=2,this._$AH=A,this._$AN=void 0,this._$AA=t,this._$AB=i,this._$AM=s,this.options=e,this._$Cv=e?.isConnected??true;}get parentNode(){let t=this._$AA.parentNode;const i=this._$AM;return void 0!==i&&11===t?.nodeType&&(t=i.parentNode),t}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(t,i=this){t=M(this,t,i),a(t)?t===A||null==t||""===t?(this._$AH!==A&&this._$AR(),this._$AH=A):t!==this._$AH&&t!==E&&this._(t):void 0!==t._$litType$?this.$(t):void 0!==t.nodeType?this.T(t):d(t)?this.k(t):this._(t);}O(t){return this._$AA.parentNode.insertBefore(t,this._$AB)}T(t){this._$AH!==t&&(this._$AR(),this._$AH=this.O(t));}_(t){this._$AH!==A&&a(this._$AH)?this._$AA.nextSibling.data=t:this.T(l.createTextNode(t)),this._$AH=t;}$(t){const{values:i,_$litType$:s}=t,e="number"==typeof s?this._$AC(t):(void 0===s.el&&(s.el=S.createElement(V(s.h,s.h[0]),this.options)),s);if(this._$AH?._$AD===e)this._$AH.p(i);else {const t=new R(e,this),s=t.u(this.options);t.p(i),this.T(s),this._$AH=t;}}_$AC(t){let i=C.get(t.strings);return void 0===i&&C.set(t.strings,i=new S(t)),i}k(t){u(this._$AH)||(this._$AH=[],this._$AR());const i=this._$AH;let s,e=0;for(const h of t)e===i.length?i.push(s=new k(this.O(c()),this.O(c()),this,this.options)):s=i[e],s._$AI(h),e++;e<i.length&&(this._$AR(s&&s._$AB.nextSibling,e),i.length=e);}_$AR(t=this._$AA.nextSibling,s){for(this._$AP?.(false,true,s);t!==this._$AB;){const s=i$1(t).nextSibling;i$1(t).remove(),t=s;}}setConnected(t){ void 0===this._$AM&&(this._$Cv=t,this._$AP?.(t));}}class H{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(t,i,s,e,h){this.type=1,this._$AH=A,this._$AN=void 0,this.element=t,this.name=i,this._$AM=e,this.options=h,s.length>2||""!==s[0]||""!==s[1]?(this._$AH=Array(s.length-1).fill(new String),this.strings=s):this._$AH=A;}_$AI(t,i=this,s,e){const h=this.strings;let o=false;if(void 0===h)t=M(this,t,i,0),o=!a(t)||t!==this._$AH&&t!==E,o&&(this._$AH=t);else {const e=t;let n,r;for(t=h[0],n=0;n<h.length-1;n++)r=M(this,e[s+n],i,n),r===E&&(r=this._$AH[n]),o||=!a(r)||r!==this._$AH[n],r===A?t=A:t!==A&&(t+=(r??"")+h[n+1]),this._$AH[n]=r;}o&&!e&&this.j(t);}j(t){t===A?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,t??"");}}class I extends H{constructor(){super(...arguments),this.type=3;}j(t){this.element[this.name]=t===A?void 0:t;}}class L extends H{constructor(){super(...arguments),this.type=4;}j(t){this.element.toggleAttribute(this.name,!!t&&t!==A);}}class z extends H{constructor(t,i,s,e,h){super(t,i,s,e,h),this.type=5;}_$AI(t,i=this){if((t=M(this,t,i,0)??A)===E)return;const s=this._$AH,e=t===A&&s!==A||t.capture!==s.capture||t.once!==s.once||t.passive!==s.passive,h=t!==A&&(s===A||e);e&&this.element.removeEventListener(this.name,this,s),h&&this.element.addEventListener(this.name,this,t),this._$AH=t;}handleEvent(t){"function"==typeof this._$AH?this._$AH.call(this.options?.host??this.element,t):this._$AH.handleEvent(t);}}class Z{constructor(t,i,s){this.element=t,this.type=6,this._$AN=void 0,this._$AM=i,this.options=s;}get _$AU(){return this._$AM._$AU}_$AI(t){M(this,t);}}const B=t$1.litHtmlPolyfillSupport;B?.(S,k),(t$1.litHtmlVersions??=[]).push("3.3.3");const D=(t,i,s)=>{const e=s?.renderBefore??i;let h=e._$litPart$;if(void 0===h){const t=s?.renderBefore??null;e._$litPart$=h=new k(i.insertBefore(c(),t),t,void 0,s??{});}return h._$AI(t),h};
+
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */const s=globalThis;class i extends y$1{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0;}createRenderRoot(){const t=super.createRenderRoot();return this.renderOptions.renderBefore??=t.firstChild,t}update(t){const r=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(t),this._$Do=D(r,this.renderRoot,this.renderOptions);}connectedCallback(){super.connectedCallback(),this._$Do?.setConnected(true);}disconnectedCallback(){super.disconnectedCallback(),this._$Do?.setConnected(false);}render(){return E}}i._$litElement$=true,i["finalized"]=true,s.litElementHydrateSupport?.({LitElement:i});const o$1=s.litElementPolyfillSupport;o$1?.({LitElement:i});(s.litElementVersions??=[]).push("4.2.2");
+
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+const t=t=>(e,o)=>{ void 0!==o?o.addInitializer(()=>{customElements.define(t,e);}):customElements.define(t,e);};
+
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */const o={attribute:true,type:String,converter:u$1,reflect:false,hasChanged:f$1},r$1=(t=o,e,r)=>{const{kind:n,metadata:i}=r;let s=globalThis.litPropertyMetadata.get(i);if(void 0===s&&globalThis.litPropertyMetadata.set(i,s=new Map),"setter"===n&&((t=Object.create(t)).wrapped=true),s.set(r.name,t),"accessor"===n){const{name:o}=r;return {set(r){const n=e.get.call(this);e.set.call(this,r),this.requestUpdate(o,n,t,true,r);},init(e){return void 0!==e&&this.C(o,void 0,t,e),e}}}if("setter"===n){const{name:o}=r;return function(r){const n=this[o];e.call(this,r),this.requestUpdate(o,n,t,true,r);}}throw Error("Unsupported decorator location: "+n)};function n(t){return (e,o)=>"object"==typeof o?r$1(t,e,o):((t,e,o)=>{const r=e.hasOwnProperty(o);return e.constructor.createProperty(o,t),r?Object.getOwnPropertyDescriptor(e,o):void 0})(t,e,o)}
+
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */function r(r){return n({...r,state:true,attribute:false})}
+
+var NumberFormat;
+(function (NumberFormat) {
+    NumberFormat["language"] = "language";
+    NumberFormat["system"] = "system";
+    NumberFormat["comma_decimal"] = "comma_decimal";
+    NumberFormat["decimal_comma"] = "decimal_comma";
+    NumberFormat["space_comma"] = "space_comma";
+    NumberFormat["none"] = "none";
+})(NumberFormat || (NumberFormat = {}));
+var TimeFormat;
+(function (TimeFormat) {
+    TimeFormat["language"] = "language";
+    TimeFormat["system"] = "system";
+    TimeFormat["am_pm"] = "12";
+    TimeFormat["twenty_four"] = "24";
+})(TimeFormat || (TimeFormat = {}));
+
+// Polymer legacy event helpers used courtesy of the Polymer project.
+//
+// Copyright (c) 2017 The Polymer Authors. All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are
+// met:
+//
+//    * Redistributions of source code must retain the above copyright
+// notice, this list of conditions and the following disclaimer.
+//    * Redistributions in binary form must reproduce the above
+// copyright notice, this list of conditions and the following disclaimer
+// in the documentation and/or other materials provided with the
+// distribution.
+//    * Neither the name of Google Inc. nor the names of its
+// contributors may be used to endorse or promote products derived from
+// this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+// OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/**
+ * Dispatches a custom event with an optional detail value.
+ *
+ * @param {string} type Name of event type.
+ * @param {*=} detail Detail value containing event-specific
+ *   payload.
+ * @param {{ bubbles: (boolean|undefined),
+ *           cancelable: (boolean|undefined),
+ *           composed: (boolean|undefined) }=}
+ *  options Object specifying options.  These may include:
+ *  `bubbles` (boolean, defaults to `true`),
+ *  `cancelable` (boolean, defaults to false), and
+ *  `node` on which to fire the event (HTMLElement, defaults to `this`).
+ * @return {Event} The new event that was fired.
+ */
+const fireEvent = (node, type, detail, options) => {
+    options = options || {};
+    // @ts-ignore
+    detail = detail === null || detail === undefined ? {} : detail;
+    const event = new Event(type, {
+        bubbles: options.bubbles === undefined ? true : options.bubbles,
+        cancelable: Boolean(options.cancelable),
+        composed: options.composed === undefined ? true : options.composed
+    });
+    event.detail = detail;
+    node.dispatchEvent(event);
+    return event;
+};
+
+// Operator applied when a threshold omits one. Matches the documented default
+// so existing "value only" ladders keep behaving as a series of "<=" bands.
+const DEFAULT_OPERATOR = '<=';
+/**
+ * Returns the threshold's comparison operator, defaulting to '<=' and trimming
+ * stray whitespace so a value like '>= ' still matches a known operator.
+ */
+function normalizeOperator(threshold) {
+    return (threshold.operator ?? DEFAULT_OPERATOR).trim();
+}
+/**
+ * Tests whether `value` satisfies a single threshold's comparison.
+ * An unrecognized operator never matches.
+ */
+function matchesThreshold(value, threshold) {
+    switch (normalizeOperator(threshold)) {
+        case '<':
+            return value < threshold.value;
+        case '<=':
+            return value <= threshold.value;
+        case '>':
+            return value > threshold.value;
+        case '>=':
+            return value >= threshold.value;
+        case '==':
+            return value === threshold.value;
+        default:
+            return false;
+    }
+}
+/** Extracts the display styles carried by a matched threshold. */
+function stylesFor(threshold) {
+    return {
+        backgroundColor: threshold.color,
+        textColor: threshold.text_color,
+        fontWeight: threshold.font_weight,
+    };
+}
+/**
+ * Resolves the styles for the first threshold that matches `value`, using
+ * operator-aware ordering so mixed operators resolve the way a user intuitively
+ * expects. Evaluation happens in three passes:
+ *
+ *   1. Greater-than thresholds ('>', '>=') are checked highest value first, so
+ *      the tightest lower bound wins (e.g. '>=60' is preferred over '>=0').
+ *   2. Less-than thresholds ('<', '<=') are checked lowest value first, so the
+ *      tightest upper bound wins (e.g. '<40' is preferred over '<60').
+ *   3. Equality thresholds ('==') are checked last.
+ *
+ * A plain ascending ladder of default '<=' thresholds still resolves exactly as
+ * before, since every band lands in the less-than pass in ascending order.
+ *
+ * Returns null when no threshold matches, letting the caller fall back to other
+ * color sources.
+ */
+function evaluateThresholds(value, thresholds) {
+    if (!thresholds || thresholds.length === 0) {
+        return null;
+    }
+    const isGreaterThan = (threshold) => {
+        const operator = normalizeOperator(threshold);
+        return operator === '>' || operator === '>=';
+    };
+    const isLessThan = (threshold) => {
+        const operator = normalizeOperator(threshold);
+        return operator === '<' || operator === '<=';
+    };
+    const isEqual = (threshold) => {
+        return normalizeOperator(threshold) === '==';
+    };
+    // Greater-than: largest value first so the strictest lower bound wins.
+    const greaterThan = thresholds
+        .filter(isGreaterThan)
+        .sort((first, second) => second.value - first.value);
+    // Less-than: smallest value first so the strictest upper bound wins.
+    const lessThan = thresholds
+        .filter(isLessThan)
+        .sort((first, second) => first.value - second.value);
+    // Equality: order does not matter, checked last.
+    const equal = thresholds.filter(isEqual);
+    for (const threshold of [...greaterThan, ...lessThan, ...equal]) {
+        if (matchesThreshold(value, threshold)) {
+            return stylesFor(threshold);
+        }
+    }
+    return null;
+}
+
+const CARD_VERSION = '2026.11.11';
+console.info(`%c  INDICATOR-GRID-CARD  \n%c  Version ${CARD_VERSION}  `, 'color: black; background: #F2720C; font-weight: 600;', 'color: black; background: #00a5c9; font-weight: 600;');
+window.customCards = window.customCards || [];
+window.customCards.push({
+    type: 'indicator-grid-card',
+    name: 'Indicator Grid Card',
+    description: 'A card displaying a grid of indicator lights showing entity status',
+    preview: true,
+    // Suggest this card for entities that naturally map to on/off indicator lights:
+    // binary sensors, switches, lights, and input booleans. Other domains (sensors,
+    // climate, etc.) are not a clear fit for an indicator grid display.
+    getEntitySuggestion: (hass, entityId) => {
+        const entityState = hass?.states?.[entityId];
+        if (!entityState)
+            return null;
+        const domain = entityId.split('.')[0];
+        const indicatorDomains = ['binary_sensor', 'switch', 'light', 'input_boolean'];
+        if (!indicatorDomains.includes(domain))
+            return null;
+        return { config: { type: 'custom:indicator-grid-card', entities: [{ entity: entityId }] } };
+    },
+});
+let IndicatorGridCard = class IndicatorGridCard extends i {
+    // Helper to normalize size values - add "px" if just a number
+    _normalizeSize(value, defaultValue) {
+        if (value === undefined)
+            return defaultValue;
+        const str = String(value);
+        // If it's just digits (with optional decimal), append "px"
+        return /^\d+(\.\d+)?$/.test(str) ? `${str}px` : str;
+    }
+    static async getConfigElement() {
+        await Promise.resolve().then(function () { return editor; });
+        return document.createElement('indicator-grid-card-editor');
+    }
+    static getStubConfig(hass) {
+        const indicatorDomains = ['binary_sensor', 'switch', 'light', 'input_boolean'];
+        const entities = hass?.states
+            ? Object.keys(hass.states)
+                .filter((id) => indicatorDomains.includes(id.split('.')[0]))
+                .slice(0, 6)
+                .map((id) => ({ entity: id }))
+            : [];
+        return {
+            columns: 3,
+            rows: 2,
+            cell_width: '',
+            cell_height: 100,
+            cell_gap: 5,
+            font_size: 16,
+            font_weight: 'bold',
+            show_icons: false,
+            icon_placement: 'above',
+            icon_size: 24,
+            entities,
+            unavailable_text: 'INOP',
+            global_colors: {
+                on: 'green',
+                off: 'gray',
+                text: 'white',
+                unavailable: 'orange',
+                blank: '#333333',
+            },
+        };
+    }
+    setConfig(config) {
+        if (!config) {
+            throw new Error('Invalid configuration');
+        }
+        // Backward compatibility: if cell_size is set, use it for width and height
+        let cellWidth = config.cell_width;
+        let cellHeight = config.cell_height;
+        if (config.cell_size !== undefined) {
+            cellWidth = cellWidth ?? `${config.cell_size}px`;
+            cellHeight = cellHeight ?? `${config.cell_size}px`;
+        }
+        this.config = {
+            ...config,
+            columns: config.columns ?? 3,
+            rows: config.rows ?? 2,
+            cell_width: this._normalizeSize(cellWidth, ''),
+            cell_height: this._normalizeSize(cellHeight, '100px'),
+            cell_gap: this._normalizeSize(config.cell_gap, '5px'),
+            font_size: this._normalizeSize(config.font_size, '16px'),
+            font_weight: config.font_weight ?? 'bold',
+            show_icons: config.show_icons ?? false,
+            icon_placement: config.icon_placement ?? 'above',
+            icon_size: this._normalizeSize(config.icon_size, '24px'),
+            unavailable_text: config.unavailable_text ?? 'INOP',
+            // No text default here: an unset text color means "black or white, whichever
+            // contrasts more with the cell fill" (see _getTextColor)
+            global_colors: {
+                on: 'green',
+                off: 'gray',
+                unavailable: 'orange',
+                blank: '#333333',
+                ...config.global_colors,
+            },
+        };
+    }
+    getCardSize() {
+        if (!this.config) {
+            return 2;
+        }
+        // Parse cell_height - expects pixel values (e.g., "100px", 100)
+        const cellHeightStr = this._normalizeSize(this.config.cell_height, '100px');
+        const cellHeight = parseFloat(cellHeightStr);
+        // Parse cell_gap - expects pixel values (e.g., "5px", 5)
+        const cellGapStr = this._normalizeSize(this.config.cell_gap, '5px');
+        const cellGap = parseFloat(cellGapStr);
+        // Calculate total height in pixels
+        const rows = this.config.rows || 2;
+        const totalHeight = (rows * cellHeight) + ((rows - 1) * cellGap);
+        // Convert to Home Assistant card units (1 unit = 50px)
+        // Round up to ensure we allocate enough space
+        return Math.ceil(totalHeight / 50);
+    }
+    // Sections view (grid layout) sizing - 12-column grid system.
+    // Reports how many section grid rows the card needs so HA reserves the
+    // correct height. A fixed value here clips taller grids, so derive it from
+    // the configured rows / cell height the same way getCardSize does.
+    getGridOptions() {
+        // HA sections grid geometry: each row is 56px tall with an 8px gap between
+        // rows (defaults for --ha-section-grid-row-height / --ha-section-grid-row-gap).
+        // A card given N rows is allocated N*56 + (N-1)*8 pixels of height.
+        const SECTION_ROW_HEIGHT = 56;
+        const SECTION_ROW_GAP = 8;
+        const rows = this.config?.rows ?? 2;
+        const cellHeight = parseFloat(this._normalizeSize(this.config?.cell_height, '100px'));
+        const cellGap = parseFloat(this._normalizeSize(this.config?.cell_gap, '5px'));
+        const cardHeight = (rows * cellHeight) + ((rows - 1) * cellGap);
+        // Solve N*56 + (N-1)*8 >= cardHeight for N, rounding up so we never clip.
+        const gridRows = Math.ceil((cardHeight + SECTION_ROW_GAP) / (SECTION_ROW_HEIGHT + SECTION_ROW_GAP));
+        return {
+            rows: gridRows,
+            columns: 12,
+            min_rows: 1,
+            min_columns: 3,
+        };
+    }
+    shouldUpdate(changedProps) {
+        if (!this.config) {
+            return false;
+        }
+        // Always update if config changed
+        if (changedProps.has('config')) {
+            return true;
+        }
+        // Check if any of our configured entities changed
+        if (changedProps.has('hass')) {
+            const oldHass = changedProps.get('hass');
+            if (!oldHass) {
+                return true;
+            }
+            // Get all entity IDs from config (direct entities + template-referenced entities)
+            const entityIds = this.config.entities
+                .filter((e) => e && !!e.entity)
+                .map(e => e.entity);
+            const templateEntityIds = this.config.entities
+                .filter((e) => e && !!e.text_template)
+                .flatMap(e => this._extractTemplateEntityIds(e.text_template));
+            // Also track entities referenced in header row cell text templates
+            const headerEntityIds = (this.config.header_rows || [])
+                .flatMap(hr => hr.cells)
+                .flatMap(cell => this._extractTemplateEntityIds(cell.text));
+            const allEntityIds = [...new Set([...entityIds, ...templateEntityIds, ...headerEntityIds])];
+            // Check if any of our entities changed
+            return allEntityIds.some(entityId => {
+                const oldState = oldHass.states[entityId];
+                const newState = this.hass.states[entityId];
+                return oldState !== newState;
+            });
+        }
+        return true;
+    }
+    _computeCell(entityConfig, stateObj) {
+        if (!stateObj || stateObj.state === 'unavailable' || stateObj.state === 'unknown') {
+            // Get entity name - prefer custom text, then friendly_name, then entity ID
+            const entityName = entityConfig.text ||
+                stateObj?.attributes?.friendly_name ||
+                entityConfig.entity ||
+                'Unknown';
+            const unavailableText = this.config.unavailable_text || 'INOP';
+            const displayText = `${entityName}\n${unavailableText}`;
+            const unavailableBackground = this._getColor('unavailable', entityConfig.colors);
+            return {
+                entity: entityConfig.entity,
+                displayText,
+                backgroundColor: unavailableBackground,
+                textColor: this._getTextColor(entityConfig.colors, unavailableBackground),
+                textOpacity: 1,
+                textAlign: entityConfig.text_align,
+                state: stateObj?.state,
+                clickable: false,
+                clickAction: 'none',
+                colspan: entityConfig.colspan || 1,
+            };
+        }
+        const state = stateObj.state;
+        const displayText = this._getDisplayText(entityConfig, stateObj);
+        const backgroundColor = this._getBackgroundColor(state, entityConfig);
+        // Check for threshold styles (text_color and font_weight)
+        let textColor = this._getTextColor(entityConfig.colors, backgroundColor);
+        let fontWeight = undefined;
+        const numericState = parseFloat(state);
+        if (!isNaN(numericState)) {
+            const thresholdStyles = this._getThresholdStyles(numericState, entityConfig.colors) ||
+                this._getThresholdStyles(numericState, this.config.global_colors);
+            if (thresholdStyles) {
+                if (thresholdStyles.textColor) {
+                    textColor = thresholdStyles.textColor;
+                }
+                if (thresholdStyles.fontWeight) {
+                    fontWeight = thresholdStyles.fontWeight;
+                }
+            }
+        }
+        const textOpacity = this._getTextOpacity(state, entityConfig);
+        const icon = this._getIcon(state, entityConfig, stateObj);
+        const clickAction = entityConfig.click_action || this._getDefaultClickAction(stateObj);
+        return {
+            entity: entityConfig.entity,
+            displayText,
+            backgroundColor,
+            textColor,
+            textOpacity,
+            textAlign: entityConfig.text_align,
+            fontWeight,
+            icon,
+            state,
+            clickable: clickAction !== 'none',
+            clickAction,
+            colspan: entityConfig.colspan || 1,
+        };
+    }
+    _getDisplayText(entityConfig, stateObj) {
+        // Static custom text - return as-is without formatting
+        if (entityConfig.text) {
+            return entityConfig.text;
+        }
+        // Template with Jinja2-style filter support
+        if (entityConfig.text_template) {
+            return this._renderTemplate(entityConfig.text_template, stateObj, entityConfig);
+        }
+        // Format state value for numeric sensors
+        const formattedState = this._formatNumericState(stateObj.state, entityConfig);
+        // Default display: if decimals configured and state is numeric, show formatted number
+        // Otherwise show friendly name (existing behavior)
+        const parsedState = parseFloat(stateObj.state);
+        const hasDecimalsConfig = entityConfig.decimals !== undefined || this.config.decimals !== undefined;
+        if (!isNaN(parsedState) && hasDecimalsConfig) {
+            return formattedState;
+        }
+        return stateObj.attributes.friendly_name || entityConfig.entity || '';
+    }
+    // Render a text_template string, supporting Jinja2-style {{ variable | filter }} syntax.
+    // Supported variables: state, name, unit, state_with_unit, entity_id, last_changed, last_updated, attributes.<attr>
+    // Supported filters: upper, lower, title, round(n), int, float, replace('a','b'), truncate(n), default('val')
+    _renderTemplate(template, stateObj, entityConfig) {
+        return template.replace(/\{\{\s*(.+?)\s*\}\}/g, (_match, expression) => {
+            const parts = expression.split('|').map((s) => s.trim());
+            let value = this._resolveTemplateVariable(parts[0], stateObj, entityConfig);
+            for (let i = 1; i < parts.length; i++) {
+                value = this._applyTemplateFilter(value, parts[i]);
+            }
+            return value;
+        });
+    }
+    _resolveTemplateVariable(variable, stateObj, entityConfig) {
+        const formattedState = this._formatNumericState(stateObj.state, entityConfig);
+        if (variable === 'state')
+            return formattedState;
+        if (variable === 'name')
+            return stateObj.attributes.friendly_name || entityConfig.entity || '';
+        if (variable === 'entity_id')
+            return stateObj.entity_id || entityConfig.entity || '';
+        if (variable === 'unit')
+            return stateObj.attributes.unit_of_measurement || '';
+        if (variable === 'state_with_unit') {
+            const unit = stateObj.attributes.unit_of_measurement;
+            return unit ? `${formattedState} ${unit}` : formattedState;
+        }
+        if (variable === 'last_changed')
+            return this._relativeTime(stateObj.last_changed);
+        if (variable === 'last_updated')
+            return this._relativeTime(stateObj.last_updated);
+        // Support attributes.xxx
+        if (variable.startsWith('attributes.')) {
+            const attr = variable.slice('attributes.'.length);
+            const val = stateObj.attributes[attr];
+            return val !== undefined && val !== null ? String(val) : '';
+        }
+        // Support states('entity_id') to reference any entity's state
+        const statesMatch = variable.match(/^states\(['"]([^'"]+)['"]\)$/);
+        if (statesMatch) {
+            const entity = this.hass.states[statesMatch[1]];
+            return entity ? entity.state : '';
+        }
+        return variable;
+    }
+    // Convert an ISO 8601 timestamp to a human-readable relative time string.
+    // e.g. "just now", "5 minutes ago", "2 hours ago", "3 days ago"
+    _relativeTime(isoTimestamp) {
+        if (!isoTimestamp)
+            return '';
+        const diffSeconds = Math.floor((Date.now() - new Date(isoTimestamp).getTime()) / 1000);
+        // Invalid timestamps produce NaN here; return empty rather than render "NaN days ago"
+        if (isNaN(diffSeconds))
+            return '';
+        if (diffSeconds < 60)
+            return 'just now';
+        const diffMinutes = Math.floor(diffSeconds / 60);
+        if (diffMinutes < 60)
+            return `${diffMinutes} minute${diffMinutes === 1 ? '' : 's'} ago`;
+        const diffHours = Math.floor(diffMinutes / 60);
+        if (diffHours < 24)
+            return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
+        const diffDays = Math.floor(diffHours / 24);
+        return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
+    }
+    // Extract entity IDs referenced via states('entity_id') in a template string
+    _extractTemplateEntityIds(template) {
+        const entityIds = [];
+        const regex = /\{\{\s*states\(['"]([^'"]+)['"]\)/g;
+        let match;
+        while ((match = regex.exec(template)) !== null) {
+            entityIds.push(match[1]);
+        }
+        return entityIds;
+    }
+    _applyTemplateFilter(value, filter) {
+        // Parse filter name and optional args: e.g. round(2), replace('a','b'), default('N/A')
+        const parenIdx = filter.indexOf('(');
+        const filterName = parenIdx >= 0 ? filter.slice(0, parenIdx).trim() : filter.trim();
+        let args = [];
+        if (parenIdx >= 0) {
+            const argsStr = filter.slice(parenIdx + 1, filter.lastIndexOf(')'));
+            // Split on commas, strip surrounding quotes/spaces from each arg
+            args = argsStr.split(',').map(s => s.trim().replace(/^['"]|['"]$/g, ''));
+        }
+        switch (filterName) {
+            case 'upper': return value.toUpperCase();
+            case 'lower': return value.toLowerCase();
+            case 'title': return value.replace(/\b\w/g, c => c.toUpperCase());
+            case 'round': {
+                const decimals = args.length > 0 ? parseInt(args[0], 10) : 0;
+                const num = parseFloat(value);
+                return isNaN(num) ? value : num.toFixed(isNaN(decimals) ? 0 : decimals);
+            }
+            case 'int': {
+                const num = parseInt(value, 10);
+                return isNaN(num) ? (args.length > 0 ? args[0] : '0') : String(num);
+            }
+            case 'float': {
+                const num = parseFloat(value);
+                return isNaN(num) ? (args.length > 0 ? args[0] : '0') : String(num);
+            }
+            case 'replace':
+                if (args.length >= 2)
+                    return value.split(args[0]).join(args[1]);
+                return value;
+            case 'truncate': {
+                const len = args.length > 0 ? parseInt(args[0], 10) : 255;
+                const limit = isNaN(len) ? 255 : len;
+                return value.length > limit ? value.slice(0, limit) + '...' : value;
+            }
+            case 'default':
+                return value !== '' ? value : (args.length > 0 ? args[0] : '');
+            default:
+                return value; // Unknown filter: pass through unchanged
+        }
+    }
+    _getBackgroundColor(state, entityConfig) {
+        const colors = entityConfig.colors;
+        // Check for specific state mapping first
+        if (colors?.states && colors.states[state]) {
+            return colors.states[state];
+        }
+        // Check global state mapping
+        if (this.config.global_colors?.states && this.config.global_colors.states[state]) {
+            return this.config.global_colors.states[state];
+        }
+        // Check for numeric thresholds
+        const numericState = parseFloat(state);
+        if (!isNaN(numericState)) {
+            const thresholdStyles = this._getThresholdStyles(numericState, colors) ||
+                this._getThresholdStyles(numericState, this.config.global_colors);
+            if (thresholdStyles?.backgroundColor) {
+                return thresholdStyles.backgroundColor;
+            }
+        }
+        // Check for on/off states
+        if (state === 'on') {
+            return this._getColor('on', colors);
+        }
+        if (state === 'off') {
+            return this._getColor('off', colors);
+        }
+        // Default fallback
+        return this._getColor('off', colors);
+    }
+    _getThresholdStyles(value, colors) {
+        // Delegates to the operator-aware evaluator so mixed operators (e.g. a
+        // ">=60" band alongside "<40") resolve correctly. See src/thresholds.ts.
+        return evaluateThresholds(value, colors?.thresholds);
+    }
+    _getColor(type, entityColors) {
+        // Check entity-specific color first
+        if (entityColors && entityColors[type]) {
+            return entityColors[type];
+        }
+        // Fall back to global color
+        if (this.config.global_colors && this.config.global_colors[type]) {
+            return this.config.global_colors[type];
+        }
+        // Hard-coded defaults
+        const defaults = {
+            on: 'green',
+            off: 'gray',
+            unavailable: 'orange',
+            text: 'white',
+            blank: '#333333',
+        };
+        return defaults[type];
+    }
+    // Text color for a cell: entity color, then global color, then black or white,
+    // whichever has the higher WCAG contrast against the fill. The old default was always
+    // white, which is under 4.5:1 on the default off (gray) and unavailable (orange) fills.
+    _getTextColor(entityColors, background) {
+        if (entityColors?.text)
+            return entityColors.text;
+        if (this.config.global_colors?.text)
+            return this.config.global_colors.text;
+        const rgb = this._resolveRgb(background);
+        if (!rgb)
+            return 'white';
+        const lin = (c) => {
+            const v = c / 255;
+            return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+        };
+        const lum = 0.2126 * lin(rgb[0]) + 0.7152 * lin(rgb[1]) + 0.0722 * lin(rgb[2]);
+        return (lum + 0.05) / 0.05 >= 1.05 / (lum + 0.05) ? 'black' : 'white';
+    }
+    // [r, g, b] for a hex, rgb() or named color, or undefined when it cannot be resolved
+    // here (e.g. var(--token), which only resolves inside the card)
+    _resolveRgb(color) {
+        const hex6 = color.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
+        if (hex6)
+            return [parseInt(hex6[1], 16), parseInt(hex6[2], 16), parseInt(hex6[3], 16)];
+        const hex3 = color.match(/^#([0-9a-f])([0-9a-f])([0-9a-f])$/i);
+        if (hex3)
+            return [parseInt(hex3[1] + hex3[1], 16), parseInt(hex3[2] + hex3[2], 16), parseInt(hex3[3] + hex3[3], 16)];
+        const rgb = color.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+        if (rgb)
+            return [Number(rgb[1]), Number(rgb[2]), Number(rgb[3])];
+        if (color.startsWith('var(') || typeof document === 'undefined' || typeof getComputedStyle !== 'function')
+            return undefined;
+        // Named colors: let the browser resolve them
+        const temp = document.createElement('div');
+        temp.style.color = color;
+        document.body.appendChild(temp);
+        let computed;
+        try {
+            computed = getComputedStyle(temp).color;
+        }
+        finally {
+            temp.remove();
+        }
+        const resolved = computed.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+        return resolved ? [Number(resolved[1]), Number(resolved[2]), Number(resolved[3])] : undefined;
+    }
+    _getIcon(state, entityConfig, stateObj) {
+        // Check entity-specific override first
+        if (entityConfig && entityConfig.show_icon !== undefined) {
+            // Entity explicitly sets show_icon, respect it
+            if (!entityConfig.show_icon) {
+                return undefined;
+            }
+            // Entity wants icon, continue to get icon
+        }
+        else {
+            // No entity override, check global setting
+            if (!this.config.show_icons) {
+                return undefined;
+            }
+        }
+        // Determine which icon to use based on state
+        const iconType = state === 'on' ? 'on' : 'off';
+        // Check entity-specific custom icon first
+        if (entityConfig && entityConfig.icon && entityConfig.icon[iconType]) {
+            return entityConfig.icon[iconType];
+        }
+        // Fall back to entity's own icon from Home Assistant
+        if (stateObj && stateObj.attributes) {
+            // Try icon attribute first
+            if (stateObj.attributes.icon) {
+                return stateObj.attributes.icon;
+            }
+            // Try entity_picture as fallback (some entities use this)
+            // Actually, entity_picture is an image URL, not an icon, so skip this
+            // For domains that don't set icon, return a default based on domain
+            const domain = stateObj.entity_id.split('.')[0];
+            const domainIcons = {
+                'light': state === 'on' ? 'mdi:lightbulb-on' : 'mdi:lightbulb',
+                'switch': state === 'on' ? 'mdi:toggle-switch' : 'mdi:toggle-switch-off',
+                'binary_sensor': state === 'on' ? 'mdi:checkbox-marked-circle' : 'mdi:checkbox-blank-circle-outline',
+                'sensor': 'mdi:eye',
+            };
+            if (domainIcons[domain]) {
+                return domainIcons[domain];
+            }
+        }
+        // No icon available
+        return undefined;
+    }
+    _getTextOpacity(state, entityConfig) {
+        // Only dim if state is "off"
+        if (state !== 'off') {
+            return 1;
+        }
+        // Check for per-entity dim setting first
+        if (entityConfig.dim_off_text !== undefined) {
+            return entityConfig.dim_off_text / 100;
+        }
+        // Fall back to global dim setting
+        if (this.config.dim_off_text !== undefined) {
+            return this.config.dim_off_text / 100;
+        }
+        // Default: no dimming
+        return 1;
+    }
+    _formatNumericState(state, entityConfig) {
+        // Try to parse the state as a number
+        const numericState = parseFloat(state);
+        // If not numeric, return original state as-is
+        if (isNaN(numericState)) {
+            return state;
+        }
+        // Check for decimals setting - per-entity first, then global
+        let decimals;
+        if (entityConfig.decimals !== undefined) {
+            decimals = entityConfig.decimals;
+        }
+        else if (this.config.decimals !== undefined) {
+            decimals = this.config.decimals;
+        }
+        // If no decimals setting configured, return original state
+        if (decimals === undefined) {
+            return state;
+        }
+        // Validate decimals range (0-10)
+        const validDecimals = Math.max(0, Math.min(10, Math.floor(decimals)));
+        // Handle special numeric values (Infinity, -Infinity)
+        if (!isFinite(numericState)) {
+            return state;
+        }
+        // Format the number with specified decimal places
+        return numericState.toFixed(validDecimals);
+    }
+    _getDefaultClickAction(stateObj) {
+        const domain = stateObj.entity_id.split('.')[0];
+        // Toggleable domains
+        if (['light', 'switch', 'input_boolean', 'automation', 'fan'].includes(domain)) {
+            return 'toggle';
+        }
+        // Everything else shows more-info
+        return 'more-info';
+    }
+    _handleClick(cell) {
+        if (!cell.clickable || !cell.entity) {
+            return;
+        }
+        if (cell.clickAction === 'toggle') {
+            this._toggleEntity(cell.entity);
+        }
+        else if (cell.clickAction === 'more-info') {
+            this._showMoreInfo(cell.entity);
+        }
+    }
+    _handleCellKeydown(e, cell) {
+        if (!cell.clickable || (e.key !== 'Enter' && e.key !== ' ')) {
+            return;
+        }
+        // Space would otherwise scroll the page
+        e.preventDefault();
+        this._handleClick(cell);
+    }
+    _toggleEntity(entityId) {
+        const domain = entityId.split('.')[0];
+        this.hass.callService(domain, 'toggle', {
+            entity_id: entityId,
+        });
+    }
+    _showMoreInfo(entityId) {
+        fireEvent(this, 'hass-more-info', { entityId });
+    }
+    _isHeaderRow(rowIndex) {
+        if (!this.config.header_rows) {
+            return false;
+        }
+        return this.config.header_rows.some(hr => hr.row_index === rowIndex);
+    }
+    _getHeaderRow(rowIndex) {
+        if (!this.config.header_rows) {
+            return undefined;
+        }
+        return this.config.header_rows.find(hr => hr.row_index === rowIndex);
+    }
+    // Process template expressions in header cell text.
+    // Supports {{ states('entity_id') }} with optional filters (e.g., | upper).
+    _processHeaderText(text) {
+        return text.replace(/\{\{\s*(.+?)\s*\}\}/g, (_match, expression) => {
+            const parts = expression.split('|').map((s) => s.trim());
+            const statesMatch = parts[0].match(/^states\(['"]([^'"]+)['"]\)$/);
+            let value;
+            if (statesMatch) {
+                const entity = this.hass.states[statesMatch[1]];
+                value = entity ? entity.state : '';
+            }
+            else {
+                value = parts[0]; // Unknown expression: return as-is
+            }
+            for (let i = 1; i < parts.length; i++) {
+                value = this._applyTemplateFilter(value, parts[i]);
+            }
+            return value;
+        });
+    }
+    _renderHeaderCell(headerCell) {
+        const colspan = headerCell.colspan || 1;
+        const textAlign = headerCell.text_align || 'center';
+        const defaultFontSize = this._normalizeSize(this.config.font_size, '16px');
+        const fontSize = this._normalizeSize(headerCell.font_size, defaultFontSize);
+        const fontWeight = headerCell.font_weight || this.config.font_weight || 'bold';
+        const backgroundColor = headerCell.background_color || this._getColor('blank', undefined);
+        const textColor = headerCell.text_color || this._getTextColor(undefined, backgroundColor);
+        const displayText = this._processHeaderText(headerCell.text);
+        const cellStyle = {
+            'background-color': backgroundColor,
+            'color': textColor,
+            'font-size': fontSize,
+            'font-weight': String(fontWeight),
+            'text-align': textAlign,
+            'grid-column': `span ${colspan}`,
+        };
+        return b `
+      <div class="cell header-cell" style=${this._styleMap(cellStyle)}>
         <div class="cell-text">
-          <div class="text-line">${a}</div>
+          <div class="text-line">${displayText}</div>
         </div>
       </div>
-    `}_renderAllCells(){const e=[];let t=0;for(let i=0;i<this.config.rows;i++)if(this._isHeaderRow(i)){const t=this._getHeaderRow(i);t&&t.cells&&t.cells.forEach(t=>{e.push(this._renderHeaderCell(t))})}else{let i=0;for(;i<this.config.columns&&t<this.config.entities.length;){const s=this.config.entities[t],o=s?.colspan||1;let n;if(s&&s.entity){const e=this.hass.states[s.entity];n=this._computeCell(s,e)}else{const e=this._getColor("blank",s?.colors);n={displayText:s?.text||"",backgroundColor:e,textColor:this._getTextColor(s?.colors,e),textOpacity:1,textAlign:s?.text_align,clickable:!1,clickAction:"none",colspan:o}}e.push(this._renderCell(n)),i+=o,t++}}return e}static get styles(){return r`
+    `;
+    }
+    _renderAllCells() {
+        const allCells = [];
+        let entityIndex = 0;
+        for (let row = 0; row < this.config.rows; row++) {
+            if (this._isHeaderRow(row)) {
+                // Render header row
+                const headerRow = this._getHeaderRow(row);
+                if (headerRow && headerRow.cells) {
+                    headerRow.cells.forEach(headerCell => {
+                        allCells.push(this._renderHeaderCell(headerCell));
+                    });
+                }
+            }
+            else {
+                // Render entity row - track columns filled by colspan
+                let colsFilled = 0;
+                while (colsFilled < this.config.columns && entityIndex < this.config.entities.length) {
+                    const entityConfig = this.config.entities[entityIndex];
+                    const colspan = entityConfig?.colspan || 1;
+                    // Create and render the cell
+                    let cell;
+                    if (!entityConfig || !entityConfig.entity) {
+                        // Text-only or blank cell
+                        const blankBackground = this._getColor('blank', entityConfig?.colors);
+                        cell = {
+                            displayText: entityConfig?.text || '',
+                            backgroundColor: blankBackground,
+                            textColor: this._getTextColor(entityConfig?.colors, blankBackground),
+                            textOpacity: 1,
+                            textAlign: entityConfig?.text_align,
+                            clickable: false,
+                            clickAction: 'none',
+                            colspan: colspan,
+                        };
+                    }
+                    else {
+                        const stateObj = this.hass.states[entityConfig.entity];
+                        cell = this._computeCell(entityConfig, stateObj);
+                    }
+                    allCells.push(this._renderCell(cell));
+                    colsFilled += colspan;
+                    entityIndex++;
+                }
+            }
+        }
+        return allCells;
+    }
+    static get styles() {
+        return i$3 `
       :host {
         display: block;
         height: 100%;
@@ -104,28 +1035,308 @@ function e(e,t,i,s){var o,n=arguments.length,r=n<3?t:null===s?s=Object.getOwnPro
         outline: 2px solid var(--primary-text-color);
         outline-offset: 2px;
       }
-    `}render(){if(!this.config||!this.hass)return B``;const e=this._normalizeSize(this.config.cell_width,""),t=e&&""!==e.trim()?e:"1fr",i=this._normalizeSize(this.config.cell_height,"100px"),s=this._normalizeSize(this.config.cell_gap,"5px"),o={"grid-template-columns":`repeat(${this.config.columns}, ${t})`,"grid-template-rows":`repeat(${this.config.rows}, ${i})`,gap:s};return B`
+    `;
+    }
+    render() {
+        if (!this.config || !this.hass) {
+            return b ``;
+        }
+        // If cell_width is blank/empty, use 1fr for auto-sizing
+        const cellWidthNormalized = this._normalizeSize(this.config.cell_width, '');
+        const columnSize = cellWidthNormalized && cellWidthNormalized.trim() !== ''
+            ? cellWidthNormalized
+            : '1fr';
+        const cellHeightNormalized = this._normalizeSize(this.config.cell_height, '100px');
+        const cellGapNormalized = this._normalizeSize(this.config.cell_gap, '5px');
+        const gridStyle = {
+            'grid-template-columns': `repeat(${this.config.columns}, ${columnSize})`,
+            'grid-template-rows': `repeat(${this.config.rows}, ${cellHeightNormalized})`,
+            'gap': cellGapNormalized,
+        };
+        return b `
       <ha-card>
-        <div class="grid-container" style=${this._styleMap(o)}>
+        <div class="grid-container" style=${this._styleMap(gridStyle)}>
           ${this._renderAllCells()}
         </div>
       </ha-card>
-    `}_colorWithOpacity(e,t){const i=e.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)$/);if(i)return`rgba(${i[1]}, ${i[2]}, ${i[3]}, ${t})`;const s=e.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);if(s){return`rgba(${parseInt(s[1],16)}, ${parseInt(s[2],16)}, ${parseInt(s[3],16)}, ${t})`}const o=document.createElement("div");let n;o.style.color=e,document.body.appendChild(o);try{n=getComputedStyle(o).color}finally{o.remove()}const r=n.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/);return r?`rgba(${r[1]}, ${r[2]}, ${r[3]}, ${t})`:e}_renderCell(e){const t=e.textOpacity<1?this._colorWithOpacity(e.textColor,e.textOpacity):e.textColor,i={"background-color":e.backgroundColor,color:t,"font-size":this._normalizeSize(this.config.font_size,"16px"),"font-weight":String(e.fontWeight??this.config.font_weight??"bold")};e.colspan&&e.colspan>1&&(i["grid-column"]=`span ${e.colspan}`);const s={left:"flex-start",center:"center",right:"flex-end"};e.textAlign&&(i["justify-content"]=s[e.textAlign]||"center",i["text-align"]=e.textAlign);const o=e.icon?`icon-${this.config.icon_placement}`:"",n={"--mdc-icon-size":this._normalizeSize(this.config.icon_size,"24px")},r={};e.textAlign&&(r["align-items"]=s[e.textAlign]||"center");const l=e.displayText.split("\n");return B`
+    `;
+    }
+    _colorWithOpacity(color, opacity) {
+        // If already rgba, extract rgb and apply new opacity
+        const rgbaMatch = color.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)$/);
+        if (rgbaMatch) {
+            return `rgba(${rgbaMatch[1]}, ${rgbaMatch[2]}, ${rgbaMatch[3]}, ${opacity})`;
+        }
+        // Try to convert hex to rgba
+        const hexMatch = color.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
+        if (hexMatch) {
+            const r = parseInt(hexMatch[1], 16);
+            const g = parseInt(hexMatch[2], 16);
+            const b = parseInt(hexMatch[3], 16);
+            return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+        }
+        // For named colors, we'll need to use a different approach
+        // Create a temporary element to get computed color
+        const temp = document.createElement('div');
+        temp.style.color = color;
+        document.body.appendChild(temp);
+        let computed;
+        try {
+            computed = getComputedStyle(temp).color;
+        }
+        finally {
+            // Ensure the temporary element is always removed, even if reading the
+            // computed style throws for some reason.
+            temp.remove();
+        }
+        // Extract RGB from computed rgb() or rgba()
+        const computedMatch = computed.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+        if (computedMatch) {
+            return `rgba(${computedMatch[1]}, ${computedMatch[2]}, ${computedMatch[3]}, ${opacity})`;
+        }
+        // Fallback: just return the color as-is
+        return color;
+    }
+    _renderCell(cell) {
+        // Convert text color to rgba with opacity if needed
+        const textColor = cell.textOpacity < 1
+            ? this._colorWithOpacity(cell.textColor, cell.textOpacity)
+            : cell.textColor;
+        const cellStyle = {
+            'background-color': cell.backgroundColor,
+            'color': textColor,
+            'font-size': this._normalizeSize(this.config.font_size, '16px'),
+            'font-weight': String(cell.fontWeight ?? this.config.font_weight ?? 'bold'),
+        };
+        // Add grid-column span if colspan is set
+        if (cell.colspan && cell.colspan > 1) {
+            cellStyle['grid-column'] = `span ${cell.colspan}`;
+        }
+        // Map text alignment to flexbox justify-content and text-align
+        // justify-content: positions content block within the flex cell
+        // text-align: controls how wrapped text aligns within text divs
+        const alignmentMap = {
+            'left': 'flex-start',
+            'center': 'center',
+            'right': 'flex-end',
+        };
+        if (cell.textAlign) {
+            cellStyle['justify-content'] = alignmentMap[cell.textAlign] || 'center';
+            cellStyle['text-align'] = cell.textAlign;
+        }
+        // Determine icon placement class
+        const iconPlacementClass = cell.icon
+            ? `icon-${this.config.icon_placement}`
+            : '';
+        const iconStyle = {
+            '--mdc-icon-size': this._normalizeSize(this.config.icon_size, '24px'),
+        };
+        // Style for cell-text to match alignment
+        const cellTextStyle = {};
+        if (cell.textAlign) {
+            cellTextStyle['align-items'] = alignmentMap[cell.textAlign] || 'center';
+        }
+        // Check if text contains newlines for multi-line display
+        const textLines = cell.displayText.split('\n');
+        // Clickable cells are keyboard buttons (Tab to reach, Enter or Space to activate);
+        // their accessible name is the cell text. Lit keeps the element across updates, so
+        // focus survives state changes.
+        return b `
       <div
-        class="cell ${e.clickable?"clickable":""} ${o}"
-        style=${this._styleMap(i)}
-        role=${e.clickable?"button":V}
-        tabindex=${e.clickable?"0":V}
-        aria-haspopup=${e.clickable&&"more-info"===e.clickAction?"dialog":V}
-        @click=${()=>this._handleClick(e)}
-        @keydown=${t=>this._handleCellKeydown(t,e)}
+        class="cell ${cell.clickable ? 'clickable' : ''} ${iconPlacementClass}"
+        style=${this._styleMap(cellStyle)}
+        role=${cell.clickable ? 'button' : A}
+        tabindex=${cell.clickable ? '0' : A}
+        aria-haspopup=${cell.clickable && cell.clickAction === 'more-info' ? 'dialog' : A}
+        @click=${() => this._handleClick(cell)}
+        @keydown=${(e) => this._handleCellKeydown(e, cell)}
       >
-        ${e.icon?B`<ha-icon class="cell-icon" .icon=${e.icon} style=${this._styleMap(n)}></ha-icon>`:""}
-        <div class="cell-text" style=${this._styleMap(r)}>
-          ${l.map(e=>B`<div class="text-line">${e}</div>`)}
+        ${cell.icon ? b `<ha-icon class="cell-icon" .icon=${cell.icon} style=${this._styleMap(iconStyle)}></ha-icon>` : ''}
+        <div class="cell-text" style=${this._styleMap(cellTextStyle)}>
+          ${textLines.map(line => b `<div class="text-line">${line}</div>`)}
         </div>
       </div>
-    `}_styleMap(e){return Object.entries(e).map(([e,t])=>`${e}: ${t}`).join("; ")}};e([ue({attribute:!1})],be.prototype,"hass",void 0),e([ge()],be.prototype,"config",void 0),be=e([ce("indicator-grid-card")],be);let ye=class extends le{setConfig(e){this._config=e}_valueChanged(e){if(!this._config||!this.hass)return;const t={...this._config,...e.detail.value};fe(this,"config-changed",{config:t})}_configValueChanged(e,t){if(!this._config||!this.hass)return;const i={...this._config,[e]:t};fe(this,"config-changed",{config:i})}_focusControl(e){this.shadowRoot?.querySelector(`[data-focus-key="${e}"]`)?.focus()}_globalColorChanged(e,t){const i={...this._config};i.global_colors||(i.global_colors={}),i.global_colors={...i.global_colors,[e]:t},fe(this,"config-changed",{config:i})}_addEntity(){const e={...this._config};e.entities||(e.entities=[]),e.entities=[...e.entities,{entity:""}],fe(this,"config-changed",{config:e})}_removeEntity(e){const t={...this._config};t.entities=[...t.entities],t.entities.splice(e,1),fe(this,"config-changed",{config:t}),this._focusControl("add-entity")}_entityChanged(e,t,i){const s={...this._config};s.entities=[...s.entities],s.entities[e]={...s.entities[e],[t]:i},fe(this,"config-changed",{config:s})}_entityColorChanged(e,t,i){const s={...this._config};s.entities=[...s.entities];const o={...s.entities[e]};o.colors||(o.colors={}),o.colors={...o.colors,[t]:i},s.entities[e]=o,fe(this,"config-changed",{config:s})}_entityIconChanged(e,t,i){const s={...this._config};s.entities=[...s.entities];const o={...s.entities[e]};o.icon||(o.icon={}),o.icon={...o.icon,[t]:i},s.entities[e]=o,fe(this,"config-changed",{config:s})}_addHeaderRow(){const e={...this._config};e.header_rows||(e.header_rows=[]),e.header_rows=[...e.header_rows,{row_index:0,cells:[{text:"Header",colspan:1}]}],fe(this,"config-changed",{config:e})}_removeHeaderRow(e){const t={...this._config};t.header_rows&&(t.header_rows=[...t.header_rows],t.header_rows.splice(e,1),fe(this,"config-changed",{config:t}),this._focusControl("add-header-row"))}_headerRowChanged(e,t,i){const s={...this._config};s.header_rows&&(s.header_rows=[...s.header_rows],s.header_rows[e]={...s.header_rows[e],[t]:i},fe(this,"config-changed",{config:s}))}_addHeaderCell(e){const t={...this._config};if(!t.header_rows)return;t.header_rows=[...t.header_rows];const i={...t.header_rows[e]};i.cells=[...i.cells,{text:"Header",colspan:1}],t.header_rows[e]=i,fe(this,"config-changed",{config:t})}_removeHeaderCell(e,t){const i={...this._config};if(!i.header_rows)return;i.header_rows=[...i.header_rows];const s={...i.header_rows[e]};s.cells=[...s.cells],s.cells.splice(t,1),i.header_rows[e]=s,fe(this,"config-changed",{config:i}),this._focusControl(`add-header-cell-${e}`)}_headerCellChanged(e,t,i,s){const o={...this._config};if(!o.header_rows)return;o.header_rows=[...o.header_rows];const n={...o.header_rows[e]};n.cells=[...n.cells],n.cells[t]={...n.cells[t],[i]:s},o.header_rows[e]=n,fe(this,"config-changed",{config:o})}static get styles(){return r`
+    `;
+    }
+    _styleMap(styles) {
+        return Object.entries(styles)
+            .map(([key, value]) => `${key}: ${value}`)
+            .join('; ');
+    }
+};
+__decorate([
+    n({ attribute: false })
+], IndicatorGridCard.prototype, "hass", void 0);
+__decorate([
+    r()
+], IndicatorGridCard.prototype, "config", void 0);
+IndicatorGridCard = __decorate([
+    t('indicator-grid-card')
+], IndicatorGridCard);
+
+let IndicatorGridCardEditor = class IndicatorGridCardEditor extends i {
+    setConfig(config) {
+        this._config = config;
+    }
+    _valueChanged(ev) {
+        if (!this._config || !this.hass) {
+            return;
+        }
+        const newConfig = { ...this._config, ...ev.detail.value };
+        fireEvent(this, 'config-changed', { config: newConfig });
+    }
+    _configValueChanged(key, value) {
+        if (!this._config || !this.hass) {
+            return;
+        }
+        const newConfig = { ...this._config, [key]: value };
+        fireEvent(this, 'config-changed', { config: newConfig });
+    }
+    // Move keyboard focus to a control that survives re-render (the list's Add button),
+    // so focus is not lost to <body> when the row holding the clicked Remove button disappears
+    _focusControl(key) {
+        this.shadowRoot?.querySelector(`[data-focus-key="${key}"]`)?.focus();
+    }
+    _globalColorChanged(colorType, value) {
+        const newConfig = { ...this._config };
+        if (!newConfig.global_colors) {
+            newConfig.global_colors = {};
+        }
+        newConfig.global_colors = {
+            ...newConfig.global_colors,
+            [colorType]: value,
+        };
+        fireEvent(this, 'config-changed', { config: newConfig });
+    }
+    _addEntity() {
+        const newConfig = { ...this._config };
+        if (!newConfig.entities) {
+            newConfig.entities = [];
+        }
+        newConfig.entities = [...newConfig.entities, { entity: '' }];
+        fireEvent(this, 'config-changed', { config: newConfig });
+    }
+    _removeEntity(index) {
+        const newConfig = { ...this._config };
+        newConfig.entities = [...newConfig.entities];
+        newConfig.entities.splice(index, 1);
+        fireEvent(this, 'config-changed', { config: newConfig });
+        this._focusControl('add-entity');
+    }
+    _entityChanged(index, key, value) {
+        const newConfig = { ...this._config };
+        newConfig.entities = [...newConfig.entities];
+        newConfig.entities[index] = {
+            ...newConfig.entities[index],
+            [key]: value,
+        };
+        fireEvent(this, 'config-changed', { config: newConfig });
+    }
+    _entityColorChanged(index, colorType, value) {
+        const newConfig = { ...this._config };
+        newConfig.entities = [...newConfig.entities];
+        const entity = { ...newConfig.entities[index] };
+        if (!entity.colors) {
+            entity.colors = {};
+        }
+        entity.colors = {
+            ...entity.colors,
+            [colorType]: value,
+        };
+        newConfig.entities[index] = entity;
+        fireEvent(this, 'config-changed', { config: newConfig });
+    }
+    _entityIconChanged(index, iconType, value) {
+        const newConfig = { ...this._config };
+        newConfig.entities = [...newConfig.entities];
+        const entity = { ...newConfig.entities[index] };
+        if (!entity.icon) {
+            entity.icon = {};
+        }
+        entity.icon = {
+            ...entity.icon,
+            [iconType]: value,
+        };
+        newConfig.entities[index] = entity;
+        fireEvent(this, 'config-changed', { config: newConfig });
+    }
+    _addHeaderRow() {
+        const newConfig = { ...this._config };
+        if (!newConfig.header_rows) {
+            newConfig.header_rows = [];
+        }
+        newConfig.header_rows = [
+            ...newConfig.header_rows,
+            {
+                row_index: 0,
+                cells: [{ text: 'Header', colspan: 1 }],
+            },
+        ];
+        fireEvent(this, 'config-changed', { config: newConfig });
+    }
+    _removeHeaderRow(index) {
+        const newConfig = { ...this._config };
+        if (!newConfig.header_rows) {
+            return;
+        }
+        newConfig.header_rows = [...newConfig.header_rows];
+        newConfig.header_rows.splice(index, 1);
+        fireEvent(this, 'config-changed', { config: newConfig });
+        this._focusControl('add-header-row');
+    }
+    _headerRowChanged(index, key, value) {
+        const newConfig = { ...this._config };
+        if (!newConfig.header_rows) {
+            return;
+        }
+        newConfig.header_rows = [...newConfig.header_rows];
+        newConfig.header_rows[index] = {
+            ...newConfig.header_rows[index],
+            [key]: value,
+        };
+        fireEvent(this, 'config-changed', { config: newConfig });
+    }
+    _addHeaderCell(rowIndex) {
+        const newConfig = { ...this._config };
+        if (!newConfig.header_rows) {
+            return;
+        }
+        newConfig.header_rows = [...newConfig.header_rows];
+        const headerRow = { ...newConfig.header_rows[rowIndex] };
+        headerRow.cells = [...headerRow.cells, { text: 'Header', colspan: 1 }];
+        newConfig.header_rows[rowIndex] = headerRow;
+        fireEvent(this, 'config-changed', { config: newConfig });
+    }
+    _removeHeaderCell(rowIndex, cellIndex) {
+        const newConfig = { ...this._config };
+        if (!newConfig.header_rows) {
+            return;
+        }
+        newConfig.header_rows = [...newConfig.header_rows];
+        const headerRow = { ...newConfig.header_rows[rowIndex] };
+        headerRow.cells = [...headerRow.cells];
+        headerRow.cells.splice(cellIndex, 1);
+        newConfig.header_rows[rowIndex] = headerRow;
+        fireEvent(this, 'config-changed', { config: newConfig });
+        this._focusControl(`add-header-cell-${rowIndex}`);
+    }
+    _headerCellChanged(rowIndex, cellIndex, key, value) {
+        const newConfig = { ...this._config };
+        if (!newConfig.header_rows) {
+            return;
+        }
+        newConfig.header_rows = [...newConfig.header_rows];
+        const headerRow = { ...newConfig.header_rows[rowIndex] };
+        headerRow.cells = [...headerRow.cells];
+        headerRow.cells[cellIndex] = {
+            ...headerRow.cells[cellIndex],
+            [key]: value,
+        };
+        newConfig.header_rows[rowIndex] = headerRow;
+        fireEvent(this, 'config-changed', { config: newConfig });
+    }
+    static get styles() {
+        return i$3 `
       ha-selector {
         display: block;
         margin-bottom: 8px;
@@ -206,142 +1417,180 @@ function e(e,t,i,s){var o,n=arguments.length,r=n<3?t:null===s?s=Object.getOwnPro
         white-space: nowrap;
         border: 0;
       }
-    `}_renderColorField(e,t,i,s){const o=!!t&&!CSS.supports("color",t);return B`
+    `;
+    }
+    // Color text field with an inline error for invalid colors. ha-selector keeps its input
+    // in a shadow root, so aria-describedby cannot reach it; the error is a live region instead.
+    // It is always rendered, and Lit only rewrites its content when validity flips, so it is
+    // announced once per change rather than on every keystroke.
+    _renderColorField(label, value, onChange, helper) {
+        const invalid = !!value && !CSS.supports('color', value);
+        return b `
       <div class="color-field">
         <ha-selector
           .hass=${this.hass}
-          .required=${!1}
-          .label=${e}
-          .value=${t}
-          .helper=${s}
-          .selector=${{text:{}}}
-          @value-changed=${e=>i(e.detail.value)}
+          .required=${false}
+          .label=${label}
+          .value=${value}
+          .helper=${helper}
+          .selector=${{ text: {} }}
+          @value-changed=${(ev) => onChange(ev.detail.value)}
         ></ha-selector>
-        <div class="error-text" aria-live="polite">${o?B`<ha-icon icon="mdi:alert-circle" aria-hidden="true"></ha-icon><span><strong>Error:</strong> ${e} is not a valid color. Use a hex code (#FF0000), a color name (red), or var(--token).</span>`:V}</div>
+        <div class="error-text" aria-live="polite">${invalid ? b `<ha-icon icon="mdi:alert-circle" aria-hidden="true"></ha-icon><span><strong>Error:</strong> ${label} is not a valid color. Use a hex code (#FF0000), a color name (red), or var(--token).</span>` : A}</div>
       </div>
-    `}render(){return this.hass&&this._config?B`
+    `;
+    }
+    render() {
+        if (!this.hass || !this._config) {
+            return b ``;
+        }
+        return b `
       <ha-form
         .hass=${this.hass}
         .data=${this._config}
-        .schema=${[{name:"columns",selector:{number:{min:1,max:20,mode:"box"}}},{name:"rows",selector:{number:{min:1,max:20,mode:"box"}}}]}
-        .computeLabel=${e=>e.label||e.name}
+        .schema=${[
+            { name: 'columns', selector: { number: { min: 1, max: 20, mode: 'box' } } },
+            { name: 'rows', selector: { number: { min: 1, max: 20, mode: 'box' } } },
+        ]}
+        .computeLabel=${(schema) => schema.label || schema.name}
         @value-changed=${this._valueChanged}
       ></ha-form>
 
       <ha-selector
-        .required=${!1}
+        .required=${false}
         .hass=${this.hass}
-        .label=${"Cell Width"}
-        .value=${this._config.cell_width||""}
-        .selector=${{text:{}}}
-        @value-changed=${e=>this._configValueChanged("cell_width",e.detail.value)}
+        .label=${'Cell Width'}
+        .value=${this._config.cell_width || ''}
+        .selector=${{ text: {} }}
+        @value-changed=${(ev) => this._configValueChanged('cell_width', ev.detail.value)}
       ></ha-selector>
 
       <ha-selector
-        .required=${!1}
+        .required=${false}
         .hass=${this.hass}
-        .label=${"Cell Height"}
-        .value=${this._config.cell_height||"100px"}
-        .selector=${{text:{}}}
-        @value-changed=${e=>this._configValueChanged("cell_height",e.detail.value)}
+        .label=${'Cell Height'}
+        .value=${this._config.cell_height || '100px'}
+        .selector=${{ text: {} }}
+        @value-changed=${(ev) => this._configValueChanged('cell_height', ev.detail.value)}
       ></ha-selector>
 
       <ha-selector
-        .required=${!1}
+        .required=${false}
         .hass=${this.hass}
-        .label=${"Cell Gap"}
-        .value=${this._config.cell_gap||"5px"}
-        .selector=${{text:{}}}
-        @value-changed=${e=>this._configValueChanged("cell_gap",e.detail.value)}
+        .label=${'Cell Gap'}
+        .value=${this._config.cell_gap || '5px'}
+        .selector=${{ text: {} }}
+        @value-changed=${(ev) => this._configValueChanged('cell_gap', ev.detail.value)}
       ></ha-selector>
 
       <ha-selector
-        .required=${!1}
+        .required=${false}
         .hass=${this.hass}
-        .label=${"Font Size"}
-        .value=${this._config.font_size||"16px"}
-        .selector=${{text:{}}}
-        @value-changed=${e=>this._configValueChanged("font_size",e.detail.value)}
+        .label=${'Font Size'}
+        .value=${this._config.font_size || '16px'}
+        .selector=${{ text: {} }}
+        @value-changed=${(ev) => this._configValueChanged('font_size', ev.detail.value)}
       ></ha-selector>
 
       <ha-selector
-        .required=${!1}
+        .required=${false}
         .hass=${this.hass}
-        .selector=${{select:{options:[{value:"300",label:"Light (300)"},{value:"normal",label:"Normal (400)"},{value:"500",label:"Medium (500)"},{value:"600",label:"Semi-Bold (600)"},{value:"bold",label:"Bold (700)"},{value:"800",label:"Extra Bold (800)"},{value:"900",label:"Black (900)"}]}}}
-        .value=${this._config.font_weight||"bold"}
-        @value-changed=${e=>this._configValueChanged("font_weight",e.detail.value)}
-        .label=${"Font Weight"}
+        .selector=${{
+            select: {
+                options: [
+                    { value: '300', label: 'Light (300)' },
+                    { value: 'normal', label: 'Normal (400)' },
+                    { value: '500', label: 'Medium (500)' },
+                    { value: '600', label: 'Semi-Bold (600)' },
+                    { value: 'bold', label: 'Bold (700)' },
+                    { value: '800', label: 'Extra Bold (800)' },
+                    { value: '900', label: 'Black (900)' },
+                ],
+            },
+        }}
+        .value=${this._config.font_weight || 'bold'}
+        @value-changed=${(ev) => this._configValueChanged('font_weight', ev.detail.value)}
+        .label=${'Font Weight'}
       ></ha-selector>
 
       <ha-selector
-        .required=${!1}
+        .required=${false}
         .hass=${this.hass}
-        .label=${"Unavailable Text"}
-        .value=${this._config.unavailable_text||"INOP"}
-        .selector=${{text:{}}}
-        @value-changed=${e=>this._configValueChanged("unavailable_text",e.detail.value)}
+        .label=${'Unavailable Text'}
+        .value=${this._config.unavailable_text || 'INOP'}
+        .selector=${{ text: {} }}
+        @value-changed=${(ev) => this._configValueChanged('unavailable_text', ev.detail.value)}
       ></ha-selector>
 
       <ha-selector
-        .required=${!1}
+        .required=${false}
         .hass=${this.hass}
-        .label=${"Dim Off Text (%)"}
-        .value=${this._config.dim_off_text??""}
-        .selector=${{number:{min:0,max:100,mode:"box",step:1}}}
-        @value-changed=${e=>this._configValueChanged("dim_off_text",""!==e.detail.value&&void 0!==e.detail.value?Number(e.detail.value):void 0)}
+        .label=${'Dim Off Text (%)'}
+        .value=${this._config.dim_off_text ?? ''}
+        .selector=${{ number: { min: 0, max: 100, mode: 'box', step: 1 } }}
+        @value-changed=${(ev) => this._configValueChanged('dim_off_text', ev.detail.value !== '' && ev.detail.value !== undefined ? Number(ev.detail.value) : undefined)}
       ></ha-selector>
 
       <ha-selector
-        .required=${!1}
+        .required=${false}
         .hass=${this.hass}
-        .label=${"Decimals"}
-        .value=${this._config.decimals??""}
-        .selector=${{number:{min:0,max:10,mode:"box",step:1}}}
-        @value-changed=${e=>this._configValueChanged("decimals",""!==e.detail.value&&void 0!==e.detail.value?Number(e.detail.value):void 0)}
+        .label=${'Decimals'}
+        .value=${this._config.decimals ?? ''}
+        .selector=${{ number: { min: 0, max: 10, mode: 'box', step: 1 } }}
+        @value-changed=${(ev) => this._configValueChanged('decimals', ev.detail.value !== '' && ev.detail.value !== undefined ? Number(ev.detail.value) : undefined)}
       ></ha-selector>
 
       <ha-selector
-        .required=${!1}
+        .required=${false}
         .hass=${this.hass}
-        .selector=${{boolean:{}}}
-        .value=${this._config.show_icons??!1}
-        @value-changed=${e=>this._configValueChanged("show_icons",e.detail.value)}
-        .label=${"Show Icons"}
+        .selector=${{ boolean: {} }}
+        .value=${this._config.show_icons ?? false}
+        @value-changed=${(ev) => this._configValueChanged('show_icons', ev.detail.value)}
+        .label=${'Show Icons'}
       ></ha-selector>
 
       <ha-selector
-        .required=${!1}
+        .required=${false}
         .hass=${this.hass}
-        .selector=${{select:{options:[{value:"above",label:"Above text"},{value:"below",label:"Below text"},{value:"left",label:"Left of text"},{value:"right",label:"Right of text"}]}}}
-        .value=${this._config.icon_placement||"above"}
-        @value-changed=${e=>this._configValueChanged("icon_placement",e.detail.value)}
-        .label=${"Icon Placement"}
+        .selector=${{
+            select: {
+                options: [
+                    { value: 'above', label: 'Above text' },
+                    { value: 'below', label: 'Below text' },
+                    { value: 'left', label: 'Left of text' },
+                    { value: 'right', label: 'Right of text' },
+                ],
+            },
+        }}
+        .value=${this._config.icon_placement || 'above'}
+        @value-changed=${(ev) => this._configValueChanged('icon_placement', ev.detail.value)}
+        .label=${'Icon Placement'}
       ></ha-selector>
 
       <ha-selector
-        .required=${!1}
+        .required=${false}
         .hass=${this.hass}
-        .label=${"Icon Size"}
-        .value=${this._config.icon_size||"24px"}
-        .selector=${{text:{}}}
-        @value-changed=${e=>this._configValueChanged("icon_size",e.detail.value)}
+        .label=${'Icon Size'}
+        .value=${this._config.icon_size || '24px'}
+        .selector=${{ text: {} }}
+        @value-changed=${(ev) => this._configValueChanged('icon_size', ev.detail.value)}
       ></ha-selector>
 
-      <ha-expansion-panel header="Global Colors" .expanded=${!1}>
-        ${this._renderColorField("On Color",this._config.global_colors?.on||"green",e=>this._globalColorChanged("on",e))}
+      <ha-expansion-panel header="Global Colors" .expanded=${false}>
+        ${this._renderColorField('On Color', this._config.global_colors?.on || 'green', (value) => this._globalColorChanged('on', value))}
 
-        ${this._renderColorField("Off Color",this._config.global_colors?.off||"gray",e=>this._globalColorChanged("off",e))}
+        ${this._renderColorField('Off Color', this._config.global_colors?.off || 'gray', (value) => this._globalColorChanged('off', value))}
 
-        ${this._renderColorField("Unavailable Color",this._config.global_colors?.unavailable||"orange",e=>this._globalColorChanged("unavailable",e))}
+        ${this._renderColorField('Unavailable Color', this._config.global_colors?.unavailable || 'orange', (value) => this._globalColorChanged('unavailable', value))}
 
-        ${this._renderColorField("Text Color",this._config.global_colors?.text||"",e=>this._globalColorChanged("text",e),"Leave empty for black or white, whichever contrasts more with each cell")}
+        ${this._renderColorField('Text Color', this._config.global_colors?.text || '', (value) => this._globalColorChanged('text', value), 'Leave empty for black or white, whichever contrasts more with each cell')}
 
-        ${this._renderColorField("Blank Cell Color",this._config.global_colors?.blank||"#333333",e=>this._globalColorChanged("blank",e))}
+        ${this._renderColorField('Blank Cell Color', this._config.global_colors?.blank || '#333333', (value) => this._globalColorChanged('blank', value))}
       </ha-expansion-panel>
 
       <div style="margin-top: 16px;">
         <h3>Header Rows</h3>
-        ${(this._config.header_rows||[]).map((e,t)=>this._renderHeaderRowConfig(e,t))}
+        ${(this._config.header_rows || []).map((headerRow, index) => this._renderHeaderRowConfig(headerRow, index))}
 
         <ha-button data-focus-key="add-header-row" @click=${this._addHeaderRow}>
           Add Header Row
@@ -350,224 +1599,295 @@ function e(e,t,i,s){var o,n=arguments.length,r=n<3?t:null===s?s=Object.getOwnPro
 
       <div style="margin-top: 16px;">
         <h3>Entities</h3>
-        ${(this._config.entities||[]).map((e,t)=>this._renderEntityConfig(e,t))}
+        ${(this._config.entities || []).map((entity, index) => this._renderEntityConfig(entity, index))}
 
         <ha-button data-focus-key="add-entity" @click=${this._addEntity}>
           Add Entity
         </ha-button>
       </div>
-    `:B``}_renderHeaderRowConfig(e,t){return B`
+    `;
+    }
+    _renderHeaderRowConfig(headerRow, rowIndex) {
+        return b `
       <div class="entity-item">
         <div class="entity-header">
-          <strong>Header Row ${t+1}</strong>
-          <ha-button appearance="plain" variant="danger" @click=${()=>this._removeHeaderRow(t)}>
-            Remove<span class="visually-hidden"> header row ${t+1}</span>
+          <strong>Header Row ${rowIndex + 1}</strong>
+          <ha-button appearance="plain" variant="danger" @click=${() => this._removeHeaderRow(rowIndex)}>
+            Remove<span class="visually-hidden"> header row ${rowIndex + 1}</span>
           </ha-button>
         </div>
 
         <div class="entity-details">
           <ha-selector
-            .required=${!1}
+            .required=${false}
             .hass=${this.hass}
-            .label=${"Row Index (0-based)"}
-            .value=${e.row_index}
-            .selector=${{number:{min:0,max:this._config.rows-1,mode:"box",step:1}}}
-            @value-changed=${e=>this._headerRowChanged(t,"row_index",Number(e.detail.value))}
+            .label=${'Row Index (0-based)'}
+            .value=${headerRow.row_index}
+            .selector=${{ number: { min: 0, max: this._config.rows - 1, mode: 'box', step: 1 } }}
+            @value-changed=${(ev) => this._headerRowChanged(rowIndex, 'row_index', Number(ev.detail.value))}
           ></ha-selector>
 
           <h4>Header Cells</h4>
-          ${e.cells.map((e,i)=>this._renderHeaderCellConfig(t,e,i))}
+          ${headerRow.cells.map((cell, cellIndex) => this._renderHeaderCellConfig(rowIndex, cell, cellIndex))}
 
-          <ha-button appearance="plain" data-focus-key="add-header-cell-${t}"
-            @click=${()=>this._addHeaderCell(t)}>
-            Add Header Cell<span class="visually-hidden"> to header row ${t+1}</span>
+          <ha-button appearance="plain" data-focus-key="add-header-cell-${rowIndex}"
+            @click=${() => this._addHeaderCell(rowIndex)}>
+            Add Header Cell<span class="visually-hidden"> to header row ${rowIndex + 1}</span>
           </ha-button>
         </div>
       </div>
-    `}_renderHeaderCellConfig(e,t,i){return B`
+    `;
+    }
+    _renderHeaderCellConfig(rowIndex, cell, cellIndex) {
+        return b `
       <div style="border: 1px dashed var(--divider-color); padding: 8px; margin: 8px 0; border-radius: 4px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <strong>Cell ${i+1}</strong>
-          <ha-button appearance="plain" variant="danger" @click=${()=>this._removeHeaderCell(e,i)}>
-            Remove<span class="visually-hidden"> cell ${i+1} of header row ${e+1}</span>
+          <strong>Cell ${cellIndex + 1}</strong>
+          <ha-button appearance="plain" variant="danger" @click=${() => this._removeHeaderCell(rowIndex, cellIndex)}>
+            Remove<span class="visually-hidden"> cell ${cellIndex + 1} of header row ${rowIndex + 1}</span>
           </ha-button>
         </div>
 
         <ha-selector
-          .required=${!1}
+          .required=${false}
           .hass=${this.hass}
-          .label=${"Text"}
-          .value=${t.text||""}
-          .selector=${{text:{}}}
-          @value-changed=${t=>this._headerCellChanged(e,i,"text",t.detail.value)}
+          .label=${'Text'}
+          .value=${cell.text || ''}
+          .selector=${{ text: {} }}
+          @value-changed=${(ev) => this._headerCellChanged(rowIndex, cellIndex, 'text', ev.detail.value)}
         ></ha-selector>
 
         <ha-selector
-          .required=${!1}
+          .required=${false}
           .hass=${this.hass}
-          .label=${"Column Span"}
-          .value=${t.colspan||1}
-          .selector=${{number:{min:1,max:this._config.columns,mode:"box",step:1}}}
-          @value-changed=${t=>this._headerCellChanged(e,i,"colspan",Number(t.detail.value))}
+          .label=${'Column Span'}
+          .value=${cell.colspan || 1}
+          .selector=${{ number: { min: 1, max: this._config.columns, mode: 'box', step: 1 } }}
+          @value-changed=${(ev) => this._headerCellChanged(rowIndex, cellIndex, 'colspan', Number(ev.detail.value))}
         ></ha-selector>
 
         <ha-selector
-          .required=${!1}
+          .required=${false}
           .hass=${this.hass}
-          .selector=${{select:{options:[{value:"left",label:"Left"},{value:"center",label:"Center"},{value:"right",label:"Right"}]}}}
-          .value=${t.text_align||"center"}
-          @value-changed=${t=>this._headerCellChanged(e,i,"text_align",t.detail.value)}
-          .label=${"Text Alignment"}
+          .selector=${{
+            select: {
+                options: [
+                    { value: 'left', label: 'Left' },
+                    { value: 'center', label: 'Center' },
+                    { value: 'right', label: 'Right' },
+                ],
+            },
+        }}
+          .value=${cell.text_align || 'center'}
+          @value-changed=${(ev) => this._headerCellChanged(rowIndex, cellIndex, 'text_align', ev.detail.value)}
+          .label=${'Text Alignment'}
         ></ha-selector>
 
-        <ha-expansion-panel header="Advanced Styling (optional)" .expanded=${!1}>
+        <ha-expansion-panel header="Advanced Styling (optional)" .expanded=${false}>
           <ha-selector
-            .required=${!1}
+            .required=${false}
             .hass=${this.hass}
-            .label=${"Font Size"}
-            .value=${t.font_size||""}
-            .selector=${{text:{}}}
-            @value-changed=${t=>this._headerCellChanged(e,i,"font_size",t.detail.value)}
+            .label=${'Font Size'}
+            .value=${cell.font_size || ''}
+            .selector=${{ text: {} }}
+            @value-changed=${(ev) => this._headerCellChanged(rowIndex, cellIndex, 'font_size', ev.detail.value)}
           ></ha-selector>
 
           <ha-selector
-            .required=${!1}
+            .required=${false}
             .hass=${this.hass}
-            .selector=${{select:{options:[{value:"",label:"Default (from card)"},{value:"300",label:"Light (300)"},{value:"normal",label:"Normal (400)"},{value:"500",label:"Medium (500)"},{value:"600",label:"Semi-Bold (600)"},{value:"bold",label:"Bold (700)"},{value:"800",label:"Extra Bold (800)"},{value:"900",label:"Black (900)"}]}}}
-            .value=${t.font_weight||""}
-            @value-changed=${t=>this._headerCellChanged(e,i,"font_weight",t.detail.value)}
-            .label=${"Font Weight"}
+            .selector=${{
+            select: {
+                options: [
+                    { value: '', label: 'Default (from card)' },
+                    { value: '300', label: 'Light (300)' },
+                    { value: 'normal', label: 'Normal (400)' },
+                    { value: '500', label: 'Medium (500)' },
+                    { value: '600', label: 'Semi-Bold (600)' },
+                    { value: 'bold', label: 'Bold (700)' },
+                    { value: '800', label: 'Extra Bold (800)' },
+                    { value: '900', label: 'Black (900)' },
+                ],
+            },
+        }}
+            .value=${cell.font_weight || ''}
+            @value-changed=${(ev) => this._headerCellChanged(rowIndex, cellIndex, 'font_weight', ev.detail.value)}
+            .label=${'Font Weight'}
           ></ha-selector>
 
-          ${this._renderColorField("Text Color",t.text_color||"",t=>this._headerCellChanged(e,i,"text_color",t))}
+          ${this._renderColorField('Text Color', cell.text_color || '', (value) => this._headerCellChanged(rowIndex, cellIndex, 'text_color', value))}
 
-          ${this._renderColorField("Background Color",t.background_color||"",t=>this._headerCellChanged(e,i,"background_color",t))}
+          ${this._renderColorField('Background Color', cell.background_color || '', (value) => this._headerCellChanged(rowIndex, cellIndex, 'background_color', value))}
         </ha-expansion-panel>
       </div>
-    `}_renderEntityConfig(e,t){const i=this._config.columns*this._config.rows,s=Math.floor(t/this._config.columns)+1,o=t%this._config.columns+1;return t>=i?B``:B`
+    `;
+    }
+    _renderEntityConfig(entity, index) {
+        const totalCells = this._config.columns * this._config.rows;
+        const row = Math.floor(index / this._config.columns) + 1;
+        const col = (index % this._config.columns) + 1;
+        if (index >= totalCells) {
+            return b ``;
+        }
+        return b `
       <div class="entity-item">
         <div class="entity-header">
-          <strong>Cell ${t+1} (Row ${s}, Col ${o})</strong>
-          <ha-button appearance="plain" variant="danger" @click=${()=>this._removeEntity(t)}>
-            Remove<span class="visually-hidden"> cell ${t+1}</span>
+          <strong>Cell ${index + 1} (Row ${row}, Col ${col})</strong>
+          <ha-button appearance="plain" variant="danger" @click=${() => this._removeEntity(index)}>
+            Remove<span class="visually-hidden"> cell ${index + 1}</span>
           </ha-button>
         </div>
 
         <div class="entity-details">
           <ha-selector
-            .required=${!1}
+            .required=${false}
             .hass=${this.hass}
-            .selector=${{entity:{}}}
-            .value=${e.entity||""}
-            @value-changed=${e=>this._entityChanged(t,"entity",e.detail.value)}
-            .label=${"Entity (leave empty for blank cell)"}
+            .selector=${{ entity: {} }}
+            .value=${entity.entity || ''}
+            @value-changed=${(ev) => this._entityChanged(index, 'entity', ev.detail.value)}
+            .label=${'Entity (leave empty for blank cell)'}
           ></ha-selector>
 
           <ha-selector
-            .required=${!1}
+            .required=${false}
             .hass=${this.hass}
-            .label=${"Custom text (optional)"}
-            .value=${e.text||""}
-            .selector=${{text:{}}}
-            @value-changed=${e=>this._entityChanged(t,"text",e.detail.value)}
+            .label=${'Custom text (optional)'}
+            .value=${entity.text || ''}
+            .selector=${{ text: {} }}
+            @value-changed=${(ev) => this._entityChanged(index, 'text', ev.detail.value)}
           ></ha-selector>
 
           <ha-selector
-            .required=${!1}
+            .required=${false}
             .hass=${this.hass}
-            .label=${"Text template"}
-            .helper=${"Use {{ name }}, {{ state }}, {{ unit }}, {{ last_changed }} or {{ attributes.<name> }}, e.g. {{ name }}: {{ state }}"}
-            .value=${e.text_template||""}
-            .selector=${{text:{}}}
-            @value-changed=${e=>this._entityChanged(t,"text_template",e.detail.value)}
+            .label=${'Text template'}
+            .helper=${'Use {{ name }}, {{ state }}, {{ unit }}, {{ last_changed }} or {{ attributes.<name> }}, e.g. {{ name }}: {{ state }}'}
+            .value=${entity.text_template || ''}
+            .selector=${{ text: {} }}
+            @value-changed=${(ev) => this._entityChanged(index, 'text_template', ev.detail.value)}
           ></ha-selector>
 
           <ha-selector
-            .required=${!1}
+            .required=${false}
             .hass=${this.hass}
-            .label=${"Column Span"}
-            .value=${e.colspan||1}
-            .selector=${{number:{min:1,max:this._config.columns,mode:"box",step:1}}}
-            @value-changed=${e=>this._entityChanged(t,"colspan",Number(e.detail.value))}
+            .label=${'Column Span'}
+            .value=${entity.colspan || 1}
+            .selector=${{ number: { min: 1, max: this._config.columns, mode: 'box', step: 1 } }}
+            @value-changed=${(ev) => this._entityChanged(index, 'colspan', Number(ev.detail.value))}
           ></ha-selector>
 
           <ha-selector
-            .required=${!1}
+            .required=${false}
             .hass=${this.hass}
-            .selector=${{select:{options:[{value:"",label:"Center (default)"},{value:"left",label:"Left"},{value:"right",label:"Right"}]}}}
-            .value=${e.text_align||""}
-            @value-changed=${e=>this._entityChanged(t,"text_align",e.detail.value||void 0)}
-            .label=${"Text Alignment"}
+            .selector=${{
+            select: {
+                options: [
+                    { value: '', label: 'Center (default)' },
+                    { value: 'left', label: 'Left' },
+                    { value: 'right', label: 'Right' },
+                ],
+            },
+        }}
+            .value=${entity.text_align || ''}
+            @value-changed=${(ev) => this._entityChanged(index, 'text_align', ev.detail.value || undefined)}
+            .label=${'Text Alignment'}
           ></ha-selector>
 
           <ha-selector
-            .required=${!1}
+            .required=${false}
             .hass=${this.hass}
-            .selector=${{select:{options:[{value:"",label:"Auto (toggle or more-info)"},{value:"toggle",label:"Toggle"},{value:"more-info",label:"More Info"},{value:"none",label:"None"}]}}}
-            .value=${e.click_action||""}
-            @value-changed=${e=>this._entityChanged(t,"click_action",e.detail.value)}
-            .label=${"Click Action"}
+            .selector=${{
+            select: {
+                options: [
+                    { value: '', label: 'Auto (toggle or more-info)' },
+                    { value: 'toggle', label: 'Toggle' },
+                    { value: 'more-info', label: 'More Info' },
+                    { value: 'none', label: 'None' },
+                ],
+            },
+        }}
+            .value=${entity.click_action || ''}
+            @value-changed=${(ev) => this._entityChanged(index, 'click_action', ev.detail.value)}
+            .label=${'Click Action'}
           ></ha-selector>
 
           <ha-selector
-            .required=${!1}
+            .required=${false}
             .hass=${this.hass}
-            .selector=${{boolean:{}}}
-            .value=${e.show_icon??!1}
-            @value-changed=${e=>this._entityChanged(t,"show_icon",e.detail.value)}
-            .label=${"Show Icon (override global setting)"}
+            .selector=${{ boolean: {} }}
+            .value=${entity.show_icon ?? false}
+            @value-changed=${(ev) => this._entityChanged(index, 'show_icon', ev.detail.value)}
+            .label=${'Show Icon (override global setting)'}
           ></ha-selector>
 
-          <ha-expansion-panel header="Per-Entity Colors (optional)" .expanded=${!1}>
+          <ha-expansion-panel header="Per-Entity Colors (optional)" .expanded=${false}>
             <div class="color-grid">
-              ${this._renderColorField("On Color",e.colors?.on||"",e=>this._entityColorChanged(t,"on",e))}
+              ${this._renderColorField('On Color', entity.colors?.on || '', (value) => this._entityColorChanged(index, 'on', value))}
 
-              ${this._renderColorField("Off Color",e.colors?.off||"",e=>this._entityColorChanged(t,"off",e))}
+              ${this._renderColorField('Off Color', entity.colors?.off || '', (value) => this._entityColorChanged(index, 'off', value))}
 
-              ${this._renderColorField("Text Color",e.colors?.text||"",e=>this._entityColorChanged(t,"text",e))}
+              ${this._renderColorField('Text Color', entity.colors?.text || '', (value) => this._entityColorChanged(index, 'text', value))}
 
-              ${this._renderColorField("Blank Cell Color",e.colors?.blank||"",e=>this._entityColorChanged(t,"blank",e))}
+              ${this._renderColorField('Blank Cell Color', entity.colors?.blank || '', (value) => this._entityColorChanged(index, 'blank', value))}
 
               <ha-selector
-                .required=${!1}
+                .required=${false}
                 .hass=${this.hass}
-                .label=${"Dim Off Text (%)"}
-                .value=${e.dim_off_text??""}
-                .selector=${{number:{min:0,max:100,mode:"box",step:1}}}
-                @value-changed=${e=>this._entityChanged(t,"dim_off_text",""!==e.detail.value&&void 0!==e.detail.value?Number(e.detail.value):void 0)}
+                .label=${'Dim Off Text (%)'}
+                .value=${entity.dim_off_text ?? ''}
+                .selector=${{ number: { min: 0, max: 100, mode: 'box', step: 1 } }}
+                @value-changed=${(ev) => this._entityChanged(index, 'dim_off_text', ev.detail.value !== '' && ev.detail.value !== undefined ? Number(ev.detail.value) : undefined)}
               ></ha-selector>
 
               <ha-selector
-                .required=${!1}
+                .required=${false}
                 .hass=${this.hass}
-                .label=${"Decimals"}
-                .value=${e.decimals??""}
-                .selector=${{number:{min:0,max:10,mode:"box",step:1}}}
-                @value-changed=${e=>this._entityChanged(t,"decimals",""!==e.detail.value&&void 0!==e.detail.value?Number(e.detail.value):void 0)}
+                .label=${'Decimals'}
+                .value=${entity.decimals ?? ''}
+                .selector=${{ number: { min: 0, max: 10, mode: 'box', step: 1 } }}
+                @value-changed=${(ev) => this._entityChanged(index, 'decimals', ev.detail.value !== '' && ev.detail.value !== undefined ? Number(ev.detail.value) : undefined)}
               ></ha-selector>
             </div>
           </ha-expansion-panel>
 
-          <ha-expansion-panel header="Custom Icons (optional)" .expanded=${!1}>
+          <ha-expansion-panel header="Custom Icons (optional)" .expanded=${false}>
             <ha-selector
-              .required=${!1}
+              .required=${false}
               .hass=${this.hass}
-              .selector=${{icon:{}}}
-              .value=${e.icon?.on||""}
-              @value-changed=${e=>this._entityIconChanged(t,"on",e.detail.value)}
-              .label=${"On Icon"}
+              .selector=${{ icon: {} }}
+              .value=${entity.icon?.on || ''}
+              @value-changed=${(ev) => this._entityIconChanged(index, 'on', ev.detail.value)}
+              .label=${'On Icon'}
             ></ha-selector>
 
             <ha-selector
-              .required=${!1}
+              .required=${false}
               .hass=${this.hass}
-              .selector=${{icon:{}}}
-              .value=${e.icon?.off||""}
-              @value-changed=${e=>this._entityIconChanged(t,"off",e.detail.value)}
-              .label=${"Off Icon"}
+              .selector=${{ icon: {} }}
+              .value=${entity.icon?.off || ''}
+              @value-changed=${(ev) => this._entityIconChanged(index, 'off', ev.detail.value)}
+              .label=${'Off Icon'}
             ></ha-selector>
           </ha-expansion-panel>
         </div>
       </div>
-    `}};e([ue({attribute:!1})],ye.prototype,"hass",void 0),e([ge()],ye.prototype,"_config",void 0),ye=e([ce("indicator-grid-card-editor")],ye);var xe=Object.freeze({__proto__:null,get IndicatorGridCardEditor(){return ye}});export{be as IndicatorGridCard};
+    `;
+    }
+};
+__decorate([
+    n({ attribute: false })
+], IndicatorGridCardEditor.prototype, "hass", void 0);
+__decorate([
+    r()
+], IndicatorGridCardEditor.prototype, "_config", void 0);
+IndicatorGridCardEditor = __decorate([
+    t('indicator-grid-card-editor')
+], IndicatorGridCardEditor);
+
+var editor = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    get IndicatorGridCardEditor () { return IndicatorGridCardEditor; }
+});
+
+export { IndicatorGridCard };
 //# sourceMappingURL=indicator-grid-card.js.map
