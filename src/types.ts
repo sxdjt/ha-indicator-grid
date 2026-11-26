@@ -13,7 +13,7 @@ export interface IndicatorGridCardConfig extends LovelaceCardConfig {
   dim_off_text?: number; // Opacity percentage (0-100) for text when entity is off, e.g., 50
   decimals?: number; // Number of decimal places for numeric states (0-10), e.g., 2
   show_icons?: boolean; // Enable/disable icons globally (default false)
-  icon_placement?: 'none' | 'above' | 'below' | 'left' | 'right'; // Global icon placement
+  icon_placement?: 'above' | 'below' | 'left' | 'right'; // Global icon placement (use show_icons: false to hide icons)
   icon_size?: string | number; // Icon size, e.g., "24px", 24 (auto-converts to px)
   entities: EntityConfig[];
   global_colors?: ColorConfig;
