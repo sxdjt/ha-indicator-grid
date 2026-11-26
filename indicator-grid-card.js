@@ -1190,6 +1190,7 @@ IndicatorGridCard = __decorate([
     t('indicator-grid-card')
 ], IndicatorGridCard);
 
+const THRESHOLD_OPERATORS = ['<=', '<', '>=', '>', '=='];
 let IndicatorGridCardEditor = class IndicatorGridCardEditor extends i {
     setConfig(config) {
         this._config = config;
@@ -1353,8 +1354,208 @@ let IndicatorGridCardEditor = class IndicatorGridCardEditor extends i {
         newConfig.header_rows[rowIndex] = headerRow;
         fireEvent(this, 'config-changed', { config: newConfig });
     }
+    // --- Thresholds and state colors (global_colors or an entity's colors) ---
+    _colorsFor(scope) {
+        return scope === 'global'
+            ? this._config.global_colors || {}
+            : this._config.entities?.[scope]?.colors || {};
+    }
+    // Write a ColorConfig back to its scope. Empty threshold lists and state maps are
+    // removed rather than stored empty, and so is an entity colors object left empty.
+    _setColors(scope, colors) {
+        const cleaned = { ...colors };
+        if (cleaned.thresholds && cleaned.thresholds.length === 0)
+            delete cleaned.thresholds;
+        if (cleaned.states && Object.keys(cleaned.states).length === 0)
+            delete cleaned.states;
+        const newConfig = { ...this._config };
+        if (scope === 'global') {
+            newConfig.global_colors = cleaned;
+        }
+        else {
+            newConfig.entities = [...newConfig.entities];
+            const entity = { ...newConfig.entities[scope], colors: cleaned };
+            if (Object.keys(cleaned).length === 0)
+                delete entity.colors;
+            newConfig.entities[scope] = entity;
+        }
+        fireEvent(this, 'config-changed', { config: newConfig });
+    }
+    _addThreshold(scope) {
+        const colors = this._colorsFor(scope);
+        this._setColors(scope, { ...colors, thresholds: [...(colors.thresholds || []), { value: 0, color: '#cccccc' }] });
+    }
+    _removeThreshold(scope, index) {
+        const colors = this._colorsFor(scope);
+        const thresholds = [...(colors.thresholds || [])];
+        thresholds.splice(index, 1);
+        this._setColors(scope, { ...colors, thresholds });
+        this._focusControl(`add-threshold-${scope}`);
+    }
+    // An empty value removes the key: '' for the optional text color / font weight, and
+    // for value and color too (the card then never matches the row, as with YAML)
+    _thresholdChanged(scope, index, key, value) {
+        const colors = this._colorsFor(scope);
+        const thresholds = [...(colors.thresholds || [])];
+        const row = { ...thresholds[index] };
+        if (value === '') {
+            delete row[key];
+        }
+        else {
+            row[key] = key === 'value' ? Number(value) : value;
+        }
+        // '<=' is the card's default operator, so it is not stored
+        if (key === 'operator' && value === '<=')
+            delete row.operator;
+        thresholds[index] = row;
+        this._setColors(scope, { ...colors, thresholds });
+    }
+    _addStateColor(scope) {
+        const colors = this._colorsFor(scope);
+        this._setColors(scope, { ...colors, states: { ...(colors.states || {}), '': '#cccccc' } });
+    }
+    _removeStateColor(scope, index) {
+        const colors = this._colorsFor(scope);
+        const entries = Object.entries(colors.states || {});
+        entries.splice(index, 1);
+        this._setColors(scope, { ...colors, states: Object.fromEntries(entries) });
+        this._focusControl(`add-state-color-${scope}`);
+    }
+    _stateColorChanged(scope, index, key, value) {
+        const colors = this._colorsFor(scope);
+        const entries = Object.entries(colors.states || {});
+        entries[index] = key === 'state' ? [value, entries[index][1]] : [entries[index][0], value];
+        this._setColors(scope, { ...colors, states: Object.fromEntries(entries) });
+    }
+    // Compact row color input with an accessible name and an inline error. A raw <input>
+    // lives in this shadow root, so aria-describedby reaches it (guide A7).
+    _renderRowColor(value, label, errorId, onChange) {
+        const invalid = !!value && !CSS.supports('color', value);
+        return b `
+      <div class="row-field">
+        <input
+          type="text"
+          class="row-input"
+          aria-label=${label}
+          aria-invalid=${invalid ? 'true' : 'false'}
+          aria-describedby=${invalid ? errorId : A}
+          .value=${value}
+          @change=${(ev) => onChange(ev.target.value)}
+        >
+        ${invalid ? b `<p id=${errorId} class="error-text"><ha-icon icon="mdi:alert-circle" aria-hidden="true"></ha-icon><span><strong>Error:</strong> ${label} is not a valid color. Use a hex code (#FF0000), a color name (red), or var(--token).</span></p>` : A}
+      </div>
+    `;
+    }
+    _renderThresholds(scope) {
+        const thresholds = this._colorsFor(scope).thresholds || [];
+        const prefix = scope === 'global' ? 'Global threshold' : `Cell ${scope + 1} threshold`;
+        return b `
+      <div class="rows-section">
+        <h4>Thresholds</h4>
+        <p class="helper-text">
+          For numeric states. Each row: value, operator (default &lt;=), fill color, and optional text color and font weight.
+          &gt; and &gt;= rows are checked highest value first, then &lt; and &lt;= rows lowest first, then ==.
+          ${scope === 'global' ? 'Applies to every entity without its own thresholds.' : 'Checked before the global thresholds.'}
+        </p>
+        ${thresholds.map((threshold, index) => {
+            const label = `${prefix} ${index + 1}`;
+            const id = `threshold-${scope}-${index}`;
+            return b `
+            <div class="row-item">
+              <input type="number" class="row-input row-value" aria-label="${label} value"
+                .value=${threshold.value === undefined ? '' : String(threshold.value)}
+                @change=${(ev) => this._thresholdChanged(scope, index, 'value', ev.target.value)}>
+              <select class="row-input row-operator" aria-label="${label} operator"
+                @change=${(ev) => this._thresholdChanged(scope, index, 'operator', ev.target.value)}>
+                ${THRESHOLD_OPERATORS.map(op => b `<option value=${op} ?selected=${(threshold.operator ?? '<=').trim() === op}>${op}</option>`)}
+              </select>
+              ${this._renderRowColor(threshold.color || '', `${label} color`, `${id}-color`, (value) => this._thresholdChanged(scope, index, 'color', value))}
+              ${this._renderRowColor(threshold.text_color || '', `${label} text color`, `${id}-text`, (value) => this._thresholdChanged(scope, index, 'text_color', value))}
+              <input type="text" class="row-input row-weight" aria-label="${label} font weight" placeholder="weight"
+                .value=${threshold.font_weight === undefined ? '' : String(threshold.font_weight)}
+                @change=${(ev) => this._thresholdChanged(scope, index, 'font_weight', ev.target.value)}>
+              <ha-button appearance="plain" variant="danger" @click=${() => this._removeThreshold(scope, index)}>
+                Remove<span class="visually-hidden"> ${label.toLowerCase()}</span>
+              </ha-button>
+            </div>
+          `;
+        })}
+        <ha-button appearance="plain" data-focus-key="add-threshold-${scope}" @click=${() => this._addThreshold(scope)}>
+          Add Threshold${scope === 'global' ? A : b `<span class="visually-hidden"> to cell ${scope + 1}</span>`}
+        </ha-button>
+      </div>
+    `;
+    }
+    _renderStateColors(scope) {
+        const entries = Object.entries(this._colorsFor(scope).states || {});
+        const prefix = scope === 'global' ? 'Global state' : `Cell ${scope + 1} state`;
+        return b `
+      <div class="rows-section">
+        <h4>State Colors</h4>
+        <p class="helper-text">
+          Fill color for an exact state (e.g. home, heat). Checked before thresholds and on/off colors.
+        </p>
+        ${entries.map(([stateName, color], index) => {
+            const label = `${prefix} ${index + 1}`;
+            return b `
+            <div class="row-item">
+              <input type="text" class="row-input" aria-label="${label} name" placeholder="state, e.g. home"
+                .value=${stateName}
+                @change=${(ev) => this._stateColorChanged(scope, index, 'state', ev.target.value)}>
+              ${this._renderRowColor(color, `${label} color`, `state-${scope}-${index}-color`, (value) => this._stateColorChanged(scope, index, 'color', value))}
+              <ha-button appearance="plain" variant="danger" @click=${() => this._removeStateColor(scope, index)}>
+                Remove<span class="visually-hidden"> ${label.toLowerCase()}</span>
+              </ha-button>
+            </div>
+          `;
+        })}
+        <ha-button appearance="plain" data-focus-key="add-state-color-${scope}" @click=${() => this._addStateColor(scope)}>
+          Add State Color${scope === 'global' ? A : b `<span class="visually-hidden"> to cell ${scope + 1}</span>`}
+        </ha-button>
+      </div>
+    `;
+    }
     static get styles() {
         return i$3 `
+      .rows-section {
+        margin-top: 12px;
+      }
+
+      .rows-section h4 {
+        margin: 8px 0 4px;
+      }
+
+      .helper-text {
+        font-size: 12px;
+        color: var(--secondary-text-color);
+        margin: 0 0 8px;
+      }
+
+      /* Wrapping row so fields keep a usable width at phone size */
+      .row-item {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: flex-start;
+        margin-bottom: 8px;
+      }
+
+      .row-item > .row-value { flex: 0 1 90px; }
+      .row-item > .row-operator { flex: 0 0 64px; }
+      .row-item > .row-weight { flex: 0 1 90px; }
+      .row-item > .row-field { flex: 1 1 120px; min-width: 0; }
+      .row-item > input[type='text']:not(.row-weight) { flex: 1 1 120px; }
+
+      /* Guide Part 4: borders >= 3:1, red border when invalid */
+      .row-input {
+        width: 100%; box-sizing: border-box; min-width: 0;
+        padding: 4px 8px; font-size: 14px; border-radius: 4px;
+        border: 1px solid var(--secondary-text-color, #727272);
+        background: var(--card-background-color, #fff); color: var(--primary-text-color);
+      }
+
+      .row-input[aria-invalid='true'] { border: 2px solid var(--error-color, #db4437); }
+
       ha-selector {
         display: block;
         margin-bottom: 8px;
@@ -1604,6 +1805,9 @@ let IndicatorGridCardEditor = class IndicatorGridCardEditor extends i {
         ${this._renderColorField('Text Color', this._config.global_colors?.text || '', (value) => this._globalColorChanged('text', value), 'Leave empty for black or white, whichever contrasts more with each cell')}
 
         ${this._renderColorField('Blank Cell Color', this._config.global_colors?.blank || '#333333', (value) => this._globalColorChanged('blank', value))}
+
+        ${this._renderStateColors('global')}
+        ${this._renderThresholds('global')}
       </ha-expansion-panel>
 
       <div style="margin-top: 16px;">
@@ -1897,6 +2101,8 @@ let IndicatorGridCardEditor = class IndicatorGridCardEditor extends i {
                 @value-changed=${(ev) => this._entityChanged(index, 'decimals', ev.detail.value !== '' && ev.detail.value !== undefined ? Number(ev.detail.value) : undefined)}
               ></ha-selector>
             </div>
+            ${this._renderStateColors(index)}
+            ${this._renderThresholds(index)}
           </ha-expansion-panel>
 
           <ha-expansion-panel header="Custom Icons (optional)" .expanded=${false}>

@@ -8,6 +8,7 @@ and this project uses [CalVer](https://calver.org/) (`YYYY.M.D`) versioning (Sem
 ## [Unreleased]
 
 ### Added
+- Visual editor: thresholds and state colors, globally (Global Colors) and per entity (Per-Entity Colors). Threshold rows set value, operator, fill color, text color and font weight; state color rows map an exact state to a fill color. Both were YAML-only.
 - Visual editor: per-entity Unavailable Color (`colors.unavailable`), which the card supported but only YAML could set.
 
 ### Fixed

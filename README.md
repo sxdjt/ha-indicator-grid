@@ -25,6 +25,7 @@ A Home Assistant Lovelace card that displays a customizable grid of indicator li
 - **Custom State Mapping**: Map specific states to specific colors
 - **Icon Support**: Display entity icons with configurable size and placement (above, below, left, right)
 - **Global & Per-Entity Settings**: Set defaults globally and override per entity
+- **Visual Editor**: Every option, including thresholds and state colors, can be set without YAML
 
 ## Installation
 

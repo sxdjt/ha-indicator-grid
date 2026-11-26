@@ -39,6 +39,11 @@ afterEach(() => { document.body.innerHTML = ''; });
 async function mountEditor(config: any, hass: any = { states: {} }): Promise<any> {
   const el: any = document.createElement('indicator-grid-card-editor');
   el.changes = [];
+  // ha-button is not defined here, so it cannot take focus; record what the editor
+  // asks to focus instead (the real element is focusable)
+  el.focused = [];
+  const focusControl = el._focusControl.bind(el);
+  el._focusControl = (key: string) => { el.focused.push(key); focusControl(key); };
   el.addEventListener('config-changed', (e: any) => el.changes.push(e.detail.config));
   el.hass = hass;
   el.setConfig(config);
@@ -102,5 +107,105 @@ describe('review sweep findings', () => {
     assert.equal(last(el).entities[0].show_icon, true);
     fire(byLabel(el, 'Show Icon'), 'hide');
     assert.equal(last(el).entities[0].show_icon, false);
+  });
+});
+
+const control = (el: any, label: string) => el.shadowRoot.querySelector(`[aria-label="${label}"]`);
+const setInput = (el: any, label: string, value: string) => {
+  const input = control(el, label);
+  input.value = value;
+  input.dispatchEvent(new (globalThis as any).Event('change'));
+};
+const button = (el: any, text: string) =>
+  [...el.shadowRoot.querySelectorAll('ha-button')].find((b: any) => b.textContent.replace(/\s+/g, ' ').trim() === text);
+const rerender = async (el: any) => { el.setConfig(last(el)); await el.updateComplete; };
+
+describe('thresholds editor', () => {
+  test('global: add, edit every field, default operator not stored, remove', async () => {
+    const el = await mountEditor({ columns: 1, rows: 1, entities: [] });
+    button(el, 'Add Threshold').click();
+    assert.deepEqual(last(el).global_colors.thresholds, [{ value: 0, color: '#cccccc' }]);
+    await rerender(el);
+    setInput(el, 'Global threshold 1 value', '30');
+    await rerender(el);
+    setInput(el, 'Global threshold 1 operator', '>');
+    await rerender(el);
+    setInput(el, 'Global threshold 1 color', 'red');
+    await rerender(el);
+    setInput(el, 'Global threshold 1 text color', 'white');
+    await rerender(el);
+    setInput(el, 'Global threshold 1 font weight', '700');
+    assert.deepEqual(last(el).global_colors.thresholds, [{ value: 30, operator: '>', color: 'red', text_color: 'white', font_weight: '700' }]);
+    await rerender(el);
+    setInput(el, 'Global threshold 1 operator', '<=');
+    await rerender(el);
+    setInput(el, 'Global threshold 1 text color', '');
+    assert.deepEqual(last(el).global_colors.thresholds, [{ value: 30, color: 'red', font_weight: '700' }]);
+    await rerender(el);
+    button(el, 'Remove global threshold 1').click();
+    assert.equal('thresholds' in last(el).global_colors, false);
+    assert.equal(el.focused.at(-1), 'add-threshold-global');
+  });
+
+  test('rows show their config; an invalid color is flagged in text', async () => {
+    const el = await mountEditor({ columns: 1, rows: 1, entities: [], global_colors: { thresholds: [{ value: 5, color: 'nope', operator: ' >= ', font_weight: 600 }] } });
+    assert.equal(control(el, 'Global threshold 1 value').value, '5');
+    assert.equal(control(el, 'Global threshold 1 operator').value, '>=');
+    assert.equal(control(el, 'Global threshold 1 font weight').value, '600');
+    const color = control(el, 'Global threshold 1 color');
+    assert.equal(color.getAttribute('aria-invalid'), 'true');
+    const error = el.shadowRoot.getElementById(color.getAttribute('aria-describedby'));
+    assert.match(error.textContent, /Error: Global threshold 1 color is not a valid color/);
+    assert.equal(control(el, 'Global threshold 1 text color').getAttribute('aria-invalid'), 'false');
+  });
+
+  test('a cleared value is removed; a row without value shows empty', async () => {
+    const el = await mountEditor({ columns: 1, rows: 1, entities: [], global_colors: { thresholds: [{ value: 5, color: 'red' }, { color: 'blue' }] } });
+    assert.equal(control(el, 'Global threshold 2 value').value, '');
+    setInput(el, 'Global threshold 1 value', '');
+    assert.deepEqual(last(el).global_colors.thresholds[0], { color: 'red' });
+  });
+
+  test('per entity: rows are named by cell and stored in that entity colors', async () => {
+    const el = await mountEditor({ columns: 2, rows: 1, entities: [{ entity: 'sensor.a' }, { entity: 'sensor.b', colors: { on: 'green' } }] });
+    button(el, 'Add Threshold to cell 2').click();
+    assert.deepEqual(last(el).entities[1].colors, { on: 'green', thresholds: [{ value: 0, color: '#cccccc' }] });
+    await rerender(el);
+    assert.ok(control(el, 'Cell 2 threshold 1 value'), 'per-entity rows carry the cell number');
+    button(el, 'Remove cell 2 threshold 1').click();
+    assert.deepEqual(last(el).entities[1].colors, { on: 'green' });
+    assert.equal(el.focused.at(-1), 'add-threshold-1');
+  });
+
+  test('removing the last per-entity color setting removes colors', async () => {
+    const el = await mountEditor({ columns: 1, rows: 1, entities: [{ entity: 'sensor.a', colors: { thresholds: [{ value: 1, color: 'red' }] } }] });
+    button(el, 'Remove cell 1 threshold 1').click();
+    assert.equal('colors' in last(el).entities[0], false);
+  });
+});
+
+describe('state colors editor', () => {
+  test('global: add, rename, recolor, remove', async () => {
+    const el = await mountEditor({ columns: 1, rows: 1, entities: [] });
+    button(el, 'Add State Color').click();
+    assert.deepEqual(last(el).global_colors.states, { '': '#cccccc' });
+    await rerender(el);
+    setInput(el, 'Global state 1 name', 'home');
+    await rerender(el);
+    setInput(el, 'Global state 1 color', 'green');
+    assert.deepEqual(last(el).global_colors.states, { home: 'green' });
+    await rerender(el);
+    button(el, 'Remove global state 1').click();
+    assert.equal('states' in last(el).global_colors, false);
+    assert.equal(el.focused.at(-1), 'add-state-color-global');
+  });
+
+  test('per entity: rows keep their order and cell-numbered names', async () => {
+    const el = await mountEditor({ columns: 1, rows: 1, entities: [{ entity: 'person.a', colors: { states: { home: 'green', away: 'red' } } }] });
+    assert.equal(control(el, 'Cell 1 state 2 name').value, 'away');
+    setInput(el, 'Cell 1 state 1 color', 'blue');
+    assert.deepEqual(last(el).entities[0].colors.states, { home: 'blue', away: 'red' });
+    button(el, 'Add State Color to cell 1').click();
+    assert.deepEqual(Object.keys(last(el).entities[0].colors.states), ['home', 'away', '']);
   });
 });
