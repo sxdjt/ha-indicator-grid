@@ -782,7 +782,7 @@ describe('review sweep findings', () => {
   });
 
   // G3 (B7): parseFloat reads the leading number of any string
-  test('timestamps, IP addresses and versions are not numeric', { todo: "parseFloat('192.168.1.1') is 192.168, so decimals and thresholds apply" }, () => {
+  test('timestamps, IP addresses and versions are not numeric', () => {
     const card = makeCard({ decimals: 1, global_colors: { thresholds: [{ value: 100000, color: 'red' }] } });
     for (const state of ['192.168.1.1', '2026-11-25T10:00:00+00:00', '2026.11.3']) {
       const s = stateObj('sensor.x', state, { friendly_name: 'X' });

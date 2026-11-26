@@ -268,6 +268,14 @@ let IndicatorGridCard = class IndicatorGridCard extends i {
         // If it's just digits (with optional decimal), append "px"
         return /^\d+(\.\d+)?$/.test(str) ? `${str}px` : str;
     }
+    // A state is numeric only when the whole string is a number. parseFloat reads the
+    // leading number of any string, so '192.168.1.1', '2026.11.3' and timestamps got
+    // decimals formatting and threshold colors.
+    _toNumber(state) {
+        if (typeof state !== 'string' || state.trim() === '')
+            return NaN;
+        return Number(state);
+    }
     static async getConfigElement() {
         await Promise.resolve().then(function () { return editor; });
         return document.createElement('indicator-grid-card-editor');
@@ -441,7 +449,7 @@ let IndicatorGridCard = class IndicatorGridCard extends i {
         // Check for threshold styles (text_color and font_weight)
         let textColor = this._getTextColor(entityConfig.colors, backgroundColor);
         let fontWeight = undefined;
-        const numericState = parseFloat(state);
+        const numericState = this._toNumber(state);
         if (!isNaN(numericState)) {
             const thresholdStyles = this._getThresholdStyles(numericState, entityConfig.colors) ||
                 this._getThresholdStyles(numericState, this.config.global_colors);
@@ -485,7 +493,7 @@ let IndicatorGridCard = class IndicatorGridCard extends i {
         const formattedState = this._formatNumericState(stateObj.state, entityConfig);
         // Default display: if decimals configured and state is numeric, show formatted number
         // Otherwise show friendly name (existing behavior)
-        const parsedState = parseFloat(stateObj.state);
+        const parsedState = this._toNumber(stateObj.state);
         const hasDecimalsConfig = entityConfig.decimals !== undefined || this.config.decimals !== undefined;
         if (!isNaN(parsedState) && hasDecimalsConfig) {
             return formattedState;
@@ -620,7 +628,7 @@ let IndicatorGridCard = class IndicatorGridCard extends i {
             return this.config.global_colors.states[state];
         }
         // Check for numeric thresholds
-        const numericState = parseFloat(state);
+        const numericState = this._toNumber(state);
         if (!isNaN(numericState)) {
             const thresholdStyles = this._getThresholdStyles(numericState, colors) ||
                 this._getThresholdStyles(numericState, this.config.global_colors);
@@ -770,7 +778,7 @@ let IndicatorGridCard = class IndicatorGridCard extends i {
     }
     _formatNumericState(state, entityConfig) {
         // Try to parse the state as a number
-        const numericState = parseFloat(state);
+        const numericState = this._toNumber(state);
         // If not numeric, return original state as-is
         if (isNaN(numericState)) {
             return state;
