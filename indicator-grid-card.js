@@ -1242,10 +1242,12 @@ let IndicatorGridCardEditor = class IndicatorGridCardEditor extends i {
     _entityChanged(index, key, value) {
         const newConfig = { ...this._config };
         newConfig.entities = [...newConfig.entities];
-        newConfig.entities[index] = {
-            ...newConfig.entities[index],
-            [key]: value,
-        };
+        const entity = { ...newConfig.entities[index], [key]: value };
+        // An unset option is removed, not stored as undefined, so the card's own default
+        // (or the global setting) applies
+        if (value === undefined)
+            delete entity[key];
+        newConfig.entities[index] = entity;
         fireEvent(this, 'config-changed', { config: newConfig });
     }
     _entityColorChanged(index, colorType, value) {
@@ -1615,7 +1617,10 @@ let IndicatorGridCardEditor = class IndicatorGridCardEditor extends i {
 
       <div style="margin-top: 16px;">
         <h3>Entities</h3>
-        ${(this._config.entities || []).map((entity, index) => this._renderEntityConfig(entity, index))}
+        ${(() => {
+            const positions = this._entityPositions();
+            return (this._config.entities || []).map((entity, index) => this._renderEntityConfig(entity, index, positions[index]));
+        })()}
 
         <ha-button data-focus-key="add-entity" @click=${this._addEntity}>
           Add Entity
@@ -1738,17 +1743,35 @@ let IndicatorGridCardEditor = class IndicatorGridCardEditor extends i {
       </div>
     `;
     }
-    _renderEntityConfig(entity, index) {
-        const totalCells = this._config.columns * this._config.rows;
-        const row = Math.floor(index / this._config.columns) + 1;
-        const col = (index % this._config.columns) + 1;
-        if (index >= totalCells) {
-            return b ``;
+    // Grid position of each entity, laid out the way the card does it: header rows are
+    // skipped and colspan uses up columns. null for an entity that does not fit.
+    _entityPositions() {
+        const columns = this._config.columns || 3;
+        const rows = this._config.rows || 2;
+        const headerRows = new Set((this._config.header_rows || []).map(hr => hr.row_index));
+        const entities = this._config.entities || [];
+        const positions = entities.map(() => null);
+        let next = 0;
+        for (let row = 0; row < rows && next < entities.length; row++) {
+            if (headerRows.has(row))
+                continue;
+            let col = 0;
+            while (col < columns && next < entities.length) {
+                positions[next] = { row: row + 1, col: col + 1 };
+                col += entities[next]?.colspan || 1;
+                next++;
+            }
         }
+        return positions;
+    }
+    _renderEntityConfig(entity, index, position) {
+        // Every entity gets a panel, including ones past the last row, so they can be
+        // edited or removed; the heading says where each cell lands
+        const where = position ? `Row ${position.row}, Col ${position.col}` : 'not shown: past the last row';
         return b `
       <div class="entity-item">
         <div class="entity-header">
-          <strong>Cell ${index + 1} (Row ${row}, Col ${col})</strong>
+          <strong>Cell ${index + 1} (${where})</strong>
           <ha-button appearance="plain" variant="danger" @click=${() => this._removeEntity(index)}>
             Remove<span class="visually-hidden"> cell ${index + 1}</span>
           </ha-button>
@@ -1830,10 +1853,18 @@ let IndicatorGridCardEditor = class IndicatorGridCardEditor extends i {
           <ha-selector
             .required=${false}
             .hass=${this.hass}
-            .selector=${{ boolean: {} }}
-            .value=${entity.show_icon ?? false}
-            @value-changed=${(ev) => this._entityChanged(index, 'show_icon', ev.detail.value)}
-            .label=${'Show Icon (override global setting)'}
+            .selector=${{
+            select: {
+                options: [
+                    { value: 'default', label: 'Default (use global Show Icons)' },
+                    { value: 'show', label: 'Show' },
+                    { value: 'hide', label: 'Hide' },
+                ],
+            },
+        }}
+            .value=${entity.show_icon === undefined ? 'default' : entity.show_icon ? 'show' : 'hide'}
+            @value-changed=${(ev) => this._entityChanged(index, 'show_icon', ev.detail.value === 'show' ? true : ev.detail.value === 'hide' ? false : undefined)}
+            .label=${'Show Icon'}
           ></ha-selector>
 
           <ha-expansion-panel header="Per-Entity Colors (optional)" .expanded=${false}>

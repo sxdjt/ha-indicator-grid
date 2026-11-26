@@ -8,6 +8,8 @@ and this project uses [CalVer](https://calver.org/) (`YYYY.M.D`) versioning (Sem
 ## [Unreleased]
 
 ### Fixed
+- Visual editor: per-entity Show Icon is Default / Show / Hide. The switch showed an unset value as off and could only store on or off, so an entity could not go back to following the global Show Icons setting.
+- Visual editor: every entity has a panel. Entities past rows x columns were hidden, so they could not be edited or removed. Panel headings give each cell's real row and column, counting header rows and column spans.
 - A config without `entities` shows an empty grid instead of breaking the card.
 - A header row without `cells`, or a header cell without `text`, no longer breaks the card. The row is skipped or the cell is blank.
 - A quoted threshold value (`value: '50'`) matches the `==` operator. The other operators already converted it to a number.

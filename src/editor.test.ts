@@ -63,7 +63,7 @@ describe('editor basics', () => {
 
 describe('review sweep findings', () => {
   // E1 (B6/B8): per-entity show_icon is tri-state in the card (unset inherits)
-  test('per-entity Show Icon can return to the global setting', { todo: 'boolean switch shows unset as off and can only write true/false' }, async () => {
+  test('per-entity Show Icon can return to the global setting', async () => {
     const el = await mountEditor({ columns: 1, rows: 1, show_icons: true, entities: [{ entity: 'light.a', show_icon: false }] });
     const control = byLabel(el, 'Show Icon');
     assert.ok(control, 'expected a Show Icon select (Default / Show / Hide)');
@@ -72,8 +72,27 @@ describe('review sweep findings', () => {
   });
 
   // E10 (B6): entities beyond rows x columns are in the config but not in the editor
-  test('every configured entity has a panel', { todo: 'entities past rows*columns are not rendered, so they cannot be removed' }, async () => {
+  test('every configured entity has a panel', async () => {
     const el = await mountEditor({ columns: 1, rows: 1, entities: [{ entity: 'light.a' }, { entity: 'light.b' }] });
     assert.equal(selectors(el).filter((s: any) => s.label === 'Entity (leave empty for blank cell)').length, 2);
+    const headings = [...el.shadowRoot.querySelectorAll('.entity-header strong')].map((h: any) => h.textContent.trim());
+    assert.deepEqual(headings.slice(-2), ['Cell 1 (Row 1, Col 1)', 'Cell 2 (not shown: past the last row)']);
+  });
+
+  test('headings count header rows and column spans', async () => {
+    const el = await mountEditor({ columns: 2, rows: 3, header_rows: [{ row_index: 0, cells: [{ text: 'H' }] }],
+      entities: [{ entity: 'a.a', colspan: 2 }, { entity: 'a.b' }, { entity: 'a.c' }] });
+    const headings = [...el.shadowRoot.querySelectorAll('.entity-item > .entity-header strong')].map((h: any) => h.textContent.trim())
+      .filter((t: string) => t.startsWith('Cell'));
+    assert.deepEqual(headings.filter((t: string) => /\(Row|not shown/.test(t)), ['Cell 1 (Row 2, Col 1)', 'Cell 2 (Row 3, Col 1)', 'Cell 3 (Row 3, Col 2)']);
+  });
+
+  test('Show Icon: Show and Hide store true and false', async () => {
+    const el = await mountEditor({ columns: 1, rows: 1, entities: [{ entity: 'light.a' }] });
+    assert.equal(byLabel(el, 'Show Icon').value, 'default');
+    fire(byLabel(el, 'Show Icon'), 'show');
+    assert.equal(last(el).entities[0].show_icon, true);
+    fire(byLabel(el, 'Show Icon'), 'hide');
+    assert.equal(last(el).entities[0].show_icon, false);
   });
 });
