@@ -1058,10 +1058,12 @@ let IndicatorGridCard = class IndicatorGridCard extends i {
         if (!this.config || !this.hass) {
             return b ``;
         }
-        // If cell_width is blank/empty, use 1fr for auto-sizing
+        // If cell_width is blank/empty, use 1fr for auto-sizing. A fixed cell_width is the most
+        // a column takes: ha-card is overflow: visible, so columns x cell_width wider than the
+        // slot drew over the next card (guide D7)
         const cellWidthNormalized = this._normalizeSize(this.config.cell_width, '');
         const columnSize = cellWidthNormalized && cellWidthNormalized.trim() !== ''
-            ? cellWidthNormalized
+            ? `minmax(0, ${cellWidthNormalized})`
             : '1fr';
         const cellHeightNormalized = this._normalizeSize(this.config.cell_height, '100px');
         const cellGapNormalized = this._normalizeSize(this.config.cell_gap, '5px');

@@ -154,7 +154,7 @@ describe('rendered cells', () => {
     const el = await mount({ columns: 1, rows: 1, cell_width: 80, dim_off_text: 50, global_colors: { text: '#ffffff' },
       entities: [{ entity: 'light.a', text_align: 'justify' }] }, hass);
     const grid = el.shadowRoot.querySelector('.grid-container').getAttribute('style');
-    assert.match(grid, /repeat\(1, 80px\)/);
+    assert.match(grid, /repeat\(1, minmax\(0, 80px\)\)/);
     assert.match(styleOf(el), /color: rgba\(255, 255, 255, 0\.5\)/);
     assert.match(styleOf(el), /justify-content: center/);
     el.shadowRoot.querySelector('.cell').click();
@@ -187,5 +187,17 @@ describe('thresholds through the card bundle', () => {
     ];
     assert.deepEqual([95, 70, 5, 15, 25, 45, 50].map((v) => color(v, bands)), ['gt80', 'ge60', 'lt10', 'le20', 'le30', 'eq45', null]);
     assert.equal(color(5, [{ value: 10, color: 'x', operator: '!=' }]), null);
+  });
+});
+
+// Guide D7 (2026-11-26, checked on the ha-test Variety page): the card must stay inside its slot
+describe('layout stays inside the card (D7)', () => {
+  test('fixed cell widths shrink when the columns do not fit the card', async () => {
+    // ha-card is overflow: visible, so 4 x 100px cells in a 250px slot drew over the next card.
+    // cell_width is now the most a column takes; the default 1fr columns are unchanged
+    const el = await mount({ columns: 4, rows: 1, cell_width: 100, entities: [] });
+    assert.match(el.shadowRoot.querySelector('.grid-container').getAttribute('style'), /repeat\(4, minmax\(0, 100px\)\)/);
+    const auto = await mount({ columns: 3, rows: 1, entities: [] });
+    assert.match(auto.shadowRoot.querySelector('.grid-container').getAttribute('style'), /repeat\(3, 1fr\)/);
   });
 });
