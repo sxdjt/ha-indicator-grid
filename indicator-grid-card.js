@@ -158,8 +158,9 @@ function normalizeOperator(threshold) {
     return (threshold.operator ?? DEFAULT_OPERATOR).trim();
 }
 /**
- * Tests whether `value` satisfies a single threshold's comparison.
- * An unrecognized operator never matches.
+ * Tests whether `value` satisfies a single threshold's comparison. Only thresholds with
+ * a known operator reach this (evaluateThresholds groups them by operator first), so an
+ * unrecognized operator never gets here and never matches.
  */
 function matchesThreshold(value, threshold) {
     // YAML `value: '50'` is a string. The relational operators coerce it, but '==' used
@@ -174,10 +175,8 @@ function matchesThreshold(value, threshold) {
             return value > limit;
         case '>=':
             return value >= limit;
-        case '==':
+        default: // '=='
             return value === limit;
-        default:
-            return false;
     }
 }
 /** Extracts the display styles carried by a matched threshold. */
@@ -280,8 +279,10 @@ let IndicatorGridCard = class IndicatorGridCard extends i {
         return Number(state);
     }
     static async getConfigElement() {
-        await Promise.resolve().then(function () { return editor; });
-        return document.createElement('indicator-grid-card-editor');
+        // Importing the module registers <indicator-grid-card-editor>; construct it from
+        // the module's export (same element as document.createElement would return)
+        const { IndicatorGridCardEditor } = await Promise.resolve().then(function () { return editor; });
+        return new IndicatorGridCardEditor();
     }
     static getStubConfig(hass) {
         const indicatorDomains = ['binary_sensor', 'switch', 'light', 'input_boolean'];
@@ -1424,6 +1425,8 @@ let IndicatorGridCardEditor = class IndicatorGridCardEditor extends i {
     _stateColorChanged(scope, index, key, value) {
         const colors = this._colorsFor(scope);
         const entries = Object.entries(colors.states || {});
+        if (!entries[index])
+            return; // no such row (same guard as the waterfall editor)
         entries[index] = key === 'state' ? [value, entries[index][1]] : [entries[index][0], value];
         this._setColors(scope, { ...colors, states: Object.fromEntries(entries) });
     }

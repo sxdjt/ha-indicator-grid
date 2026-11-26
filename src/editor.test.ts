@@ -209,3 +209,171 @@ describe('state colors editor', () => {
     assert.deepEqual(Object.keys(last(el).entities[0].colors.states), ['home', 'away', '']);
   });
 });
+
+describe('editor fields', () => {
+  const base = () => ({ columns: 2, rows: 2, entities: [{ entity: 'light.a' }] });
+
+  test('grid size via ha-form, and every card-level field', async () => {
+    const el = await mountEditor(base());
+    const form = el.shadowRoot.querySelector('ha-form');
+    assert.deepEqual([form.computeLabel({ name: 'rows' }), form.computeLabel({ name: 'rows', label: 'Rows' })], ['rows', 'Rows']);
+    el.shadowRoot.querySelector('ha-form').dispatchEvent(new (globalThis as any).CustomEvent('value-changed', { detail: { value: { columns: 4 } } }));
+    assert.equal(last(el).columns, 4);
+    const fields: Array<[string, any, string, any]> = [
+      ['Cell Width', '25%', 'cell_width', '25%'], ['Cell Height', '120px', 'cell_height', '120px'], ['Cell Gap', '8', 'cell_gap', '8'],
+      ['Font Size', '18', 'font_size', '18'], ['Font Weight', '600', 'font_weight', '600'], ['Show Icons', true, 'show_icons', true],
+      ['Icon Placement', 'left', 'icon_placement', 'left'], ['Icon Size', '30', 'icon_size', '30'],
+      ['Dim Off Text (%)', '50', 'dim_off_text', 50], ['Decimals', '0', 'decimals', 0],
+    ];
+    for (const [label, value, key, stored] of fields) {
+      fire(byLabel(el, label), value);
+      assert.deepEqual(last(el)[key], stored, label);
+    }
+    fire(byLabel(el, 'Decimals'), '');
+    fire(byLabel(el, 'Dim Off Text (%)'), undefined);
+    assert.equal(last(el).dim_off_text, undefined);
+  });
+
+  test('global color fields', async () => {
+    const el = await mountEditor({ ...base(), global_colors: { on: 'blue' } });
+    for (const [label, key] of [['On Color', 'on'], ['Off Color', 'off'], ['Unavailable Color', 'unavailable'], ['Text Color', 'text'], ['Blank Cell Color', 'blank']]) {
+      fire(byLabel(el, label), 'red');
+      assert.equal(last(el).global_colors[key], 'red', label);
+    }
+    const blank = await mountEditor(base());
+    fire(byLabel(blank, 'On Color'), 'red');
+    assert.deepEqual(last(blank).global_colors, { on: 'red' });
+  });
+
+  test('entity fields, icons and colors; Add and Remove entity', async () => {
+    const el = await mountEditor({ columns: 2, rows: 2, entities: [{ entity: 'light.a', colors: { on: 'x' }, icon: { on: 'mdi:a' } }] });
+    const entityFields: Array<[string, any, string, any]> = [
+      ['Entity (leave empty for blank cell)', 'light.b', 'entity', 'light.b'], ['Custom text (optional)', 'A', 'text', 'A'],
+      ['Text template', '{{ state }}', 'text_template', '{{ state }}'], ['Column Span', '2', 'colspan', 2],
+      ['Text Alignment', 'left', 'text_align', 'left'], ['Click Action', 'none', 'click_action', 'none'],
+    ];
+    for (const [label, value, key, stored] of entityFields) {
+      fire(byLabel(el, label, label === 'Text Alignment' ? 0 : 0), value);
+      assert.deepEqual(last(el).entities[0][key], stored, label);
+    }
+    fire(byLabel(el, 'Text Alignment'), '');
+    assert.equal('text_align' in last(el).entities[0], false);
+    for (const [label, key] of [['On Color', 'on'], ['Off Color', 'off'], ['Text Color', 'text'], ['Blank Cell Color', 'blank']]) {
+      fire(byLabel(el, label, 1), 'teal');
+      assert.equal(last(el).entities[0].colors[key], 'teal', label);
+    }
+    fire(byLabel(el, 'Dim Off Text (%)', 1), '30');
+    assert.equal(last(el).entities[0].dim_off_text, 30);
+    fire(byLabel(el, 'Decimals', 1), '');
+    assert.equal('decimals' in last(el).entities[0], false);
+    fire(byLabel(el, 'On Icon'), 'mdi:x');
+    fire(byLabel(el, 'Off Icon'), 'mdi:y');
+    assert.deepEqual(last(el).entities[0].icon, { on: 'mdi:a', off: 'mdi:y' });
+    button(el, 'Add Entity').click();
+    assert.equal(last(el).entities.length, 2);
+    button(el, 'Remove cell 1').click();
+    assert.equal(last(el).entities.length, 0);
+    assert.equal(el.focused.at(-1), 'add-entity');
+  });
+
+  test('a blank entity panel shows empty fields; colors and icons start from nothing', async () => {
+    const el = await mountEditor({ columns: 1, rows: 1, entities: [{}] });
+    assert.deepEqual([byLabel(el, 'Entity (leave empty for blank cell)').value, byLabel(el, 'On Icon').value, byLabel(el, 'Column Span').value], ['', '', 1]);
+    fire(byLabel(el, 'On Color', 1), 'red');
+    assert.deepEqual(last(el).entities[0].colors, { on: 'red' });
+    fire(byLabel(el, 'On Icon'), 'mdi:z');
+    assert.deepEqual(last(el).entities[0].icon, { on: 'mdi:z' });
+  });
+
+  test('no entities key: Add Entity starts the list', async () => {
+    const el = await mountEditor({ columns: 1, rows: 1 });
+    button(el, 'Add Entity').click();
+    assert.deepEqual(last(el).entities, [{ entity: '' }]);
+  });
+
+  test('header rows and cells: add, edit, remove', async () => {
+    const el = await mountEditor({ columns: 2, rows: 3, entities: [] });
+    button(el, 'Add Header Row').click();
+    assert.deepEqual(last(el).header_rows, [{ row_index: 0, cells: [{ text: 'Header', colspan: 1 }] }]);
+    await rerender(el);
+    fire(byLabel(el, 'Row Index (0-based)'), '2');
+    assert.equal(last(el).header_rows[0].row_index, 2);
+    await rerender(el);
+    button(el, 'Add Header Cell to header row 1').click();
+    assert.equal(last(el).header_rows[0].cells.length, 2);
+    await rerender(el);
+    const cellFields: Array<[string, any, string, any]> = [
+      ['Text', 'Living', 'text', 'Living'], ['Column Span', '2', 'colspan', 2], ['Text Alignment', 'left', 'text_align', 'left'],
+      ['Font Size', '20', 'font_size', '20'], ['Font Weight', '600', 'font_weight', '600'],
+    ];
+    for (const [label, value, key, stored] of cellFields) {
+      const nth = ['Font Size', 'Font Weight'].includes(label) ? 1 : 0;
+      fire(byLabel(el, label, nth), value);
+      assert.deepEqual(last(el).header_rows[0].cells[0][key], stored, label);
+    }
+    fire(byLabel(el, 'Text Color', 1), 'white');
+    fire(byLabel(el, 'Background Color'), 'black');
+    assert.equal(last(el).header_rows[0].cells[0].background_color, 'black');
+    button(el, 'Remove cell 1 of header row 1').click();
+    assert.equal(last(el).header_rows[0].cells.length, 1);
+    assert.equal(el.focused.at(-1), 'add-header-cell-0');
+    button(el, 'Remove header row 1').click();
+    assert.deepEqual(last(el).header_rows, []);
+    assert.equal(el.focused.at(-1), 'add-header-row');
+  });
+
+  test('header helpers do nothing without header rows; header cell without text shows empty', async () => {
+    const el = await mountEditor({ columns: 1, rows: 1, entities: [] });
+    const before = el.changes.length;
+    el._removeHeaderRow(0);
+    el._headerRowChanged(0, 'row_index', 1);
+    el._addHeaderCell(0);
+    el._removeHeaderCell(0, 0);
+    el._headerCellChanged(0, 0, 'text', 'x');
+    assert.equal(el.changes.length, before);
+    const withCell = await mountEditor({ columns: 1, rows: 2, entities: [], header_rows: [{ row_index: 0, cells: [{}] }] });
+    assert.deepEqual([byLabel(withCell, 'Text').value, byLabel(withCell, 'Column Span').value, byLabel(withCell, 'Text Alignment').value], ['', 1, 'center']);
+  });
+
+  test('Show Icon starts at Show or Hide; per-entity dim and decimals clear', async () => {
+    const el = await mountEditor({ columns: 2, rows: 1, entities: [{ entity: 'a.a', show_icon: true, dim_off_text: 20, decimals: 2 }, { entity: 'a.b', show_icon: false }] });
+    assert.deepEqual([byLabel(el, 'Show Icon').value, byLabel(el, 'Show Icon', 1).value], ['show', 'hide']);
+    fire(byLabel(el, 'Dim Off Text (%)', 1), undefined);
+    fire(byLabel(el, 'Decimals', 1), undefined);
+    assert.equal('decimals' in last(el).entities[0], false);
+    fire(byLabel(el, 'Decimals', 1), '3');
+    assert.equal(last(el).entities[0].decimals, 3);
+    const before = el.changes.length;
+    el._stateColorChanged(1, 0, 'color', 'red');
+    assert.equal(el.changes.length, before, 'no state row 1 on cell 2: nothing fired');
+  });
+
+  test('row helpers with no list yet; a threshold without color shows empty', async () => {
+    const el = await mountEditor({ columns: 1, rows: 1, entities: [{ entity: 'a.a' }], global_colors: { thresholds: [{ value: 1 }] } });
+    assert.equal(control(el, 'Global threshold 1 color').value, '');
+    el._removeThreshold(0, 0);
+    el._thresholdChanged(0, 0, 'color', 'red');
+    el._removeStateColor(0, 0);
+    el._addStateColor(0);
+    assert.deepEqual(last(el).entities[0].colors.states, { '': '#cccccc' });
+    el._config = { ...el._config, entities: [{ entity: 'a.a', colors: { states: { home: 'g' } } }] };
+    el._stateColorChanged(0, 0, 'state', 'away');
+    assert.deepEqual(last(el).entities[0].colors.states, { away: 'g' });
+  });
+
+  test('nothing is fired or rendered without hass', async () => {
+    const el = await mountEditor(base(), null);  // undefined would take the default hass
+    el._valueChanged({ detail: { value: { columns: 3 } } });
+    el._configValueChanged('rows', 3);
+    assert.equal(el.changes.length, 0);
+    assert.equal(el.shadowRoot.querySelectorAll('ha-selector').length, 0);
+  });
+
+  test('editor defaults: grid size and lists when unset', async () => {
+    const el = await mountEditor({ entities: [{}] });
+    assert.deepEqual(el._entityPositions(), [{ row: 1, col: 1 }]);
+    const shown = await mountEditor({ columns: 1, rows: 1, entities: [], global_colors: {} });
+    assert.equal(byLabel(shown, 'Font Weight').value, 'bold');
+    assert.equal(byLabel(shown, 'Cell Height').value, '100px');
+  });
+});

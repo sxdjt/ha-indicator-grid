@@ -9,8 +9,8 @@
     "build": "rollup -c && cp dist/indicator-grid-card.js indicator-grid-card.js",
     "watch": "rollup -c --watch",
     "lint": "eslint src",
-    "test": "rollup -c && scripts/run-capped.sh node --test --test-timeout=10000 --test-concurrency=1 src/thresholds.test.ts src/indicator-grid-card.test.ts src/editor.test.ts",
-    "coverage": "rollup -c && NODE_OPTIONS=--enable-source-maps scripts/run-capped.sh node --test --test-timeout=10000 --test-concurrency=1 --experimental-test-coverage src/thresholds.test.ts src/indicator-grid-card.test.ts src/editor.test.ts"
+    "test": "rollup -c && scripts/run-capped.sh node --test --test-timeout=10000 --test-concurrency=1 src/*.test.ts",
+    "coverage": "rollup -c && NODE_OPTIONS=--enable-source-maps scripts/run-capped.sh node --test --test-timeout=10000 --test-concurrency=1 --experimental-test-coverage src/*.test.ts"
   },
   "keywords": [
     "home-assistant",

@@ -298,6 +298,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
   private _stateColorChanged(scope: ColorScope, index: number, key: 'state' | 'color', value: string): void {
     const colors = this._colorsFor(scope);
     const entries = Object.entries(colors.states || {});
+    if (!entries[index]) return; // no such row (same guard as the waterfall editor)
     entries[index] = key === 'state' ? [value, entries[index][1]] : [entries[index][0], value];
     this._setColors(scope, { ...colors, states: Object.fromEntries(entries) });
   }

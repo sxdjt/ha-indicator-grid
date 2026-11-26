@@ -59,8 +59,10 @@ export class IndicatorGridCard extends LitElement {
   }
 
   public static async getConfigElement(): Promise<LovelaceCardEditor> {
-    await import('./editor');
-    return document.createElement('indicator-grid-card-editor') as LovelaceCardEditor;
+    // Importing the module registers <indicator-grid-card-editor>; construct it from
+    // the module's export (same element as document.createElement would return)
+    const { IndicatorGridCardEditor } = await import('./editor');
+    return new IndicatorGridCardEditor();
   }
 
   public static getStubConfig(hass?: any): Partial<IndicatorGridCardConfig> {

@@ -24,8 +24,9 @@ function normalizeOperator(threshold: ThresholdConfig): string {
 }
 
 /**
- * Tests whether `value` satisfies a single threshold's comparison.
- * An unrecognized operator never matches.
+ * Tests whether `value` satisfies a single threshold's comparison. Only thresholds with
+ * a known operator reach this (evaluateThresholds groups them by operator first), so an
+ * unrecognized operator never gets here and never matches.
  */
 function matchesThreshold(value: number, threshold: ThresholdConfig): boolean {
   // YAML `value: '50'` is a string. The relational operators coerce it, but '==' used
@@ -40,10 +41,8 @@ function matchesThreshold(value: number, threshold: ThresholdConfig): boolean {
       return value > limit;
     case '>=':
       return value >= limit;
-    case '==':
+    default: // '=='
       return value === limit;
-    default:
-      return false;
   }
 }
 

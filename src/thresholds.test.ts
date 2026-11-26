@@ -115,3 +115,18 @@ test('carries text_color and font_weight from the matched threshold', () => {
     fontWeight: 'bold',
   });
 });
+
+test('every operator, with several bands per group, in any list order', () => {
+  // Out of order on purpose: each group is sorted before matching
+  const bands: ThresholdConfig[] = [
+    { value: 60, operator: '>=', color: 'ge60' }, { value: 80, operator: '>', color: 'gt80' },
+    { value: 30, operator: '<=', color: 'le30' }, { value: 10, operator: '<', color: 'lt10' },
+    { value: 45, operator: '==', color: 'eq45' },
+  ];
+  assert.deepEqual([95, 70, 5, 25, 45].map((v) => colorFor(v, bands)), ['gt80', 'ge60', 'lt10', 'le30', 'eq45']);
+});
+
+test('a value no band matches returns null; an unknown operator never matches', () => {
+  assert.equal(colorFor(50, [{ value: 10, color: 'x' }, { value: 20, color: 'y', operator: '>=' }].slice(0, 1)), null);
+  assert.equal(colorFor(5, [{ value: 10, color: 'x', operator: '!=' as any }]), null);
+});
