@@ -60,7 +60,7 @@ entities:
 | `cell_height` | string/number | `100` | Height of each cell (e.g., `100` or `"100px"`) - numbers auto-convert to px |
 | `cell_width` | string/number | auto (100%) | Width of each cell (e.g., `100`, `"100px"`, `"25%"`, blank for auto) |
 | `columns` | number | `3` | Number of columns in the grid |
-| `decimals` | number | none | Number of decimal places for numeric sensors (0-10, e.g., `2` shows "72.50") |
+| `decimals` | number | none | Number of decimal places for numeric sensors (0-10, e.g., `2` shows "72.50"). When set, a numeric cell without `text` or `text_template` shows its value instead of the entity name |
 | `dim_off_text` | number | none | Opacity percentage (0-100) for text when entity is "off" (e.g., `50` for 50% opacity) |
 | `font_size` | string/number | `16` | Font size for text (e.g., `16` or `"16px"`) - numbers auto-convert to px |
 | `font_weight` | string/number | `bold` | Font weight for text |
@@ -70,7 +70,8 @@ entities:
 | `icon_size` | string/number | `24` | Icon size (e.g., `24` or `"24px"`) - numbers auto-convert to px |
 | `rows` | number | `2` | Number of rows in the grid |
 | `show_icons` | boolean | `false` | Enable/disable icons globally |
-| `unavailable_text` | string | `INOP` | Text to display for unavailable entities |
+| `unavailable_text` | string | `INOP` | Text shown under the name for unavailable, unknown or missing entities |
+| `cell_size` | number | - | Deprecated: sets both `cell_width` and `cell_height` in pixels. Use those instead; they win when both are set |
 
 
 ### Global Colors
@@ -81,17 +82,17 @@ entities:
 | `off` | string | `gray` | Color when entity is "off" |
 | `blank` | string | `#333333` | Background color for blank cells |
 | `states` | object | - | Map specific states to colors |
-| `text` | string | `white` | Text color |
+| `text` | string | black or white | Text color. Unset, each cell uses black or white, whichever contrasts more with its fill |
 | `thresholds` | list | - | Threshold configuration for numeric values |
-| `unavailable` | string | `orange` | Color when entity is unavailable |
+| `unavailable` | string | `orange` | Color when the entity is unavailable, unknown or missing. These cells show the name and `unavailable_text`, and cannot be clicked |
 
 ### Entity Configuration
 
 | Name | Type | Default | Description |
 |------|------|---------|-------------|
 | `entity` | string | - | Entity ID (omit for blank cell or text-only cell) |
-| `click_action` | string | auto | Action on click: `toggle`, `more-info`, or `none` |
-| `colors` | object | - | Per-entity color overrides |
+| `click_action` | string | auto | Action on click: `toggle`, `more-info`, or `none`. Auto toggles `light`, `switch`, `input_boolean`, `automation` and `fan` entities and opens more-info for everything else |
+| `colors` | object | - | Per-entity color overrides: the same keys as `global_colors` (`on`, `off`, `unavailable`, `text`, `blank`, `states`, `thresholds`) |
 | `colspan` | number | `1` | Number of columns this cell spans |
 | `decimals` | number | - | Per-entity override for decimals (0-10) |
 | `dim_off_text` | number | - | Per-entity override for dim_off_text (0-100) |
@@ -162,6 +163,23 @@ colors:
 
 Operators: `<`, `<=`, `>`, `>=`, `==` (default: `<=`)
 
+How a value is matched, whatever order the list is in:
+
+1. `>` and `>=` thresholds are checked highest value first.
+2. `<` and `<=` thresholds are checked lowest value first.
+3. `==` thresholds are checked last.
+
+The first match wins. A value that matches nothing falls back to the `off` color, so close a ladder of `<=` bands with a `>` band (in the example above, a value of 90 matches no band and shows the `off` color).
+
+#### Color Resolution
+
+For each cell, the first of these that applies sets the background:
+
+1. Entity `colors.states`, then global `states`, for the exact state
+2. Entity `thresholds`, then global `thresholds`, for numeric states (threshold `text_color` and `font_weight` also apply)
+3. `on` color for the state `on`
+4. `off` color for every other state
+
 #### Icons
 
 Icons are displayed from the entity's default icon or can be customized per state:
@@ -216,10 +234,12 @@ The `text_template` field supports Jinja2-style filter pipelines using `{{ varia
 | `title` | `{{ state \| title }}` | `Charging` |
 | `round(n)` | `{{ state \| round(1) }}` | `23.5` |
 | `int` | `{{ state \| int }}` | `23` |
-| `float` | `{{ state \| float }}` | `23.0` |
+| `float` | `{{ state \| float }}` | `23.456` |
 | `replace('a','b')` | `{{ state \| replace('_',' ') }}` | `not home` |
-| `truncate(n)` | `{{ state \| truncate(8) }}` | `Chargi...` |
+| `truncate(n)` | `{{ state \| truncate(6) }}` | `chargi...` |
 | `default('val')` | `{{ state \| default('N/A') }}` | fallback if empty |
+
+The examples use the states `charging`, `23.456` and `not_home`. `int` and `float` accept a fallback for non-numeric values, e.g. `int(0)` (default `0`).
 
 Filters can be chained: `{{ state | upper | truncate(8) }}`
 
@@ -261,7 +281,7 @@ text_template: "{{state|round(0)}} mph @ {{states('sensor.tempest_wind_direction
 6. **Click Behavior**: By default, lights/switches toggle and sensors show more-info
 7. **Responsive Width**: Leave `cell_width` blank or use percentages (e.g., `25%`) for responsive layouts. Use pixels (e.g., `100` or `"100px"`) for fixed widths
 8. **Cell Height**: Use pixel values for `cell_height` (e.g., `100` or `"100px"`). The card automatically calculates its total height to prevent overlapping with cards below
-9. **Sections View**: If using the HA Sections dashboard layout, add `grid_options: rows: auto` to each card to prevent content clipping:
+9. **Sections View**: The card reports the height its rows and cell height need. If content is still clipped (for example long text that wraps), add `grid_options: rows: auto`:
    ```yaml
    grid_options:
      rows: auto
