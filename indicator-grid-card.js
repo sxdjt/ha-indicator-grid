@@ -258,9 +258,11 @@ window.customCards.push({
     },
 });
 let IndicatorGridCard = class IndicatorGridCard extends i {
-    // Helper to normalize size values - add "px" if just a number
+    // Helper to normalize size values - add "px" if just a number. A blank value (a YAML
+    // key left empty is null; a field cleared in the editor is '') uses the default: both
+    // became invalid CSS ('null', '') that collapsed the grid.
     _normalizeSize(value, defaultValue) {
-        if (value === undefined)
+        if (value === undefined || value === null || value === '')
             return defaultValue;
         const str = String(value);
         // If it's just digits (with optional decimal), append "px"

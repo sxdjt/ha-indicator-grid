@@ -40,9 +40,11 @@ export class IndicatorGridCard extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
   @state() private config!: IndicatorGridCardConfig;
 
-  // Helper to normalize size values - add "px" if just a number
-  private _normalizeSize(value: string | number | undefined, defaultValue: string): string {
-    if (value === undefined) return defaultValue;
+  // Helper to normalize size values - add "px" if just a number. A blank value (a YAML
+  // key left empty is null; a field cleared in the editor is '') uses the default: both
+  // became invalid CSS ('null', '') that collapsed the grid.
+  private _normalizeSize(value: string | number | null | undefined, defaultValue: string): string {
+    if (value === undefined || value === null || value === '') return defaultValue;
     const str = String(value);
     // If it's just digits (with optional decimal), append "px"
     return /^\d+(\.\d+)?$/.test(str) ? `${str}px` : str;

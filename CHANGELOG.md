@@ -3,9 +3,12 @@
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+and this project uses [CalVer](https://calver.org/) (`YYYY.M.D`) versioning (SemVer before 2026).
 
 ## [Unreleased]
+
+### Fixed
+- A size left blank in YAML (`cell_height:`), or cleared in the visual editor, uses its default. It became invalid CSS (`null` or empty), which collapsed the grid rows or the font size.
 
 ### Changed
 - The built `indicator-grid-card.js` is no longer minified, so it stays readable when troubleshooting in the browser. The "Last changed" build timestamp header is removed.

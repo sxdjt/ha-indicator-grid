@@ -771,7 +771,7 @@ describe('_getTextColor', () => {
 describe('review sweep findings', () => {
   // G1 (B4): a size left blank in YAML (null) or cleared in the editor ('') must use
   // the default; both became invalid CSS ('null', '')
-  test('blank sizes fall back to their defaults', { todo: "_normalizeSize only defaults undefined; null -> 'null', '' -> ''" }, () => {
+  test('blank sizes fall back to their defaults', () => {
     const card = makeCard();
     card.setConfig({ entities: [], cell_height: null, cell_gap: '', font_size: '', icon_size: null, cell_width: null });
     assert.deepEqual(
