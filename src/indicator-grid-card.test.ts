@@ -806,7 +806,7 @@ describe('review sweep findings', () => {
   });
 
   // G10 (B8): README marks entities required; a config without it crashed the render
-  test('a config without entities renders an empty grid', { todo: 'render reads config.entities.length' }, async () => {
+  test('a config without entities renders an empty grid', async () => {
     const el = await mount({ rows: 1, columns: 1 }, { states: {} });
     assert.equal(el.shadowRoot.querySelectorAll('.grid-container').length, 1);
   });

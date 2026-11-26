@@ -8,6 +8,7 @@ and this project uses [CalVer](https://calver.org/) (`YYYY.M.D`) versioning (Sem
 ## [Unreleased]
 
 ### Fixed
+- A config without `entities` shows an empty grid instead of breaking the card.
 - A header row without `cells`, or a header cell without `text`, no longer breaks the card. The row is skipped or the cell is blank.
 - A quoted threshold value (`value: '50'`) matches the `==` operator. The other operators already converted it to a number.
 - States such as IP addresses (`192.168.1.1`), versions (`2026.11.3`) and timestamps are no longer treated as numbers. Their leading digits got `decimals` formatting and threshold colors, e.g. `192.2`.

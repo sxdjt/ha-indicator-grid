@@ -111,6 +111,8 @@ export class IndicatorGridCard extends LitElement {
 
     this.config = {
       ...config,
+      // README marks entities required, but a config without it crashed the render
+      entities: config.entities ?? [],
       columns: config.columns ?? 3,
       rows: config.rows ?? 2,
       cell_width: this._normalizeSize(cellWidth, ''),
