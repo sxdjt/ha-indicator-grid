@@ -28,17 +28,20 @@ function normalizeOperator(threshold: ThresholdConfig): string {
  * An unrecognized operator never matches.
  */
 function matchesThreshold(value: number, threshold: ThresholdConfig): boolean {
+  // YAML `value: '50'` is a string. The relational operators coerce it, but '==' used
+  // ===, so a quoted value never matched. Compare as numbers throughout.
+  const limit = Number(threshold.value);
   switch (normalizeOperator(threshold)) {
     case '<':
-      return value < threshold.value;
+      return value < limit;
     case '<=':
-      return value <= threshold.value;
+      return value <= limit;
     case '>':
-      return value > threshold.value;
+      return value > limit;
     case '>=':
-      return value >= threshold.value;
+      return value >= limit;
     case '==':
-      return value === threshold.value;
+      return value === limit;
     default:
       return false;
   }

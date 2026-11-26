@@ -792,7 +792,7 @@ describe('review sweep findings', () => {
   });
 
   // G11 (B7): YAML value: '50' is a string; '==' compares with ===
-  test("a quoted threshold value matches '=='", { todo: "matchesThreshold compares 50 === '50'" }, () => {
+  test("a quoted threshold value matches '=='", () => {
     const card = makeCard({});
     assert.equal(card._getBackgroundColor('50', { colors: { thresholds: [{ value: '50', color: 'red', operator: '==' }] } }), 'red');
   });
