@@ -765,3 +765,49 @@ describe('_getTextColor', () => {
     assert.equal(card._getTextColor(undefined, 'var(--state-on-color)'), 'white');
   });
 });
+
+// Review sweep (docs/card-review-plan.md section 7). Each todo test moves into the
+// matching describe block above when its fix lands.
+describe('review sweep findings', () => {
+  // G1 (B4): a size left blank in YAML (null) or cleared in the editor ('') must use
+  // the default; both became invalid CSS ('null', '')
+  test('blank sizes fall back to their defaults', { todo: "_normalizeSize only defaults undefined; null -> 'null', '' -> ''" }, () => {
+    const card = makeCard();
+    card.setConfig({ entities: [], cell_height: null, cell_gap: '', font_size: '', icon_size: null, cell_width: null });
+    assert.deepEqual(
+      [card.config.cell_height, card.config.cell_gap, card.config.font_size, card.config.icon_size, card.config.cell_width],
+      ['100px', '5px', '16px', '24px', ''],
+    );
+    assert.equal(Number.isFinite(card.getCardSize()), true);
+  });
+
+  // G3 (B7): parseFloat reads the leading number of any string
+  test('timestamps, IP addresses and versions are not numeric', { todo: "parseFloat('192.168.1.1') is 192.168, so decimals and thresholds apply" }, () => {
+    const card = makeCard({ decimals: 1, global_colors: { thresholds: [{ value: 100000, color: 'red' }] } });
+    for (const state of ['192.168.1.1', '2026-11-25T10:00:00+00:00', '2026.11.3']) {
+      const s = stateObj('sensor.x', state, { friendly_name: 'X' });
+      assert.equal(card._getDisplayText({ entity: 'sensor.x' }, s), 'X', state);
+      assert.notEqual(card._getBackgroundColor(state, { entity: 'sensor.x' }), 'red', state);
+    }
+  });
+
+  // G11 (B7): YAML value: '50' is a string; '==' compares with ===
+  test("a quoted threshold value matches '=='", { todo: "matchesThreshold compares 50 === '50'" }, () => {
+    const card = makeCard({});
+    assert.equal(card._getBackgroundColor('50', { colors: { thresholds: [{ value: '50', color: 'red', operator: '==' }] } }), 'red');
+  });
+
+  // G8 (B8): header rows/cells missing required keys must not break the card
+  test('a header row without cells, or a cell without text, does not throw', { todo: 'shouldUpdate flatMaps undefined cells; render calls replace on undefined text' }, async () => {
+    const hass = { states: { 'light.a': stateObj('light.a', 'on') } };
+    const el = await mount({ rows: 2, columns: 1, header_rows: [{ row_index: 0 }, { row_index: 1, cells: [{}] }], entities: [{ entity: 'light.a' }] }, hass);
+    assert.doesNotThrow(() => el.shouldUpdate(new Map([['hass', { states: {} }]])));
+    assert.equal(el.shadowRoot.querySelectorAll('.header-cell').length, 1);
+  });
+
+  // G10 (B8): README marks entities required; a config without it crashed the render
+  test('a config without entities renders an empty grid', { todo: 'render reads config.entities.length' }, async () => {
+    const el = await mount({ rows: 1, columns: 1 }, { states: {} });
+    assert.equal(el.shadowRoot.querySelectorAll('.grid-container').length, 1);
+  });
+});
