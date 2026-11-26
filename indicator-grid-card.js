@@ -409,10 +409,11 @@ let IndicatorGridCard = class IndicatorGridCard extends i {
             const templateEntityIds = this.config.entities
                 .filter((e) => e && !!e.text_template)
                 .flatMap(e => this._extractTemplateEntityIds(e.text_template));
-            // Also track entities referenced in header row cell text templates
+            // Also track entities referenced in header row cell text templates. A header row
+            // without cells, or a cell without text, is skipped rather than throwing.
             const headerEntityIds = (this.config.header_rows || [])
-                .flatMap(hr => hr.cells)
-                .flatMap(cell => this._extractTemplateEntityIds(cell.text));
+                .flatMap(hr => hr.cells || [])
+                .flatMap(cell => this._extractTemplateEntityIds(cell?.text ?? ''));
             const allEntityIds = [...new Set([...entityIds, ...templateEntityIds, ...headerEntityIds])];
             // Check if any of our entities changed
             return allEntityIds.some(entityId => {
@@ -884,7 +885,7 @@ let IndicatorGridCard = class IndicatorGridCard extends i {
         const fontWeight = headerCell.font_weight || this.config.font_weight || 'bold';
         const backgroundColor = headerCell.background_color || this._getColor('blank', undefined);
         const textColor = headerCell.text_color || this._getTextColor(undefined, backgroundColor);
-        const displayText = this._processHeaderText(headerCell.text);
+        const displayText = this._processHeaderText(headerCell.text ?? '');
         const cellStyle = {
             'background-color': backgroundColor,
             'color': textColor,

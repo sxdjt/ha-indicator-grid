@@ -798,7 +798,7 @@ describe('review sweep findings', () => {
   });
 
   // G8 (B8): header rows/cells missing required keys must not break the card
-  test('a header row without cells, or a cell without text, does not throw', { todo: 'shouldUpdate flatMaps undefined cells; render calls replace on undefined text' }, async () => {
+  test('a header row without cells, or a cell without text, does not throw', async () => {
     const hass = { states: { 'light.a': stateObj('light.a', 'on') } };
     const el = await mount({ rows: 2, columns: 1, header_rows: [{ row_index: 0 }, { row_index: 1, cells: [{}] }], entities: [{ entity: 'light.a' }] }, hass);
     assert.doesNotThrow(() => el.shouldUpdate(new Map([['hass', { states: {} }]])));
