@@ -7,6 +7,9 @@ and this project uses [CalVer](https://calver.org/) (`YYYY.M.D`) versioning (Sem
 
 ## [Unreleased]
 
+### Added
+- Visual editor: per-entity Unavailable Color (`colors.unavailable`), which the card supported but only YAML could set.
+
 ### Fixed
 - Visual editor: per-entity Show Icon is Default / Show / Hide. The switch showed an unset value as off and could only store on or off, so an entity could not go back to following the global Show Icons setting.
 - Visual editor: every entity has a panel. Entities past rows x columns were hidden, so they could not be edited or removed. Panel headings give each cell's real row and column, counting header rows and column spans.

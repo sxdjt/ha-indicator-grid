@@ -771,6 +771,9 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
               ${this._renderColorField('Off Color', entity.colors?.off || '', (value) =>
                 this._entityColorChanged(index, 'off', value))}
 
+              ${this._renderColorField('Unavailable Color', entity.colors?.unavailable || '', (value) =>
+                this._entityColorChanged(index, 'unavailable', value))}
+
               ${this._renderColorField('Text Color', entity.colors?.text || '', (value) =>
                 this._entityColorChanged(index, 'text', value))}
 

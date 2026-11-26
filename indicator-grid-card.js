@@ -1873,6 +1873,8 @@ let IndicatorGridCardEditor = class IndicatorGridCardEditor extends i {
 
               ${this._renderColorField('Off Color', entity.colors?.off || '', (value) => this._entityColorChanged(index, 'off', value))}
 
+              ${this._renderColorField('Unavailable Color', entity.colors?.unavailable || '', (value) => this._entityColorChanged(index, 'unavailable', value))}
+
               ${this._renderColorField('Text Color', entity.colors?.text || '', (value) => this._entityColorChanged(index, 'text', value))}
 
               ${this._renderColorField('Blank Cell Color', entity.colors?.blank || '', (value) => this._entityColorChanged(index, 'blank', value))}

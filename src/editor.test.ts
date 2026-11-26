@@ -61,6 +61,14 @@ describe('editor basics', () => {
   });
 });
 
+describe('per-entity colors', () => {
+  test('Unavailable Color writes colors.unavailable', async () => {
+    const el = await mountEditor({ columns: 1, rows: 1, entities: [{ entity: 'light.a' }] });
+    fire(byLabel(el, 'Unavailable Color', 1), 'purple');
+    assert.equal(last(el).entities[0].colors.unavailable, 'purple');
+  });
+});
+
 describe('review sweep findings', () => {
   // E1 (B6/B8): per-entity show_icon is tri-state in the card (unset inherits)
   test('per-entity Show Icon can return to the global setting', async () => {
