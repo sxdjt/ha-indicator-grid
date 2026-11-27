@@ -4,7 +4,7 @@ import { HomeAssistant, LovelaceCardEditor, fireEvent } from 'custom-card-helper
 import { IndicatorGridCardConfig, EntityConfig, ColorConfig, IndicatorCell, HeaderRowConfig, HeaderCellConfig } from './types';
 import { evaluateThresholds, ThresholdStyles } from './thresholds';
 
-const CARD_VERSION = '2026.11.11';
+const CARD_VERSION = '2026.11.26-beta.1';
 
 console.info(
   `%c  INDICATOR-GRID-CARD  \n%c  Version ${CARD_VERSION}  `,

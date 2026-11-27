@@ -270,7 +270,7 @@ function evaluateThresholds(value, thresholds) {
     return null;
 }
 
-const CARD_VERSION = '2026.11.11';
+const CARD_VERSION = '2026.11.26-beta.1';
 console.info(`%c  INDICATOR-GRID-CARD  \n%c  Version ${CARD_VERSION}  `, 'color: black; background: #F2720C; font-weight: 600;', 'color: black; background: #00a5c9; font-weight: 600;');
 window.customCards = window.customCards || [];
 window.customCards.push({
