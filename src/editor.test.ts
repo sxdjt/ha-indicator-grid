@@ -377,3 +377,30 @@ describe('editor fields', () => {
     assert.equal(byLabel(shown, 'Cell Height').value, '100px');
   });
 });
+
+// Found on ha-test (2026-11-26): HA's number selector sends undefined when a field is
+// cleared, not ''; a bare Number() saved NaN (`.nan` in the YAML), and null became 0
+describe('cleared number fields', () => {
+  test('cleared (undefined, null) or non-numeric number fields remove the key', async () => {
+    const el = await mountEditor({ columns: 2, rows: 3, dim_off_text: 40, decimals: 2,
+      header_rows: [{ row_index: 0, cells: [{ text: 'H', colspan: 2 }] }],
+      entities: [{ entity: 'a.a', colspan: 2, dim_off_text: 50, decimals: 1 }] });
+    for (const cleared of [undefined, null, 'abc']) {
+      const tag = String(cleared);
+      fire(byLabel(el, 'Dim Off Text (%)', 0), cleared);
+      assert.equal('dim_off_text' in last(el), false, `card dim ${tag}`);
+      fire(byLabel(el, 'Decimals', 0), cleared);
+      assert.equal('decimals' in last(el), false, `card decimals ${tag}`);
+      fire(byLabel(el, 'Row Index (0-based)'), cleared);
+      assert.equal('row_index' in last(el).header_rows[0], false, `row_index ${tag}`);
+      fire(byLabel(el, 'Column Span', 0), cleared);
+      assert.equal('colspan' in last(el).header_rows[0].cells[0], false, `header colspan ${tag}`);
+      fire(byLabel(el, 'Column Span', 1), cleared);
+      assert.equal('colspan' in last(el).entities[0], false, `entity colspan ${tag}`);
+      fire(byLabel(el, 'Dim Off Text (%)', 1), cleared);
+      assert.equal('dim_off_text' in last(el).entities[0], false, `entity dim ${tag}`);
+      fire(byLabel(el, 'Decimals', 1), cleared);
+      assert.equal('decimals' in last(el).entities[0], false, `entity decimals ${tag}`);
+    }
+  });
+});

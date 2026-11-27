@@ -1227,6 +1227,15 @@ IndicatorGridCard = __decorate([
 ], IndicatorGridCard);
 
 const THRESHOLD_OPERATORS = ['<=', '<', '>=', '>', '=='];
+// A number field's value for the config, or undefined to remove the key. HA's number
+// selector sends undefined when a field is cleared (not ''); a bare Number() saved NaN
+// (`.nan` in the YAML) and turned null into 0.
+function editorNumber(value) {
+    if (value === '' || value === null || value === undefined)
+        return undefined;
+    const n = Number(value);
+    return Number.isFinite(n) ? n : undefined;
+}
 let IndicatorGridCardEditor = class IndicatorGridCardEditor extends i {
     setConfig(config) {
         this._config = config;
@@ -1243,6 +1252,9 @@ let IndicatorGridCardEditor = class IndicatorGridCardEditor extends i {
             return;
         }
         const newConfig = { ...this._config, [key]: value };
+        // A cleared option is removed, so the card's default applies
+        if (value === undefined)
+            delete newConfig[key];
         fireEvent(this, 'config-changed', { config: newConfig });
     }
     // Move keyboard focus to a control that survives re-render (the list's Add button),
@@ -1345,10 +1357,10 @@ let IndicatorGridCardEditor = class IndicatorGridCardEditor extends i {
             return;
         }
         newConfig.header_rows = [...newConfig.header_rows];
-        newConfig.header_rows[index] = {
-            ...newConfig.header_rows[index],
-            [key]: value,
-        };
+        const row = { ...newConfig.header_rows[index], [key]: value };
+        if (value === undefined)
+            delete row[key];
+        newConfig.header_rows[index] = row;
         fireEvent(this, 'config-changed', { config: newConfig });
     }
     _addHeaderCell(rowIndex) {
@@ -1383,10 +1395,10 @@ let IndicatorGridCardEditor = class IndicatorGridCardEditor extends i {
         newConfig.header_rows = [...newConfig.header_rows];
         const headerRow = { ...newConfig.header_rows[rowIndex] };
         headerRow.cells = [...headerRow.cells];
-        headerRow.cells[cellIndex] = {
-            ...headerRow.cells[cellIndex],
-            [key]: value,
-        };
+        const cell = { ...headerRow.cells[cellIndex], [key]: value };
+        if (value === undefined)
+            delete cell[key];
+        headerRow.cells[cellIndex] = cell;
         newConfig.header_rows[rowIndex] = headerRow;
         fireEvent(this, 'config-changed', { config: newConfig });
     }
@@ -1785,7 +1797,7 @@ let IndicatorGridCardEditor = class IndicatorGridCardEditor extends i {
         .label=${'Dim Off Text (%)'}
         .value=${this._config.dim_off_text ?? ''}
         .selector=${{ number: { min: 0, max: 100, mode: 'box', step: 1 } }}
-        @value-changed=${(ev) => this._configValueChanged('dim_off_text', ev.detail.value !== '' && ev.detail.value !== undefined ? Number(ev.detail.value) : undefined)}
+        @value-changed=${(ev) => this._configValueChanged('dim_off_text', editorNumber(ev.detail.value))}
       ></ha-selector>
 
       <ha-selector
@@ -1794,7 +1806,7 @@ let IndicatorGridCardEditor = class IndicatorGridCardEditor extends i {
         .label=${'Decimals'}
         .value=${this._config.decimals ?? ''}
         .selector=${{ number: { min: 0, max: 10, mode: 'box', step: 1 } }}
-        @value-changed=${(ev) => this._configValueChanged('decimals', ev.detail.value !== '' && ev.detail.value !== undefined ? Number(ev.detail.value) : undefined)}
+        @value-changed=${(ev) => this._configValueChanged('decimals', editorNumber(ev.detail.value))}
       ></ha-selector>
 
       <ha-selector
@@ -1887,7 +1899,7 @@ let IndicatorGridCardEditor = class IndicatorGridCardEditor extends i {
             .label=${'Row Index (0-based)'}
             .value=${headerRow.row_index}
             .selector=${{ number: { min: 0, max: this._config.rows - 1, mode: 'box', step: 1 } }}
-            @value-changed=${(ev) => this._headerRowChanged(rowIndex, 'row_index', Number(ev.detail.value))}
+            @value-changed=${(ev) => this._headerRowChanged(rowIndex, 'row_index', editorNumber(ev.detail.value))}
           ></ha-selector>
 
           <h4>Header Cells</h4>
@@ -1926,7 +1938,7 @@ let IndicatorGridCardEditor = class IndicatorGridCardEditor extends i {
           .label=${'Column Span'}
           .value=${cell.colspan || 1}
           .selector=${{ number: { min: 1, max: this._config.columns, mode: 'box', step: 1 } }}
-          @value-changed=${(ev) => this._headerCellChanged(rowIndex, cellIndex, 'colspan', Number(ev.detail.value))}
+          @value-changed=${(ev) => this._headerCellChanged(rowIndex, cellIndex, 'colspan', editorNumber(ev.detail.value))}
         ></ha-selector>
 
         <ha-selector
@@ -2054,7 +2066,7 @@ let IndicatorGridCardEditor = class IndicatorGridCardEditor extends i {
             .label=${'Column Span'}
             .value=${entity.colspan || 1}
             .selector=${{ number: { min: 1, max: this._config.columns, mode: 'box', step: 1 } }}
-            @value-changed=${(ev) => this._entityChanged(index, 'colspan', Number(ev.detail.value))}
+            @value-changed=${(ev) => this._entityChanged(index, 'colspan', editorNumber(ev.detail.value))}
           ></ha-selector>
 
           <ha-selector
@@ -2127,7 +2139,7 @@ let IndicatorGridCardEditor = class IndicatorGridCardEditor extends i {
                 .label=${'Dim Off Text (%)'}
                 .value=${entity.dim_off_text ?? ''}
                 .selector=${{ number: { min: 0, max: 100, mode: 'box', step: 1 } }}
-                @value-changed=${(ev) => this._entityChanged(index, 'dim_off_text', ev.detail.value !== '' && ev.detail.value !== undefined ? Number(ev.detail.value) : undefined)}
+                @value-changed=${(ev) => this._entityChanged(index, 'dim_off_text', editorNumber(ev.detail.value))}
               ></ha-selector>
 
               <ha-selector
@@ -2136,7 +2148,7 @@ let IndicatorGridCardEditor = class IndicatorGridCardEditor extends i {
                 .label=${'Decimals'}
                 .value=${entity.decimals ?? ''}
                 .selector=${{ number: { min: 0, max: 10, mode: 'box', step: 1 } }}
-                @value-changed=${(ev) => this._entityChanged(index, 'decimals', ev.detail.value !== '' && ev.detail.value !== undefined ? Number(ev.detail.value) : undefined)}
+                @value-changed=${(ev) => this._entityChanged(index, 'decimals', editorNumber(ev.detail.value))}
               ></ha-selector>
             </div>
             ${this._renderStateColors(index)}

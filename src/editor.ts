@@ -9,6 +9,16 @@ type ColorScope = 'global' | number;
 
 const THRESHOLD_OPERATORS = ['<=', '<', '>=', '>', '=='];
 
+
+// A number field's value for the config, or undefined to remove the key. HA's number
+// selector sends undefined when a field is cleared (not ''); a bare Number() saved NaN
+// (`.nan` in the YAML) and turned null into 0.
+function editorNumber(value: unknown): number | undefined {
+  if (value === '' || value === null || value === undefined) return undefined;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : undefined;
+}
+
 @customElement('indicator-grid-card-editor')
 export class IndicatorGridCardEditor extends LitElement implements LovelaceCardEditor {
   @property({ attribute: false }) public hass!: HomeAssistant;
@@ -33,7 +43,9 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
       return;
     }
 
-    const newConfig = { ...this._config, [key]: value };
+    const newConfig: any = { ...this._config, [key]: value };
+    // A cleared option is removed, so the card's default applies
+    if (value === undefined) delete newConfig[key];
     fireEvent(this, 'config-changed', { config: newConfig });
   }
 
@@ -170,10 +182,9 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
     }
 
     newConfig.header_rows = [...newConfig.header_rows];
-    newConfig.header_rows[index] = {
-      ...newConfig.header_rows[index],
-      [key]: value,
-    };
+    const row: any = { ...newConfig.header_rows[index], [key]: value };
+    if (value === undefined) delete row[key];
+    newConfig.header_rows[index] = row;
 
     fireEvent(this, 'config-changed', { config: newConfig });
   }
@@ -217,10 +228,9 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
     newConfig.header_rows = [...newConfig.header_rows];
     const headerRow = { ...newConfig.header_rows[rowIndex] };
     headerRow.cells = [...headerRow.cells];
-    headerRow.cells[cellIndex] = {
-      ...headerRow.cells[cellIndex],
-      [key]: value,
-    };
+    const cell: any = { ...headerRow.cells[cellIndex], [key]: value };
+    if (value === undefined) delete cell[key];
+    headerRow.cells[cellIndex] = cell;
     newConfig.header_rows[rowIndex] = headerRow;
 
     fireEvent(this, 'config-changed', { config: newConfig });
@@ -632,7 +642,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
         .label=${'Dim Off Text (%)'}
         .value=${this._config.dim_off_text ?? ''}
         .selector=${{number: {min: 0, max: 100, mode: 'box', step: 1}}}
-        @value-changed=${(ev: CustomEvent) => this._configValueChanged('dim_off_text', ev.detail.value !== '' && ev.detail.value !== undefined ? Number(ev.detail.value) : undefined)}
+        @value-changed=${(ev: CustomEvent) => this._configValueChanged('dim_off_text', editorNumber(ev.detail.value))}
       ></ha-selector>
 
       <ha-selector
@@ -641,7 +651,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
         .label=${'Decimals'}
         .value=${this._config.decimals ?? ''}
         .selector=${{number: {min: 0, max: 10, mode: 'box', step: 1}}}
-        @value-changed=${(ev: CustomEvent) => this._configValueChanged('decimals', ev.detail.value !== '' && ev.detail.value !== undefined ? Number(ev.detail.value) : undefined)}
+        @value-changed=${(ev: CustomEvent) => this._configValueChanged('decimals', editorNumber(ev.detail.value))}
       ></ha-selector>
 
       <ha-selector
@@ -742,7 +752,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
             .value=${headerRow.row_index}
             .selector=${{number: {min: 0, max: this._config.rows - 1, mode: 'box', step: 1}}}
             @value-changed=${(ev: CustomEvent) =>
-              this._headerRowChanged(rowIndex, 'row_index', Number(ev.detail.value))}
+              this._headerRowChanged(rowIndex, 'row_index', editorNumber(ev.detail.value))}
           ></ha-selector>
 
           <h4>Header Cells</h4>
@@ -784,7 +794,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
           .value=${cell.colspan || 1}
           .selector=${{number: {min: 1, max: this._config.columns, mode: 'box', step: 1}}}
           @value-changed=${(ev: CustomEvent) =>
-            this._headerCellChanged(rowIndex, cellIndex, 'colspan', Number(ev.detail.value))}
+            this._headerCellChanged(rowIndex, cellIndex, 'colspan', editorNumber(ev.detail.value))}
         ></ha-selector>
 
         <ha-selector
@@ -923,7 +933,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
             .value=${entity.colspan || 1}
             .selector=${{number: {min: 1, max: this._config.columns, mode: 'box', step: 1}}}
             @value-changed=${(ev: CustomEvent) =>
-              this._entityChanged(index, 'colspan', Number(ev.detail.value))}
+              this._entityChanged(index, 'colspan', editorNumber(ev.detail.value))}
           ></ha-selector>
 
           <ha-selector
@@ -1006,7 +1016,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
                 .value=${entity.dim_off_text ?? ''}
                 .selector=${{number: {min: 0, max: 100, mode: 'box', step: 1}}}
                 @value-changed=${(ev: CustomEvent) =>
-                  this._entityChanged(index, 'dim_off_text', ev.detail.value !== '' && ev.detail.value !== undefined ? Number(ev.detail.value) : undefined)}
+                  this._entityChanged(index, 'dim_off_text', editorNumber(ev.detail.value))}
               ></ha-selector>
 
               <ha-selector
@@ -1016,7 +1026,7 @@ export class IndicatorGridCardEditor extends LitElement implements LovelaceCardE
                 .value=${entity.decimals ?? ''}
                 .selector=${{number: {min: 0, max: 10, mode: 'box', step: 1}}}
                 @value-changed=${(ev: CustomEvent) =>
-                  this._entityChanged(index, 'decimals', ev.detail.value !== '' && ev.detail.value !== undefined ? Number(ev.detail.value) : undefined)}
+                  this._entityChanged(index, 'decimals', editorNumber(ev.detail.value))}
               ></ha-selector>
             </div>
             ${this._renderStateColors(index)}

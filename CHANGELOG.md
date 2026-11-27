@@ -20,6 +20,7 @@ and this project uses [CalVer](https://calver.org/) (`YYYY.M.D`) versioning (Sem
 - States such as IP addresses (`192.168.1.1`), versions (`2026.11.3`) and timestamps are no longer treated as numbers. Their leading digits got `decimals` formatting and threshold colors, e.g. `192.2`.
 - A size left blank in YAML (`cell_height:`), or cleared in the visual editor, uses its default. It became invalid CSS (`null` or empty), which collapsed the grid rows or the font size.
 - A fixed `cell_width` whose columns add up to more than the card's width drew past the card and over the card beside it. `cell_width` is now the most a column takes; in a narrower card the columns shrink to fit. Automatic widths (no `cell_width`) are unchanged.
+- Visual editor: clearing a number field (Dim Off Text, Decimals, a header row's Row Index, Column Span) removes the setting. Home Assistant reports a cleared field as empty, which the editor saved as `NaN` (`.nan` in the YAML) or, for card-level fields, kept as an empty key.
 
 ### Changed
 - The built `indicator-grid-card.js` is no longer minified, so it stays readable when troubleshooting in the browser. The "Last changed" build timestamp header is removed.
