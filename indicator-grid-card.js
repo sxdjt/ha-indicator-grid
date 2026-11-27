@@ -72,6 +72,15 @@ const t=t=>(e,o)=>{ void 0!==o?o.addInitializer(()=>{customElements.define(t,e);
  * SPDX-License-Identifier: BSD-3-Clause
  */function r(r){return n({...r,state:true,attribute:false})}
 
+/**
+ * Apply a theme to an element by setting the CSS variables on it.
+ *
+ * element: Element to apply theme on.
+ * themes: HASS Theme information
+ * localTheme: selected theme.
+ * updateMeta: boolean if we should update the theme-color meta element.
+ */
+
 var NumberFormat;
 (function (NumberFormat) {
     NumberFormat["language"] = "language";
@@ -88,6 +97,30 @@ var TimeFormat;
     TimeFormat["am_pm"] = "12";
     TimeFormat["twenty_four"] = "24";
 })(TimeFormat || (TimeFormat = {}));
+var TimeZone;
+(function (TimeZone) {
+    TimeZone["local"] = "local";
+    TimeZone["server"] = "server";
+})(TimeZone || (TimeZone = {}));
+var DateFormat;
+(function (DateFormat) {
+    DateFormat["language"] = "language";
+    DateFormat["system"] = "system";
+    DateFormat["DMY"] = "DMY";
+    DateFormat["MDY"] = "MDY";
+    DateFormat["YMD"] = "YMD";
+})(DateFormat || (DateFormat = {}));
+var FirstWeekday;
+(function (FirstWeekday) {
+    FirstWeekday["language"] = "language";
+    FirstWeekday["monday"] = "monday";
+    FirstWeekday["tuesday"] = "tuesday";
+    FirstWeekday["wednesday"] = "wednesday";
+    FirstWeekday["thursday"] = "thursday";
+    FirstWeekday["friday"] = "friday";
+    FirstWeekday["saturday"] = "saturday";
+    FirstWeekday["sunday"] = "sunday";
+})(FirstWeekday || (FirstWeekday = {}));
 
 // Polymer legacy event helpers used courtesy of the Polymer project.
 //
