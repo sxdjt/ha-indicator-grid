@@ -23,7 +23,7 @@ and this project uses [CalVer](https://calver.org/) (`YYYY.M.D`) versioning (Sem
 
 ### Changed
 - The built `indicator-grid-card.js` is no longer minified, so it stays readable when troubleshooting in the browser. The "Last changed" build timestamp header is removed.
-- Updated dependencies within their current major versions: custom-card-helpers 2.0.0 -> 2.2.1, home-assistant-js-websocket 9.6.0 -> 9.9.0, tslib 2.8.1 -> 2.9.1, and (development only) rollup 4.62.2 -> 4.68.8, @rollup/plugin-typescript 12.3.0 -> 12.3.1, jsdom 30.0.1 -> 30.1.3. The new custom-card-helpers adds a few unused enums to the bundle; card behavior is unchanged.
+- Updated dependencies: custom-card-helpers 2.0.0 -> 2.2.1, home-assistant-js-websocket 9.6.0 -> 9.9.0, tslib 2.8.1 -> 2.9.1, and (development only) rollup 4.62.2 -> 4.68.8, @rollup/plugin-typescript 12.3.0 -> 12.3.1, jsdom 30.0.1 -> 31.0.1 (needs Node 22.22.2+, 24.15+ or 26+ to run the tests). The new custom-card-helpers adds a few unused enums to the bundle; card behavior is unchanged.
 
 ### Security
 - Updated development dependencies to resolve Dependabot and `npm audit` advisories. None of these packages are bundled into the card:
